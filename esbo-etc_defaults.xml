@@ -1,0 +1,53 @@
+<root>
+    <common>
+        <wl_min val="400" units="nanometer" comment="Shortest wavelength used for binning input spectra"/>
+        <wl_max val="5" units="micron" comment="Shortest wavelength used for binning input spectra"/>
+        <logbinres val="1000" units="" comment="Resolving power for common spectral binning. A linear binning wavelength integral is estimated as wl_min/R"/>
+        <d_aperture val="5" units="m" comment="Diameter of the telescope aperture"/>
+        <jitter_rms val="0.1" units="arcsec" comment="Sigma RMS of the telescope jitter"/>
+        <output_path val="../output" comment="Output directory to store output files"/>
+        <config_path val="__path__"/>
+    </common>
+
+<!--    <noise>-->
+<!--        <EnableJitter val="False"/>-->
+<!--        <EnableShotNoise val="True"/>-->
+<!--        <EnableReadoutNoise val="True"/>-->
+<!--    </noise>-->
+
+    <astroscene>
+        <target type="BlackBodyTarget" val="5778" units="K" mag="10" band="G" comment="Modeling the sun as mag 10 star"/>
+        <medium type="Atmosphere" transmissivity="__base__/data/atmosphere/transmittance.csv"
+                emission="__base__/data/atmosphere/emission.csv" comment="Including the atmosphere"/>
+        <medium type="StrayLight" emission="__base__/data/strayLight/emission.csv"
+                comment="Including arbitrary noise sources"/>
+    </astroscene>
+
+    <common_optics>
+        <optical_component type="Mirror" reflectivity="__path__/data/mirror/reflectivity.csv"
+                           emissivity="__path__/data/mirror/emissivity.csv" val="70" units="K" comment="M1"/>
+        <optical_component type="Mirror" reflectivity="__path__/data/mirror/reflectivity.csv"
+                           emissivity="__path__/data/mirror/emissivity.csv" val="70" units="K" comment="M2"/>
+        <optical_component type="Mirror" reflectivity="__path__/data/mirror/reflectivity.csv"
+                           emissivity="__path__/data/mirror/emissivity.csv" val="70" units="K" comment="M3"/>
+        <optical_component type="Filter" band="G"
+                           emissivity="__path__/data/filter/emissivity.csv" val="70" units="K" comment="Filter wheel"/>
+    </common_optics>
+
+    <instrument>
+        <optical_component type="Mirror" reflectivity="__path__/data/mirror/reflectivity.csv"
+                           emissivity="__path__/data/mirror/emissivity.csv" val="70" units="K" comment="M4"/>
+        <optical_component type="Filter" band="G"
+                           emissivity="__path__/data/filter/emissivity.csv" val="70" units="K" comment="Filter wheel"/>
+        <sensor type="CCD">
+            <f_number val="18.5" units="" comment="The working f/#"/>
+            <pixel_geometry val="1024, 1024" units="" comment="Pixel geometry"/>
+            <pixel>
+                <quantum_efficiency val="__path__/data/ccd/qe.csv" comment="Quantum efficiency of the detector pixel"/>
+                <pixel_size val="15" units="micron"/>
+                <dark_current val="20" units="1/s" comment="Detector dark current"/>
+                <sigma_read_out val="10.0" units="" comment="Detector readout noise in e-rms"/>
+            </pixel>
+        </sensor>
+    </instrument>
+</root>
