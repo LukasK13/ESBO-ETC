@@ -1,6 +1,7 @@
 from esbo_etc.lib.helpers import error
-import numpy as np
-from scipy.integrate import cumtrapz
+# import numpy as np
+# from scipy.integrate import cumtrapz
+from scipy.interpolate import interp1d
 import astropy.units as u
 import math
 
@@ -65,22 +66,26 @@ class SpectralQty:
         if wl.unit != self.wl.unit:
             error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
 
-        idx = np.where(np.logical_and(self.wl > 0.9 * wl.min(), self.wl < 1.1 * wl.max()))[0]
-        wl_old = self.wl[idx]
-        qty_old = self.qty[idx]
+        # idx = np.where(np.logical_and(self.wl > 0.9 * wl.min(), self.wl < 1.1 * wl.max()))[0]
+        # wl_old = self.wl[idx]
+        # qty_old = self.qty[idx]
+        #
+        # if np.diff(wl_old).min() < np.diff(wl).min():
+        #     # Binning
+        #     c = cumtrapz(qty_old, x=wl_old) * qty_old.unit * wl_old.unit
+        #     print(c)
+        #     xpc = wl_old[1:]
+        #
+        #     delta = np.gradient(wl)
+        #     new_c_1 = np.interp(wl - 0.5 * delta, xpc, c, left=0.0, right=0.0) * c.unit
+        #     new_c_2 = np.interp(wl + 0.5 * delta, xpc, c, left=0.0, right=0.0) * c.unit
+        #     qty = (new_c_2 - new_c_1) / delta
+        # else:
+        #     # Interpolation
+        #     qty = np.interp(wl, wl_old, qty_old, left=0.0, right=0.0)
 
-        if np.diff(wl_old).min() < np.diff(wl).min():
-            # Binning
-            c = cumtrapz(qty_old, x=wl_old) * qty_old.unit * wl_old.unit
-            xpc = wl_old[1:]
-
-            delta = np.gradient(wl)
-            new_c_1 = np.interp(wl - 0.5 * delta, xpc, c, left=0.0, right=0.0) * c.unit
-            new_c_2 = np.interp(wl + 0.5 * delta, xpc, c, left=0.0, right=0.0) * c.unit
-            qty = (new_c_2 - new_c_1) / delta
-        else:
-            # Interpolation
-            qty = np.interp(wl, wl_old, qty_old, left=0.0, right=0.0) * qty_old.unit
+        f = interp1d(self.wl, self.qty, fill_value="extrapolate")
+        qty = f(wl) * self.qty.unit
 
         self.wl = wl
         self.qty = qty
