@@ -8,6 +8,7 @@ class ATarget(ITransmissive):
     """
     Abstract super class for target models
     """
+
     @abstractmethod
     def __init__(self, sfd: SpectralQty):
         """
