@@ -2,12 +2,14 @@ from esbo_etc.lib.helpers import error
 import numpy as np
 from scipy.integrate import cumtrapz
 import astropy.units as u
+import math
 
 
 class SpectralQty:
     """
     A class to hold and work with spectral quantities
     """
+
     def __init__(self, wl: u.Quantity, qty: u.Quantity):
         """
         Initialize a new spectral quantity
@@ -21,6 +23,24 @@ class SpectralQty:
         """
         self.wl = wl
         self.qty = qty
+
+    def __eq__(self, other) -> bool:
+        """
+        Check if this object is equal to another object
+
+        Parameters
+        ----------
+        other : SpectralQty
+            Object to compare with
+
+        Returns
+        -------
+        res : bool
+            Result of the comparison
+        """
+        return self.wl.unit == other.wl.unit and self.qty.unit == other.qty.unit and \
+               all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.wl.value, other.wl.value)]) and \
+               all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.qty.value, other.qty.value)])
 
     def add(self, sqty: "SpectralQty"):
         pass
