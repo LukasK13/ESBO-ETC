@@ -34,6 +34,9 @@ class BlackBodyTarget(ATarget):
             Desired apparent magnitude of the point source
         band : str
             Band used for fitting the planck curve to a star of 0th magnitude
+
+        Returns
+        -------
         """
         if band not in self.band_wl.keys():
             error("Band has to be one of '[" + ", ".join(list(self.band_wl.keys())) + "]'")
@@ -42,9 +45,9 @@ class BlackBodyTarget(ATarget):
 
         # Calculate the correction factor for a star of 0th magnitude using the spectral flux density
         # for the central wavelength of the given band
-        factor = self.band_sfd[band] / (bb(self.band_wl[band]) * u.sr)
+        factor = self.band_sfd[band] / (bb(self.band_wl[band]) * u.sr) * u.sr
         # Calculate spectral flux density for the given wavelengths and scale it for a star of the given magnitude
         sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)
 
         # Initialize super class
-        super().__init__(SpectralQty(self.band_wl, sfd))
+        super().__init__(SpectralQty(wl_bins, sfd))
