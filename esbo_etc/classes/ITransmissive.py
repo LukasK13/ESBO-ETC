@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+from .SpectralQty import SpectralQty
 
 
 class ITransmissive(ABC):
     @abstractmethod
-    def calcSignal(self):
+    def calcSignal(self) -> SpectralQty:
         pass
 
     @abstractmethod
-    def calcNoise(self):
+    def calcNoise(self) -> SpectralQty:
         pass
