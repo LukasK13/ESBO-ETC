@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from ..ITransmissive import ITransmissive
 from ..SpectralQty import SpectralQty
+import astropy.units as u
 
 
 class ATarget(ITransmissive):
@@ -19,7 +20,6 @@ class ATarget(ITransmissive):
         """
         self._sfd = sfd
 
-    @abstractmethod
     def calcNoise(self) -> SpectralQty:
         """
         Calculate the spectral radiance of the target's noise
@@ -29,7 +29,7 @@ class ATarget(ITransmissive):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        return SpectralQty(self.sfd.wl, [0] * len(self.sfd.wl))
+        return SpectralQty(self._sfd.wl, [0] * len(self._sfd.wl) << u.W / (u.m**2 * u.nm * u.sr))
 
     def calcSignal(self) -> SpectralQty:
         """
@@ -40,5 +40,5 @@ class ATarget(ITransmissive):
         signal : SpectralQty
             The spectral flux density of the target's signal
         """
-        return self.sfd
+        return self._sfd
 
