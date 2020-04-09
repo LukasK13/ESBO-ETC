@@ -1,7 +1,9 @@
 from ..ITransmissive import ITransmissive
 from abc import abstractmethod
 from ..SpectralQty import SpectralQty
-import copy
+from esbo_etc.lib.helpers import error
+import astropy.units as u
+from astropy.modeling.models import BlackBody
 
 
 class AOpticalComponent(ITransmissive):
@@ -10,8 +12,10 @@ class AOpticalComponent(ITransmissive):
     """
 
     @abstractmethod
+    @u.quantity_input(obstructor_temp=[u.K, u.Celsius])
     def __init__(self, parent: ITransmissive, transreflectivity: SpectralQty = None,
-                 noise: SpectralQty = None, obstruction: float = 0):
+                 noise: SpectralQty = None, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
+                 obstructor_emissivity: float = 0):
         """
         Initialize a new optical component
 
@@ -31,6 +35,10 @@ class AOpticalComponent(ITransmissive):
             denotes a completely obstructed component with therefore no incoming flux. It is important to note, that
             the obstruction factor reflects the obstruction of the optical component additionally to the obstruction
             factors of the prior elements in the beam.
+        obstructor_temp : Quantity in Kelvin / Celsius
+            Temperature of the obstructing component.
+        obstructor_emissivity : float
+            Emissivity of the obstructing component.
         """
         self._parent = parent
         if transreflectivity:
@@ -38,6 +46,8 @@ class AOpticalComponent(ITransmissive):
         if noise:
             self._noise = noise
         self._obstruction = obstruction
+        self._obstructor_temp = obstructor_temp
+        self._obstructor_emissivity = obstructor_emissivity
 
     def calcSignal(self) -> SpectralQty:
         """
@@ -48,7 +58,7 @@ class AOpticalComponent(ITransmissive):
         signal : SpectralQty
             The spectral flux density of the target's signal
         """
-        return self.propagate(copy.deepcopy(self._parent.calcSignal())).multiply(1 - self._obstruction)
+        return self.propagate(self._parent.calcSignal()) * (1 - self._obstruction)
 
     def calcNoise(self) -> SpectralQty:
         """
@@ -59,7 +69,13 @@ class AOpticalComponent(ITransmissive):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        return self.propagate(copy.deepcopy(self._parent.calcNoise())).add(self.ownNoise())
+        parent = self.propagate(self._parent.calcNoise())
+        if self._obstructor_temp > 0 * u.K:
+            bb = BlackBody(temperature=self._obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
+            obstructor = bb(parent.wl) * self._obstructor_emissivity
+            return parent * (1. - self._obstruction) + obstructor * self._obstruction + self.ownNoise()
+        else:
+            return parent * (1. - self._obstruction) + self.ownNoise()
 
     def propagate(self, sqty: SpectralQty) -> SpectralQty:
         """
@@ -75,7 +91,10 @@ class AOpticalComponent(ITransmissive):
         sqty : SpectralQty
             Manipulated incoming radiation
         """
-        return sqty.multiply(self._transreflectivity)
+        if hasattr(self, "_transreflectivity"):
+            return sqty * self._transreflectivity
+        else:
+            error("Transreflectivity not given. Method propagate() needs to be implemented.")
 
     def ownNoise(self) -> SpectralQty:
         """
@@ -86,4 +105,7 @@ class AOpticalComponent(ITransmissive):
         sqty : SpectralQty
             The noise created by the optical component
         """
-        return self._noise
+        if hasattr(self, "_noise"):
+            return self._noise
+        else:
+            error("noise not given. Method ownNoise() needs to be implemented.")
