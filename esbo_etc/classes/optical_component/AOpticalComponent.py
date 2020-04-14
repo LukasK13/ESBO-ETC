@@ -1,10 +1,10 @@
 from ..ITransmissive import ITransmissive
 from abc import abstractmethod
 from ..SpectralQty import SpectralQty
-from esbo_etc.lib.helpers import error
+from esbo_etc.lib.helpers import error, isLambda
 import astropy.units as u
 from astropy.modeling.models import BlackBody
-from typing import Union
+from typing import Union, Callable
 
 
 class AOpticalComponent(ITransmissive):
@@ -74,9 +74,11 @@ class AOpticalComponent(ITransmissive):
         if self._obstructor_temp > 0 * u.K:
             bb = BlackBody(temperature=self._obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
             obstructor = bb(parent.wl) * self._obstructor_emissivity
-            return parent * (1. - self._obstruction) + obstructor * self._obstruction + self.ownNoise()
+            noise = parent * (1. - self._obstruction) + obstructor * self._obstruction
         else:
-            return parent * (1. - self._obstruction) + self.ownNoise()
+            noise = parent * (1. - self._obstruction)
+        return noise + self.ownNoise()
+
 
     def propagate(self, sqty: SpectralQty) -> SpectralQty:
         """
@@ -97,13 +99,13 @@ class AOpticalComponent(ITransmissive):
         else:
             error("Transreflectivity not given. Method propagate() needs to be implemented.")
 
-    def ownNoise(self) -> SpectralQty:
+    def ownNoise(self) -> Union[SpectralQty, Callable, int, float]:
         """
         Calculate the noise created by the optical component
 
         Returns
         -------
-        noise : SpectralQty
+        noise : Union[SpectralQty, Callable, int, float]
             The noise created by the optical component
         """
         if hasattr(self, "_noise"):
