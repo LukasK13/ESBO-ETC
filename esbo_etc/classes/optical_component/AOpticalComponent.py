@@ -102,7 +102,7 @@ class AOpticalComponent(ITransmissive):
 
         Returns
         -------
-        sqty : SpectralQty
+        noise : SpectralQty
             The noise created by the optical component
         """
         if hasattr(self, "_noise"):
