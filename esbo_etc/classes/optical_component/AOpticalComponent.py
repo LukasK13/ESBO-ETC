@@ -16,7 +16,7 @@ class AOpticalComponent(ITransmissive):
     @u.quantity_input(obstructor_temp=[u.K, u.Celsius])
     def __init__(self, parent: ITransmissive, transreflectivity: Union[SpectralQty, int, float, u.Quantity] = None,
                  noise: Union[SpectralQty, int, float, u.Quantity] = None, obstruction: float = 0,
-                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 0):
+                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
         Initialize a new optical component
 
