@@ -75,6 +75,10 @@ class TestSpectralQty(TestCase):
         self.assertEqual(
             self.sqty + SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.W / (u.m ** 2 * u.nm)),
             SpectralQty(range(201, 204) << u.nm, [2.7, 3.8, 4.9] << u.W / (u.m ** 2 * u.nm)))
+        # lambda
+        sqty_2 = lambda wl: 1 * u.W / (u.m ** 2 * u.nm ** 2) * wl
+        self.assertEqual(self.sqty + sqty_2,
+                         SpectralQty(self.wl, [201.1, 202.2, 203.3, 204.4] << u.W / (u.m**2 * u.nm)))
 
     def test_rebinning(self):
         # Test interpolation

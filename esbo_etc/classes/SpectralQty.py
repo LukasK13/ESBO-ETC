@@ -1,8 +1,8 @@
-from esbo_etc.lib.helpers import error
+from esbo_etc.lib.helpers import error, isLambda
 from scipy.interpolate import interp1d
 import astropy.units as u
 import math
-from typing import Union
+from typing import Union, Callable
 import logging
 from astropy.io import ascii
 import re
@@ -108,13 +108,13 @@ class SpectralQty:
                all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.wl.value, other.wl.value)]) and \
                all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.qty.value, other.qty.value)])
 
-    def __add__(self, other: Union[int, float, u.Quantity, "SpectralQty"]) -> "SpectralQty":
+    def __add__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable]) -> "SpectralQty":
         """
         Calculate the sum with another object
 
         Parameters
         ----------
-        other : Union[int, float, u.Quantity, "SpectralQty"]
+        other : Union[int, float, u.Quantity, "SpectralQty", Callable]
             Addend to be added to this object. If the binning of the object on the right hand side differs
             from the binning of the left object, the object on the right hand side will be rebinned.
 
@@ -132,6 +132,9 @@ class SpectralQty:
                 return SpectralQty(self.wl, self.qty + other)
             else:
                 raise TypeError("Units are not matching for addition.")
+        # Summand is of type lambda
+        elif isLambda(other):
+            return SpectralQty(self.wl, self.qty + [other(wl).value for wl in self.wl] * other(self.wl[0]).unit)
         # Summand is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit) and other.qty.unit.is_equivalent(self.qty.unit):
