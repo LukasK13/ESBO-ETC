@@ -57,7 +57,7 @@ class SpectralQty:
         file : str
             Path to the file to read the values from. The file needs to provide two columns: wavelength
             and the corresponding spectral quantity. The format of the file will be guessed by
-            `astropy.io.ascii.read(). If the file doesn't provide units via astropy's enhanced CSV format, the units
+            `astropy.io.ascii.read()`. If the file doesn't provide units via astropy's enhanced CSV format, the units
             will be read from the column headers or otherwise assumed to be *wl_unit_default* and *qty_unit_default*.
         wl_unit_default : Quantity
             Default unit to be used for the wavelength column if no units are provided by the file.
