@@ -22,6 +22,8 @@ class SpectralQty:
         qty : Quantity
             The quantity values corresponding to the binned wavelengths. If the values are supplied without a unit,
             they are assumed to be dimensionless.
+        extrapolate : bool
+            Whether extrapolation should be allowed. If disabled, the spectrum will be truncated and a warning given.
         """
         # Check if both lengths are equal
         if len(wl) == len(qty):
