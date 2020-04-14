@@ -1,4 +1,6 @@
-from esbo_etc.classes import AOpticalComponent, ITransmissive, SpectralQty
+from esbo_etc.classes.optical_component.AOpticalComponent import AOpticalComponent
+from esbo_etc.classes.ITransmissive import ITransmissive
+from esbo_etc.classes.SpectralQty import SpectralQty
 import astropy.units as u
 
 
