@@ -34,8 +34,7 @@ class AHotOpticalComponent(AOpticalComponent):
             bb = BlackBody(temperature=temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
             self._noise = SpectralQty(wl_bins, bb(wl_bins)) * emissivity
         else:
-            # Create zero dummy noise
-            self._noise = SpectralQty(wl_bins, [0] * len(wl_bins) << u.W / (u.m ** 2 * u.nm * u.sr))
+            self._noise = 0
 
     def ownNoise(self) -> SpectralQty:
         """

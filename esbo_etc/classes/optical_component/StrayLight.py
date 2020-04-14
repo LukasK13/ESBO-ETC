@@ -24,7 +24,5 @@ class StrayLight(AOpticalComponent):
         # Read the emission
         emission_sqty = SpectralQty.fromFile(emission, wl_unit_default=u.nm,
                                                        qty_unit_default=u.W / (u.m**2 * u.nm * u.sr))
-        # Create dummy transmittance
-        transmittance_sqty = SpectralQty(emission_sqty.wl, [1] * len(emission_sqty.wl) * u.dimensionless_unscaled)
         # Initialize the super class
-        super().__init__(parent, transmittance_sqty, emission_sqty)
+        super().__init__(parent, 1.0, emission_sqty)

@@ -4,6 +4,7 @@ from ..SpectralQty import SpectralQty
 from esbo_etc.lib.helpers import error
 import astropy.units as u
 from astropy.modeling.models import BlackBody
+from typing import Union
 
 
 class AOpticalComponent(ITransmissive):
@@ -13,9 +14,9 @@ class AOpticalComponent(ITransmissive):
 
     @abstractmethod
     @u.quantity_input(obstructor_temp=[u.K, u.Celsius])
-    def __init__(self, parent: ITransmissive, transreflectivity: SpectralQty = None,
-                 noise: SpectralQty = None, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
-                 obstructor_emissivity: float = 0):
+    def __init__(self, parent: ITransmissive, transreflectivity: Union[SpectralQty, int, float, u.Quantity] = None,
+                 noise: Union[SpectralQty, int, float, u.Quantity] = None, obstruction: float = 0,
+                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 0):
         """
         Initialize a new optical component
 
