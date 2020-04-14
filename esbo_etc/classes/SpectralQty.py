@@ -3,6 +3,7 @@ from scipy.interpolate import interp1d
 import astropy.units as u
 import math
 from typing import Union
+import logging
 
 
 class SpectralQty:
@@ -10,7 +11,7 @@ class SpectralQty:
     A class to hold and work with spectral quantities
     """
 
-    def __init__(self, wl: u.Quantity, qty: u.Quantity):
+    def __init__(self, wl: u.Quantity, qty: u.Quantity, extrapolate: bool = False):
         """
         Initialize a new spectral quantity
 
@@ -35,6 +36,7 @@ class SpectralQty:
                 self.qty = qty * u.dimensionless_unscaled
         else:
             error("Lengths not matching")
+        self._extrapolate = extrapolate
 
     def __eq__(self, other) -> bool:
         """
@@ -87,7 +89,13 @@ class SpectralQty:
                     return SpectralQty(self.wl, self.qty + other.qty)
                 # Wavelengths are not matching, rebinning needed
                 else:
-                    return SpectralQty(self.wl, self.qty + other.rebin(self.wl).qty)
+                    # Rebin addend
+                    other_rebinned = other.rebin(self.wl)
+                    if len(self.wl) == len(other_rebinned.wl) and all(self.wl == other_rebinned.wl):
+                        return SpectralQty(self.wl, self.qty + other_rebinned.qty)
+                    else:
+                        # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
+                        return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty + other_rebinned.qty)
             else:
                 error("Units are not matching for addition.")
 
@@ -125,7 +133,13 @@ class SpectralQty:
                     return SpectralQty(self.wl, self.qty - other.qty)
                 # Wavelengths are not matching, rebinning needed
                 else:
-                    return SpectralQty(self.wl, self.qty - other.rebin(self.wl).qty)
+                    # Rebin subtrahend
+                    other_rebinned = other.rebin(self.wl)
+                    if len(self.wl) == len(other_rebinned.wl) and all(self.wl == other_rebinned.wl):
+                        return SpectralQty(self.wl, self.qty - other_rebinned.qty)
+                    else:
+                        # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
+                        return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty - other_rebinned.qty)
             else:
                 error("Units are not matching for substraction.")
 
@@ -155,7 +169,13 @@ class SpectralQty:
                     return SpectralQty(self.wl, self.qty * other.qty)
                 # Wavelengths are not matching, rebinning needed
                 else:
-                    return SpectralQty(self.wl, self.qty * other.rebin(self.wl).qty)
+                    # Rebin factor
+                    other_rebinned = other.rebin(self.wl)
+                    if len(self.wl) == len(other_rebinned.wl) and all(self.wl == other_rebinned.wl):
+                        return SpectralQty(self.wl, self.qty * other_rebinned.qty)
+                    else:
+                        # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
+                        return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty * other_rebinned.qty)
             else:
                 error("Units are not matching for multiplication.")
 
@@ -179,5 +199,10 @@ class SpectralQty:
 
         if wl.unit != self.wl.unit:
             error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
-        f = interp1d(self.wl, self.qty, fill_value="extrapolate")
-        return SpectralQty(wl, f(wl) * self.qty.unit)
+        if not self._extrapolate:
+            if min(wl) < min(self.wl) or max(wl) > max(self.wl):
+                logging.warning("Extrapolation disabled, bandwidth will be reduced.")
+                # Remove new wavelengths where extrapolation would have been necessary
+                wl = [x.value for x in wl if min(self.wl) <= x <= max(self.wl)] * wl.unit
+        f = interp1d(self.wl, self.qty.value, fill_value="extrapolate")
+        return SpectralQty(wl, f(wl.to(self.wl.unit)) * self.qty.unit)

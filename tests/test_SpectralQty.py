@@ -31,9 +31,14 @@ class TestSpectralQty(TestCase):
                          SpectralQty(self.wl, [1.1, 2.4, 3.9, 5.6] << u.W / (u.m * u.nm)))
         self.assertEqual(SpectralQty(self.wl, np.arange(1, 5, 1) << u.m) * self.sqty,
                          SpectralQty(self.wl, [1.1, 2.4, 3.9, 5.6] << u.W / (u.m * u.nm)))
-        # rebin
-        self.assertEqual(self.sqty * SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.m),
-                         SpectralQty(self.wl, [0.55, 1.8, 3.25, 4.9] << u.W / (u.m * u.nm)))
+        # rebin without extrapolation and without reduction
+        self.assertEqual(
+            self.sqty * SpectralQty(np.arange(199.5, 204.5, 1) << u.nm, np.arange(1, 6, 1) << u.m),
+            SpectralQty(self.wl, [1.65, 3.0, 4.55, 6.3] * u.W / (u.m * u.nm)))
+        # rebin without extrapolation and with reduction
+        self.assertEqual(
+            self.sqty * SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.m),
+            SpectralQty(range(201, 204) << u.nm, [1.8, 3.25, 4.9] << u.W / (u.m * u.nm)))
 
     def test___sub__(self):
         # Quantity
@@ -44,10 +49,14 @@ class TestSpectralQty(TestCase):
         self.assertEqual(
             self.sqty - SpectralQty(np.arange(200, 204, 1) << u.nm, np.arange(1, 5, 1) << u.W / (u.m ** 2 * u.nm)),
             SpectralQty(self.wl, [0.1, -0.8, -1.7, -2.6] * u.W / (u.m ** 2 * u.nm)))
-        # rebin
+        # rebin without extrapolation and without reduction
+        self.assertEqual(
+            self.sqty - SpectralQty(np.arange(199.5, 204.5, 1) << u.nm, np.arange(1, 6, 1) << u.W / (u.m ** 2 * u.nm)),
+            SpectralQty(self.wl, [-0.4, -1.3, -2.2, -3.1] * u.W / (u.m ** 2 * u.nm)))
+        # rebin without extrapolation and with reduction
         self.assertEqual(
             self.sqty - SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.W / (u.m ** 2 * u.nm)),
-            SpectralQty(self.wl, [0.6, -0.3, -1.2, -2.1] * u.W / (u.m ** 2 * u.nm)))
+            SpectralQty(range(201, 204) << u.nm, [-0.3, -1.2, -2.1] << u.W / (u.m ** 2 * u.nm)))
 
     def test___add__(self):
         # Quantity
@@ -58,22 +67,33 @@ class TestSpectralQty(TestCase):
         self.assertEqual(
             self.sqty + SpectralQty(np.arange(200, 204, 1) << u.nm, np.arange(1, 5, 1) << u.W / (u.m ** 2 * u.nm)),
             SpectralQty(self.wl, [2.1, 3.2, 4.3, 5.4] * u.W / (u.m ** 2 * u.nm)))
-        # rebin
+        # rebin without extrapolation and without reduction
+        self.assertEqual(
+            self.sqty + SpectralQty(np.arange(199.5, 204.5, 1) << u.nm, np.arange(1, 6, 1) << u.W / (u.m ** 2 * u.nm)),
+            SpectralQty(self.wl, [2.6, 3.7, 4.8, 5.9] * u.W / (u.m ** 2 * u.nm)))
+        # rebin without extrapolation and with reduction
         self.assertEqual(
             self.sqty + SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.W / (u.m ** 2 * u.nm)),
-            SpectralQty(self.wl, [1.6, 2.7, 3.8, 4.9] * u.W / (u.m ** 2 * u.nm)))
+            SpectralQty(range(201, 204) << u.nm, [2.7, 3.8, 4.9] << u.W / (u.m ** 2 * u.nm)))
 
     def test_rebinning(self):
         # Test interpolation
         wl_new = np.arange(200.5, 210.5, 1) << u.nm
+        sqty_res = SpectralQty(wl_new[:3], [1.15, 1.25, 1.35] << u.W / (u.m ** 2 * u.nm))
+        sqty_rebin = self.sqty.rebin(wl_new)
+        self.assertEqual(sqty_rebin, sqty_res)
+
+        # Test extrapolation
+        wl_new = np.arange(200.5, 210.5, 1) << u.nm
         sqty_res = SpectralQty(wl_new, [1.15, 1.25, 1.35, 1.45, 1.55, 1.65, 1.75, 1.85,
                                         1.95, 2.05] << u.W / (u.m ** 2 * u.nm))
-        sqty_rebin = self.sqty.rebin(wl_new)
+        sqty_extrapol = SpectralQty(self.wl, self.qty, extrapolate=True)
+        sqty_rebin = sqty_extrapol.rebin(wl_new)
         self.assertEqual(sqty_rebin, sqty_res)
 
         # Test binning
         self.setUp()
         wl_new = np.arange(200.5, 210, 2) << u.nm
-        sqty_res = SpectralQty(wl_new, [1.15, 1.35, 1.55, 1.75, 1.95] << u.W / (u.m ** 2 * u.nm))
+        sqty_res = SpectralQty(wl_new[:2], [1.15, 1.35] << u.W / (u.m ** 2 * u.nm))
         sqty_rebin = self.sqty.rebin(wl_new)
         self.assertEqual(sqty_rebin, sqty_res)
