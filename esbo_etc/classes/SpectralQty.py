@@ -248,7 +248,7 @@ class SpectralQty:
             The rebinned spectral quantity
         """
 
-        if wl.unit != self.wl.unit:
+        if not wl.unit.is_equivalent(self.wl.unit):
             error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
         if not self._extrapolate:
             if min(wl) < min(self.wl) or max(wl) > max(self.wl):
