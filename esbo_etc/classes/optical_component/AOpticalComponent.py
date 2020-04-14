@@ -28,8 +28,8 @@ class AOpticalComponent(ITransmissive):
             the incoming radiation from the parent element in order to propagate the incoming radiation through the
             optical component.
         noise : SpectralQty
-            The noise created by the optical component. This noise will be added to the propagated incoming noise in
-            order to calculate the overall noise.
+            The noise created by the optical component as spectral radiance. This noise will be added to the propagated
+            incoming noise in order to calculate the overall noise.
         obstruction : float
             The additional obstruction factor of the optical component. 0 means the component is not obstructed, 1
             denotes a completely obstructed component with therefore no incoming flux. It is important to note, that
