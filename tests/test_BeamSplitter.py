@@ -11,7 +11,8 @@ class TestBeamSplitter(TestCase):
 
     def setUp(self):
         self.target = FileTarget("data/target/target_demo_1.csv")
-        self.splitter = BeamSplitter(self.target, "data/lens/lens_transmittance.csv", 0.5, temp=300 * u.K)
+        self.splitter = BeamSplitter(self.target, "data/beamsplitter/beamsplitter_transmittance.csv", 0.5,
+                                     temp=300 * u.K)
 
     def test___init__(self):
         self.assertEqual(self.splitter.calcNoise(),
