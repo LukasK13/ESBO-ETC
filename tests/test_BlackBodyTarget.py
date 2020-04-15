@@ -18,5 +18,5 @@ class TestBlackBodyTarget(TestCase):
 
     def test_noise(self):
         noise = SpectralQty(np.arange(400, 800, 100) << u.nm,
-                            [0.] * 10 << u.W / (u.m ** 2 * u.nm * u.sr))
+                            [0.] * 4 << u.W / (u.m ** 2 * u.nm * u.sr))
         self.assertEqual(self.target.calcNoise(), noise)
