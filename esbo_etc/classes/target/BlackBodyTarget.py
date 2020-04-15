@@ -12,11 +12,10 @@ class BlackBodyTarget(ATarget):
     # Bands from Handbook of Space Astronomy and Astrophysics
     # band_sfd = {"U": 1790*u.Jansky, "B": 4063*u.Jansky, "V": 3636*u.Jansky, "R": 3064*u.Jansky,
     #            "I": 2416*u.Jansky, "J": 1590*u.Jansky, "H": 1020*u.Jansky, "K": 640*u.Jansky}
-    band_sfd = {"U": 4.175e-11, "B": 6.32e-11, "V": 3.631e-11, "R": 2.177e-11,
-                "I": 1.126e-11, "J": 3.15e-12, "H": 1.14e-12, "K": 3.96e-13}
+    band_sfd = dict(U=4.175e-11, B=6.32e-11, V=3.631e-11, R=2.177e-11, I=1.126e-11, J=3.15e-12, H=1.14e-12, K=3.96e-13)
     band_sfd = {k: v * u.W / (u.m ** 2 * u.nm) for k, v in band_sfd.items()}
-    band_wl = {"U": 366 * u.nanometer, "B": 438 * u.nanometer, "V": 545 * u.nanometer, "R": 641 * u.nanometer,
-               "I": 798 * u.nanometer, "J": 1220 * u.nanometer, "H": 1630 * u.nanometer, "K": 2190 * u.nanometer}
+    band_wl = dict(U=366 * u.nm, B=438 * u.nm, V=545 * u.nm, R=641 * u.nm, I=798 * u.nm, J=1220 * u.nm, H=1630 * u.nm,
+                   K=2190 * u.nm)
 
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], mag=u.mag)
     def __init__(self, wl_bins: u.Quantity, temp: u.Quantity = 5778 * u.K,
@@ -33,7 +32,7 @@ class BlackBodyTarget(ATarget):
         mag : Quantity in mag
             Desired apparent magnitude of the point source
         band : str
-            Band used for fitting the planck curve to a star of 0th magnitude
+            Band used for fitting the planck curve to a star of 0th magnitude. Can be one of [U, B, V, R, I, J, H, K].
 
         Returns
         -------
