@@ -13,8 +13,8 @@ class AHotOpticalComponent(AOpticalComponent):
     """
     @abstractmethod
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], obstruction_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: ITransmissive, emissivity: SpectralQty, temp: u.Quantity, obstruction: float = 0,
-                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
+    def __init__(self, parent: ITransmissive, emissivity: Union[SpectralQty, int, float, str], temp: u.Quantity,
+                 obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
         Initialize a new optical component with thermal emission
 
@@ -22,7 +22,7 @@ class AHotOpticalComponent(AOpticalComponent):
         ----------
         parent : ITransmissive
             The parent element of the optical component from which the electromagnetic radiation is received.
-        emissivity : SpectralQty
+        emissivity : Union[SpectralQty, int, float, str]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -44,6 +44,10 @@ class AHotOpticalComponent(AOpticalComponent):
             if isinstance(emissivity, SpectralQty):
                 bb = self._gb_factory(temp)
                 self._noise = SpectralQty(emissivity.wl, bb(emissivity.wl)) * emissivity
+            elif isinstance(emissivity, str):
+                em = SpectralQty.fromFile(emissivity, u.nm, u.dimensionless_unscaled)
+                bb = self._gb_factory(temp)
+                self._noise = SpectralQty(emissivity.wl, bb(emissivity.wl)) * em
             else:
                 bb = self._gb_factory(temp, emissivity)
                 self._noise = bb
