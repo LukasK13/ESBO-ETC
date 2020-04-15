@@ -18,8 +18,8 @@ class Filter(AHotOpticalComponent):
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
     def __init__(self, parent: ITransmissive, transmittance: Union[SpectralQty, Callable],
-                 emissivity: Union[SpectralQty, int, float] = 1, temp: u.Quantity = 0 * u.K, obstruction: float = 0,
-                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
+                 emissivity: Union[int, float, str] = 1, temp: u.Quantity = 0 * u.K,
+                 obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
         Instantiate a new filter model
 
@@ -29,7 +29,7 @@ class Filter(AHotOpticalComponent):
             The parent element of the optical component from which the electromagnetic radiation is received.
         transmittance : Union[SpectralQty, Callable]
             The spectral transmittance coefficients of the filter.
-        emissivity : SpectralQty
+        emissivity : Union[str, int, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -61,7 +61,7 @@ class Filter(AHotOpticalComponent):
             The parent element of the optical component from which the electromagnetic radiation is received.
         band : str
             The spectral band of the filter. Can be one of [U, B, V, R, I, J, H, K].
-        emissivity : SpectralQty
+        emissivity : Union[str, int, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -101,7 +101,7 @@ class Filter(AHotOpticalComponent):
         transmittance : str
             Path to the file containing the spectral transmittance-coefficients of the filter element.
             The format of the file will be guessed by `astropy.io.ascii.read()`.
-        emissivity : SpectralQty
+        emissivity : Union[str, int, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -140,7 +140,7 @@ class Filter(AHotOpticalComponent):
             Start wavelength of the pass-band
         end : length-quantity
             End wavelength of the pass-band
-        emissivity : SpectralQty
+        emissivity : Union[str, int, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
