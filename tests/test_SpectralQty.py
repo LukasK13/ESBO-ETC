@@ -39,6 +39,9 @@ class TestSpectralQty(TestCase):
         self.assertEqual(
             self.sqty * SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.m),
             SpectralQty(range(201, 204) << u.nm, [1.8, 3.25, 4.9] << u.W / (u.m * u.nm)))
+        # lambda
+        sqty_2 = lambda wl: 0.7 * u.dimensionless_unscaled
+        self.assertEqual(self.sqty * sqty_2, SpectralQty(self.wl, self.qty * 0.7))
 
     def test___sub__(self):
         # Quantity
@@ -57,6 +60,10 @@ class TestSpectralQty(TestCase):
         self.assertEqual(
             self.sqty - SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.W / (u.m ** 2 * u.nm)),
             SpectralQty(range(201, 204) << u.nm, [-0.3, -1.2, -2.1] << u.W / (u.m ** 2 * u.nm)))
+        # lambda
+        sqty_2 = lambda wl: 1 * u.W / (u.m ** 2 * u.nm ** 2) * wl
+        self.assertEqual(self.sqty - sqty_2,
+                         SpectralQty(self.wl, [-198.9, -199.8, -200.7, -201.6] << u.W / (u.m ** 2 * u.nm)))
 
     def test___add__(self):
         # Quantity
@@ -78,7 +85,7 @@ class TestSpectralQty(TestCase):
         # lambda
         sqty_2 = lambda wl: 1 * u.W / (u.m ** 2 * u.nm ** 2) * wl
         self.assertEqual(self.sqty + sqty_2,
-                         SpectralQty(self.wl, [201.1, 202.2, 203.3, 204.4] << u.W / (u.m**2 * u.nm)))
+                         SpectralQty(self.wl, [201.1, 202.2, 203.3, 204.4] << u.W / (u.m ** 2 * u.nm)))
 
     def test_rebinning(self):
         # Test interpolation
@@ -104,7 +111,11 @@ class TestSpectralQty(TestCase):
 
     def test_fromFile(self):
         sqty = SpectralQty.fromFile("data/target/target_demo_1.csv", u.nm, u.W / (u.m ** 2 * u.nm))
-        res = SpectralQty(np.arange(1.1, 2.1, 0.1) * 1e-15 << u.W / (u.m**2 * u.nm),
-                                           np.arange(200, 210, 1) << u.nm)
-        self.assertEqual(sqty, SpectralQty(np.arange(200, 210, 1) << u.nm,
-                                           np.arange(1.1, 2.1, 0.1) * 1e-15 << u.W / (u.m**2 * u.nm)))
+        res = SpectralQty(np.arange(200, 210, 1) << u.nm,
+                          np.arange(1.1, 2.1, 0.1) * 1e-15 << u.W / (u.m ** 2 * u.nm))
+        self.assertEqual(sqty, res)
+
+        sqty = SpectralQty.fromFile("data/target/target_demo_2.csv", u.nm, u.W / (u.m ** 2 * u.nm))
+        print(sqty.wl)
+        print(sqty.qty)
+        self.assertEqual(sqty, res)
