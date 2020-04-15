@@ -105,10 +105,10 @@ class SpectralQty:
         res : bool
             Result of the comparison
         """
-        return self.wl.unit == other.wl.unit and self.qty.unit == other.qty.unit and \
+        return self.wl.unit.is_equivalent(other.wl.unit) and self.qty.unit.is_equivalent(other.qty.unit) and \
             len(self.wl) == len(other.wl) and len(self.qty) == len(other.qty) and \
-            all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.wl.value, other.wl.value)]) and \
-            all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.qty.value, other.qty.value)])
+            all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.wl.value, other.wl.to(self.wl.unit).value)]) and\
+            all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.qty.value, other.qty.to(self.qty.unit).value)])
 
     def __add__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable]) -> "SpectralQty":
         """
