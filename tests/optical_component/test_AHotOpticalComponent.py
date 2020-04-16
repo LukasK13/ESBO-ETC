@@ -21,7 +21,7 @@ class TestAHotOpticalComponent(TestCase):
     wl = np.arange(201, 205, 1) << u.nm
 
     def setUp(self):
-        self.target = FileTarget("data/target/target_demo_1.csv")
+        self.target = FileTarget("data/target/target_demo_1.csv", self.wl)
 
     def test___init__(self):
         comp = HotOpticalComponent(self.target, SpectralQty(self.wl, np.repeat(0.5, 4) << u.dimensionless_unscaled),
