@@ -53,4 +53,4 @@ class BlackBodyTarget(ATarget):
         sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)
 
         # Initialize super class
-        super().__init__(SpectralQty(wl_bins, sfd))
+        super().__init__(SpectralQty(wl_bins, sfd), wl_bins)

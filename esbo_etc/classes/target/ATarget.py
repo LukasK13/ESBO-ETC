@@ -11,7 +11,8 @@ class ATarget(IRadiant):
     """
 
     @abstractmethod
-    def __init__(self, sfd: SpectralQty):
+    @u.quantity_input(wl_bins="length")
+    def __init__(self, sfd: SpectralQty, wl_bins: u.Quantity):
         """
         Initialize a new target
 
@@ -21,6 +22,7 @@ class ATarget(IRadiant):
             The spectral flux density of the target
         """
         self.__sfd = sfd
+        self.__wl_bins = wl_bins
 
     def calcNoise(self) -> SpectralQty:
         """
@@ -31,7 +33,7 @@ class ATarget(IRadiant):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        return SpectralQty(self.__sfd.wl, np.repeat(0, len(self.__sfd.wl)) << u.W / (u.m**2 * u.nm * u.sr))
+        return SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
 
     def calcSignal(self) -> SpectralQty:
         """
