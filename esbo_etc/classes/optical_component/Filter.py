@@ -11,10 +11,10 @@ class Filter(AHotOpticalComponent):
     A class to model a filter component and its thermal emission. The model can be created from a file, the name of
     a band or a custom spectral range.
     """
-    _band_central_wl = dict(U=366 * u.nm, B=438 * u.nm, V=545 * u.nm, R=641 * u.nm, I=798 * u.nm, J=1220 * u.nm,
-                           H=1630 * u.nm, K=2190 * u.nm)
-    _band_bandwidth = dict(U=68 * u.nm, B=98 * u.nm, V=89 * u.nm, R=220 * u.nm, I=240 * u.nm, J=300 * u.nm, H=400 * u.nm,
-                          K=600 * u.nm)
+    _band = dict(U=dict(cwl=366 * u.nm, bw=68 * u.nm), B=dict(cwl=438 * u.nm, bw=98 * u.nm),
+                 V=dict(cwl=545 * u.nm, bw=89 * u.nm), R=dict(cwl=641 * u.nm, bw=220 * u.nm),
+                 I=dict(cwl=798 * u.nm, bw=240 * u.nm), J=dict(cwl=1220 * u.nm, bw=300 * u.nm),
+                 H=dict(cwl=1630 * u.nm, bw=400 * u.nm), K=dict(cwl=2190 * u.nm, bw=600 * u.nm))
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
     def __init__(self, parent: ITransmissive, transmittance: Union[SpectralQty, Callable],
@@ -80,10 +80,10 @@ class Filter(AHotOpticalComponent):
         filter : Filter
             The instantiated filter object.
         """
-        if band not in cls._band_central_wl.keys():
-            error("Band has to be one of '[" + ", ".join(list(cls._band_central_wl.keys())) + "]'")
-        return cls.fromRange(parent, cls._band_central_wl[band] - cls._band_bandwidth[band] / 2,
-                             cls._band_central_wl[band] + cls._band_bandwidth[band] / 2, emissivity, temp, obstruction,
+        if band not in cls._band.keys():
+            error("Band has to be one of '[" + ", ".join(list(cls._band.keys())) + "]'")
+        return cls.fromRange(parent, cls._band[band]["cwl"] - cls._band[band]["bw"] / 2,
+                             cls._band[band]["cwl"] + cls._band[band]["bw"] / 2, emissivity, temp, obstruction,
                              obstructor_temp, obstructor_emissivity)
 
     @classmethod
