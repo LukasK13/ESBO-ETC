@@ -75,13 +75,13 @@ class Configuration(object):
 
         self.calc_metaoptions()
 
-    def parser(self, parent):
+    def parser(self, parent: eT.Element):
         """
         Parse a XML element tree to an Entry-tree
 
         Parameters
         ----------
-        parent : ElementTree
+        parent : xml.etree.ElementTree.Element
             The parent XML tree to be parsed
 
         Returns

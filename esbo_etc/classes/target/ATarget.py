@@ -20,7 +20,7 @@ class ATarget(IRadiant):
         sfd: SpectralQty
             The spectral flux density of the target
         """
-        self._sfd = sfd
+        self.__sfd = sfd
 
     def calcNoise(self) -> SpectralQty:
         """
@@ -31,7 +31,7 @@ class ATarget(IRadiant):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        return SpectralQty(self._sfd.wl, np.repeat(0, len(self._sfd.wl)) << u.W / (u.m**2 * u.nm * u.sr))
+        return SpectralQty(self.__sfd.wl, np.repeat(0, len(self.__sfd.wl)) << u.W / (u.m**2 * u.nm * u.sr))
 
     def calcSignal(self) -> SpectralQty:
         """
@@ -42,4 +42,4 @@ class ATarget(IRadiant):
         signal : SpectralQty
             The spectral flux density of the target's signal
         """
-        return self._sfd
+        return self.__sfd

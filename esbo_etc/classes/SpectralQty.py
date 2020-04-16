@@ -110,7 +110,8 @@ class SpectralQty:
             all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.wl.value, other.wl.to(self.wl.unit).value)]) and\
             all([math.isclose(x, y, rel_tol=1e-5) for x, y in zip(self.qty.value, other.qty.to(self.qty.unit).value)])
 
-    def __add__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable]) -> "SpectralQty":
+    def __add__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable[[u.Quantity], u.Quantity]]) ->\
+            "SpectralQty":
         """
         Calculate the sum with another object
 
@@ -157,7 +158,8 @@ class SpectralQty:
 
     __radd__ = __add__
 
-    def __sub__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable]) -> "SpectralQty":
+    def __sub__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable[[u.Quantity], u.Quantity]]) ->\
+            "SpectralQty":
         """
         Calculate the difference to another object
 
@@ -202,7 +204,8 @@ class SpectralQty:
             else:
                 error("Units are not matching for substraction.")
 
-    def __mul__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable]) -> "SpectralQty":
+    def __mul__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable[[u.Quantity], u.Quantity]]) ->\
+            "SpectralQty":
         """
         Calculate the product with another object
 

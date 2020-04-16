@@ -41,14 +41,14 @@ class AOpticalComponent(IRadiant):
         obstructor_emissivity : float
             Emissivity of the obstructing component.
         """
-        self._parent = parent
+        self.__parent = parent
         if transreflectivity:
-            self._transreflectivity = transreflectivity
+            self.__transreflectivity = transreflectivity
         if noise:
-            self._noise = noise
-        self._obstruction = obstruction
-        self._obstructor_temp = obstructor_temp
-        self._obstructor_emissivity = obstructor_emissivity
+            self.__noise = noise
+        self.__obstruction = obstruction
+        self.__obstructor_temp = obstructor_temp
+        self.__obstructor_emissivity = obstructor_emissivity
 
     def calcSignal(self) -> SpectralQty:
         """
@@ -59,7 +59,7 @@ class AOpticalComponent(IRadiant):
         signal : SpectralQty
             The spectral flux density of the target's signal
         """
-        return self.propagate(self._parent.calcSignal()) * (1 - self._obstruction)
+        return self._propagate(self.__parent.calcSignal()) * (1 - self.__obstruction)
 
     def calcNoise(self) -> SpectralQty:
         """
@@ -70,44 +70,44 @@ class AOpticalComponent(IRadiant):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        parent = self.propagate(self._parent.calcNoise())
-        if self._obstructor_temp > 0 * u.K:
-            bb = BlackBody(temperature=self._obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
-            obstructor = bb(parent.wl) * self._obstructor_emissivity
-            noise = parent * (1. - self._obstruction) + obstructor * self._obstruction
+        parent = self._propagate(self.__parent.calcNoise())
+        if self.__obstructor_temp > 0 * u.K:
+            bb = BlackBody(temperature=self.__obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
+            obstructor = bb(parent.wl) * self.__obstructor_emissivity
+            noise = parent * (1. - self.__obstruction) + obstructor * self.__obstruction
         else:
-            noise = parent * (1. - self._obstruction)
-        return noise + self.ownNoise()
+            noise = parent * (1. - self.__obstruction)
+        return noise + self._ownNoise()
 
-    def propagate(self, sqty: SpectralQty) -> SpectralQty:
+    def _propagate(self, rad: SpectralQty) -> SpectralQty:
         """
         Propagate incoming radiation through the optical component
 
         Parameters
         ----------
-        sqty : SpectralQty
+        rad : SpectralQty
             The incoming radiation
 
         Returns
         -------
-        sqty : SpectralQty
+        rad : SpectralQty
             Manipulated incoming radiation
         """
-        if hasattr(self, "_transreflectivity"):
-            return sqty * self._transreflectivity
-        else:
+        try:
+            return rad * self.__transreflectivity
+        except AttributeError:
             error("Transreflectivity not given. Method propagate() needs to be implemented.")
 
-    def ownNoise(self) -> Union[SpectralQty, Callable, int, float]:
+    def _ownNoise(self) -> Union[SpectralQty, Callable[[u.Quantity], u.Quantity], int, float]:
         """
         Calculate the noise created by the optical component
 
         Returns
         -------
-        noise : Union[SpectralQty, Callable, int, float]
+        noise : Union[SpectralQty, Callable[[u.Quantity], u.Quantity], int, float]
             The noise created by the optical component
         """
-        if hasattr(self, "_noise"):
-            return self._noise
-        else:
+        try:
+            return self.__noise
+        except AttributeError:
             error("noise not given. Method ownNoise() needs to be implemented.")

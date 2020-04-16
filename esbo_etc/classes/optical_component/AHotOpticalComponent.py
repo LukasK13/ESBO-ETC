@@ -42,32 +42,32 @@ class AHotOpticalComponent(AOpticalComponent):
         if temp > 0 * u.K:
             # Create noise from black body model
             if isinstance(emissivity, SpectralQty):
-                bb = self._gb_factory(temp)
-                self._noise = SpectralQty(emissivity.wl, bb(emissivity.wl)) * emissivity
+                bb = self.__gb_factory(temp)
+                self.__noise = SpectralQty(emissivity.wl, bb(emissivity.wl)) * emissivity
             elif isinstance(emissivity, str):
                 em = SpectralQty.fromFile(emissivity, u.nm, u.dimensionless_unscaled)
-                bb = self._gb_factory(temp)
-                self._noise = SpectralQty(em.wl, bb(em.wl)) * em
+                bb = self.__gb_factory(temp)
+                self.__noise = SpectralQty(em.wl, bb(em.wl)) * em
             else:
-                bb = self._gb_factory(temp, emissivity)
-                self._noise = bb
+                bb = self.__gb_factory(temp, emissivity)
+                self.__noise = bb
         else:
-            self._noise = 0
+            self.__noise = 0
 
-    def ownNoise(self) -> Union[SpectralQty, Callable, int, float]:
+    def _ownNoise(self) -> Union[SpectralQty, Callable[[u.Quantity], u.Quantity], int, float]:
         """
         Calculate the noise created by the optical component
 
         Returns
         -------
-        noise : Union[SpectralQty, Callable, int, float]
+        noise : Union[SpectralQty, Callable[[u.Quantity], u.Quantity], int, float]
             The noise created by the optical component
         """
-        return self._noise
+        return self.__noise
 
     @staticmethod
     @u.quantity_input(temp=[u.Kelvin, u.Celsius])
-    def _gb_factory(temp: u.Quantity, em: Union[int, float] = 1):
+    def __gb_factory(temp: u.Quantity, em: Union[int, float] = 1):
         """
         Factory for a grey body lambda-function.
 

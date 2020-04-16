@@ -17,7 +17,7 @@ class Filter(AHotOpticalComponent):
                  H=dict(cwl=1630 * u.nm, bw=400 * u.nm), K=dict(cwl=2190 * u.nm, bw=600 * u.nm))
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: IRadiant, transmittance: Union[SpectralQty, Callable],
+    def __init__(self, parent: IRadiant, transmittance: Union[SpectralQty, Callable[[u.Quantity], u.Quantity]],
                  emissivity: Union[int, float, str] = 1, temp: u.Quantity = 0 * u.K,
                  obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
@@ -159,10 +159,10 @@ class Filter(AHotOpticalComponent):
         filter : Filter
             The instantiated filter object.
         """
-        return cls(parent, cls._filter_factory(start, end), emissivity, temp,
+        return cls(parent, cls.__filter_factory(start, end), emissivity, temp,
                    obstruction, obstructor_temp, obstructor_emissivity)
 
-    def propagate(self, sqty: SpectralQty) -> SpectralQty:
+    def _propagate(self, sqty: SpectralQty) -> SpectralQty:
         """
         Propagate incoming radiation through the optical component
 
@@ -179,8 +179,8 @@ class Filter(AHotOpticalComponent):
         return sqty * self._transmittance
 
     @staticmethod
-    # @u.quantity_input(start="length", end="length")
-    def _filter_factory(start: u.Quantity, end: u.Quantity):
+    @u.quantity_input(start="length", end="length")
+    def __filter_factory(start: u.Quantity, end: u.Quantity):
         """
         Create a infinite order bandpass filter
 
@@ -193,7 +193,7 @@ class Filter(AHotOpticalComponent):
 
         Returns
         -------
-        lambda : Callable
+        lambda : Callable[[u.Quantity], u.Quantity]
             The filter function
         """
         return lambda wl: 1 * u.dimensionless_unscaled if start <= wl <= end else 0 * u.dimensionless_unscaled

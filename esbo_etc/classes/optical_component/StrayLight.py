@@ -9,7 +9,7 @@ class StrayLight(AOpticalComponent):
     A class to model additional stray light sources e.g. zodiacal light
     """
 
-    def __init__(self, parent: IRadiant, emission: str = None):
+    def __init__(self, parent: IRadiant, emission: str):
         """
         Initialize a new stray light source
 

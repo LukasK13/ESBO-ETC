@@ -13,7 +13,7 @@ class HotOpticalComponent(AHotOpticalComponent):
                  obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         super().__init__(parent, emissivity, temp, obstruction, obstructor_temp, obstructor_emissivity)
 
-    def propagate(self, sqty: SpectralQty) -> SpectralQty:
+    def _propagate(self, sqty: SpectralQty) -> SpectralQty:
         return sqty
 
 

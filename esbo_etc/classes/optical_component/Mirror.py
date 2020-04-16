@@ -39,18 +39,18 @@ class Mirror(AHotOpticalComponent):
         self._reflectance = SpectralQty.fromFile(reflectance, u.nm, u.dimensionless_unscaled)
         super().__init__(parent, emissivity, temp, obstruction, obstructor_temp, obstructor_emissivity)
 
-    def propagate(self, sqty: SpectralQty) -> SpectralQty:
+    def _propagate(self, rad: SpectralQty) -> SpectralQty:
         """
         Propagate incoming radiation through the optical component
 
         Parameters
         ----------
-        sqty : SpectralQty
+        rad : SpectralQty
             The incoming radiation
 
         Returns
         -------
-        sqty : SpectralQty
+        rad : SpectralQty
             Manipulated incoming radiation
         """
-        return sqty * self._reflectance
+        return rad * self._reflectance
