@@ -55,23 +55,23 @@ class Configuration(object):
     """
     conf = None
 
-    def __init__(self, filename="esbo-etc_defaults.xml"):
+    def __init__(self, file="esbo-etc_defaults.xml"):
         """
         Parse a XML configuration file.
 
         Parameters
         ----------
-        filename : str
+        file : str
             configuration file to parse
         """
 
         # Check if configuration file exists
-        if not os.path.exists(filename):
-            error("Configuration file '" + filename + "' doesn't exist.")
+        if not os.path.exists(file):
+            error("Configuration file '" + file + "' doesn't exist.")
 
         # Read configuration file
-        logging.info("Reading configuration from file '" + filename + "'.")
-        self.conf = self.parser(eT.parse(filename).getroot())
+        logging.info("Reading configuration from file '" + file + "'.")
+        self.conf = self.parser(eT.parse(file).getroot())
 
         self.calc_metaoptions()
 
