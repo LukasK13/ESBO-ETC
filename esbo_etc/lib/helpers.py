@@ -24,13 +24,13 @@ def error(msg: str, exit_: bool = True):
         sys.exit(1)
 
 
-def isLambda(v: object):
+def isLambda(obj: object):
     """
     Check if a object is of type lambda
 
     Parameters
     ----------
-    v : object
+    obj : object
         The object to check.
 
     Returns
@@ -38,4 +38,4 @@ def isLambda(v: object):
     res : bool
         Result of the check
     """
-    return isinstance(v, type(lambda: None)) and v.__name__ == (lambda: None).__name__
+    return isinstance(obj, type(lambda: None)) and obj.__name__ == (lambda: None).__name__
