@@ -20,7 +20,7 @@ class TestAHotOpticalComponent(TestCase):
     wl = np.arange(201, 205, 1) << u.nm
 
     def setUp(self):
-        self.target = FileTarget("data/target/target_demo_1.csv")
+        self.target = FileTarget("../data/target/target_demo_1.csv")
         self.comp = HotOpticalComponent(self.target, SpectralQty(self.wl, [0.5] * 4), temp=300 * u.K)
 
     def test___init__(self):
