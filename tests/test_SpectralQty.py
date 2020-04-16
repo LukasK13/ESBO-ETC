@@ -116,6 +116,4 @@ class TestSpectralQty(TestCase):
         self.assertEqual(sqty, res)
 
         sqty = SpectralQty.fromFile("data/target/target_demo_2.csv", u.nm, u.W / (u.m ** 2 * u.nm))
-        print(sqty.wl)
-        print(sqty.qty)
         self.assertEqual(sqty, res)

@@ -1,20 +1,20 @@
-from ..ITransmissive import ITransmissive
-from abc import abstractmethod
+from ..IRadiant import IRadiant
 from ..SpectralQty import SpectralQty
-from esbo_etc.lib.helpers import error, isLambda
+from ...lib.helpers import error
+from abc import abstractmethod
 import astropy.units as u
 from astropy.modeling.models import BlackBody
 from typing import Union, Callable
 
 
-class AOpticalComponent(ITransmissive):
+class AOpticalComponent(IRadiant):
     """
     Abstract super class for an optical component
     """
 
     @abstractmethod
     @u.quantity_input(obstructor_temp=[u.K, u.Celsius])
-    def __init__(self, parent: ITransmissive, transreflectivity: Union[SpectralQty, int, float, u.Quantity] = None,
+    def __init__(self, parent: IRadiant, transreflectivity: Union[SpectralQty, int, float, u.Quantity] = None,
                  noise: Union[SpectralQty, int, float, u.Quantity] = None, obstruction: float = 0,
                  obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
@@ -22,7 +22,7 @@ class AOpticalComponent(ITransmissive):
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received
         transreflectivity : SpectralQty
             The spectral transmission / reflectivity coefficient of the component. This coefficient is multiplied with
@@ -78,7 +78,6 @@ class AOpticalComponent(ITransmissive):
         else:
             noise = parent * (1. - self._obstruction)
         return noise + self.ownNoise()
-
 
     def propagate(self, sqty: SpectralQty) -> SpectralQty:
         """

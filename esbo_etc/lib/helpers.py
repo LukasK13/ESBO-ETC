@@ -1,9 +1,6 @@
 import logging
 import sys
 import traceback
-import astropy.units as u
-from astropy.modeling.models import BlackBody
-from typing import Union
 
 
 def error(msg: str, exit_: bool = True):
@@ -41,5 +38,4 @@ def isLambda(v: object):
     res : bool
         Result of the check
     """
-    LAMBDA = lambda: 0
-    return isinstance(v, type(LAMBDA)) and v.__name__ == LAMBDA.__name__
+    return isinstance(v, type(lambda: None)) and v.__name__ == (lambda: None).__name__

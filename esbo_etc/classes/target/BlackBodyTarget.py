@@ -2,7 +2,7 @@ from ..target.ATarget import ATarget
 from ..SpectralQty import SpectralQty
 import astropy.units as u
 from astropy.modeling.models import BlackBody
-from esbo_etc.lib.helpers import error
+from ...lib.helpers import error
 
 
 class BlackBodyTarget(ATarget):

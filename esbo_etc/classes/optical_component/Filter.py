@@ -1,6 +1,6 @@
 from .AHotOpticalComponent import AHotOpticalComponent
 from ..SpectralQty import SpectralQty
-from ..ITransmissive import ITransmissive
+from ..IRadiant import IRadiant
 from ...lib.helpers import error
 from astropy import units as u
 from typing import Union, Callable
@@ -17,7 +17,7 @@ class Filter(AHotOpticalComponent):
                  H=dict(cwl=1630 * u.nm, bw=400 * u.nm), K=dict(cwl=2190 * u.nm, bw=600 * u.nm))
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: ITransmissive, transmittance: Union[SpectralQty, Callable],
+    def __init__(self, parent: IRadiant, transmittance: Union[SpectralQty, Callable],
                  emissivity: Union[int, float, str] = 1, temp: u.Quantity = 0 * u.K,
                  obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
@@ -25,7 +25,7 @@ class Filter(AHotOpticalComponent):
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
         transmittance : Union[SpectralQty, Callable]
             The spectral transmittance coefficients of the filter.
@@ -48,7 +48,7 @@ class Filter(AHotOpticalComponent):
 
     @classmethod
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromBand(cls, parent: ITransmissive, band: str, emissivity: Union[str, int, float] = 1,
+    def fromBand(cls, parent: IRadiant, band: str, emissivity: Union[str, int, float] = 1,
                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                  obstructor_emissivity: float = 1) -> "Filter":
         """
@@ -57,7 +57,7 @@ class Filter(AHotOpticalComponent):
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
         band : str
             The spectral band of the filter. Can be one of [U, B, V, R, I, J, H, K].
@@ -88,7 +88,7 @@ class Filter(AHotOpticalComponent):
 
     @classmethod
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromFile(cls, parent: ITransmissive, transmittance: str, emissivity: Union[str, int, float] = 1,
+    def fromFile(cls, parent: IRadiant, transmittance: str, emissivity: Union[str, int, float] = 1,
                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                  obstructor_emissivity: float = 1) -> "Filter":
         """
@@ -96,7 +96,7 @@ class Filter(AHotOpticalComponent):
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
         transmittance : str
             Path to the file containing the spectral transmittance-coefficients of the filter element.
@@ -125,7 +125,7 @@ class Filter(AHotOpticalComponent):
 
     @classmethod
     # @u.quantity_input(start="length", end="length", temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromRange(cls, parent: ITransmissive, start: u.Quantity, end: u.Quantity,
+    def fromRange(cls, parent: IRadiant, start: u.Quantity, end: u.Quantity,
                   emissivity: Union[str, int, float] = 1, temp: u.Quantity = 0 * u.K, obstruction: float = 0,
                   obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1) -> "Filter":
         """
@@ -134,7 +134,7 @@ class Filter(AHotOpticalComponent):
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
         start : length-quantity
             Start wavelength of the pass-band

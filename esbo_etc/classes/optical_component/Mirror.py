@@ -1,6 +1,6 @@
 from .AHotOpticalComponent import AHotOpticalComponent
 from ..SpectralQty import SpectralQty
-from ..ITransmissive import ITransmissive
+from ..IRadiant import IRadiant
 from astropy import units as u
 from typing import Union
 
@@ -10,7 +10,7 @@ class Mirror(AHotOpticalComponent):
     A class to model the optical characteristics of a mirror.
     """
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: ITransmissive, reflectance: str,
+    def __init__(self, parent: IRadiant, reflectance: str,
                  emissivity: Union[int, float, str] = 1, temp: u.Quantity = 0 * u.K,
                  obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
@@ -18,7 +18,7 @@ class Mirror(AHotOpticalComponent):
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
         reflectance : str
             The spectral transmittance coefficients of the filter.

@@ -5,7 +5,7 @@ import numpy as np
 
 
 class OpticalComponent(AOpticalComponent):
-    def __init__(self, parent: ITransmissive, transreflectivity: SpectralQty = None,
+    def __init__(self, parent: IRadiant, transreflectivity: SpectralQty = None,
                  noise: SpectralQty = None, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                  obstructor_emissivity: float = 0):
         super().__init__(parent, transreflectivity, noise, obstruction, obstructor_temp, obstructor_emissivity)

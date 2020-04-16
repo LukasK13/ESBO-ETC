@@ -1,5 +1,5 @@
 from esbo_etc.classes.optical_component.AOpticalComponent import AOpticalComponent
-from esbo_etc.classes.ITransmissive import ITransmissive
+from esbo_etc.classes.IRadiant import IRadiant
 from esbo_etc.classes.SpectralQty import SpectralQty
 from abc import abstractmethod
 import astropy.units as u
@@ -13,14 +13,14 @@ class AHotOpticalComponent(AOpticalComponent):
     """
     @abstractmethod
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], obstruction_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: ITransmissive, emissivity: Union[SpectralQty, int, float, str], temp: u.Quantity,
+    def __init__(self, parent: IRadiant, emissivity: Union[SpectralQty, int, float, str], temp: u.Quantity,
                  obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
         Initialize a new optical component with thermal emission
 
         Parameters
         ----------
-        parent : ITransmissive
+        parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
         emissivity : Union[SpectralQty, int, float, str]
             The spectral emissivity coefficient for the optical surface.
@@ -47,7 +47,7 @@ class AHotOpticalComponent(AOpticalComponent):
             elif isinstance(emissivity, str):
                 em = SpectralQty.fromFile(emissivity, u.nm, u.dimensionless_unscaled)
                 bb = self._gb_factory(temp)
-                self._noise = SpectralQty(emissivity.wl, bb(emissivity.wl)) * em
+                self._noise = SpectralQty(em.wl, bb(em.wl)) * em
             else:
                 bb = self._gb_factory(temp, emissivity)
                 self._noise = bb

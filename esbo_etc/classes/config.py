@@ -3,23 +3,28 @@ import numpy as np
 import astropy.units as u
 import os
 import logging
-from esbo_etc.lib.helpers import error
+from ..lib.helpers import error
+from typing import Union
 
 
 class Entry(object):
     """
     A class used to represent a configuration entry.
-    Copied from ExoSim (https://github.com/ExoSim/ExoSimPublic)
+    Taken from ExoSim (https://github.com/ExoSim/ExoSimPublic)
     """
+    val: Union[str, bool, u.Quantity]
 
     def __call__(self):
         return self.val if hasattr(self, "val") else None
 
-    def parse(self, xml):
+    def parse(self, xml: eT.Element):
         """
         Parse attributes of a XML element
 
-        :param xml: XML element to parse the attributes from
+        Parameters
+        ----------
+        xml : xml.etree.ElementTree.Element
+            XML element to parse the attributes from
         """
         # Copy the XML attributes to object attributes
         for attrib in xml.attrib.keys():
@@ -30,8 +35,6 @@ class Entry(object):
             try:
                 self.val = u.Quantity(list(map(float, self.val.split(','))),
                                       self.units)
-                # if self.units == 'deg':
-                #     self.val = [val * pq.rad for val in self.val]  # workaround for qt unit conversion
                 if len(self.val) == 1:
                     self.val = self.val[0]
             except (ValueError, LookupError):
@@ -52,7 +55,7 @@ class Configuration(object):
     """
     conf = None
 
-    def __init__(self, filename="esbo-etc_defaults.xml", default_path=None):
+    def __init__(self, filename="esbo-etc_defaults.xml"):
         """
         Parse a XML configuration file.
 
@@ -60,8 +63,6 @@ class Configuration(object):
         ----------
         filename : str
             configuration file to parse
-        default_path : str
-            default path to use for relative paths
         """
 
         # Check if configuration file exists
@@ -111,18 +112,12 @@ class Configuration(object):
     def calc_metaoptions(self):
         """
         Calculate additional attributes e.g. the wavelength grid
-        Returns
-        -------
-
         """
         self.calc_metaoption_wl_delta()
 
     def calc_metaoption_wl_delta(self):
         """
         Calculate the wavelength grid used for the calculations.
-        Returns
-        -------
-
         """
         if hasattr(self.conf.common, "wl_delta"):
             wl_delta = self.conf.common.wl_delta()
@@ -131,7 +126,3 @@ class Configuration(object):
         setattr(self.conf.common, 'wl_bins', np.arange(self.conf.common.wl_min().to(u.micron).value,
                                                        self.conf.common.wl_max().to(u.micron).value,
                                                        wl_delta.to(u.micron).value) * u.micron)
-
-
-if __name__ == "__main__":
-    conf = Configuration()

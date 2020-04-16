@@ -10,7 +10,7 @@ class TestLens(TestCase):
     wl = np.arange(201, 205, 1) << u.nm
 
     def setUp(self):
-        self.target = FileTarget("../data/target/target_demo_1.csv")
+        self.target = FileTarget("data/target/target_demo_1.csv")
         self.lens = Lens(self.target, "data/lens/lens_transmittance.csv", 0.5, temp=300 * u.K)
 
     def test___init__(self):
