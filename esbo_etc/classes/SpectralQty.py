@@ -6,6 +6,7 @@ from typing import Union, Callable
 import logging
 from astropy.io import ascii
 import re
+import os
 
 
 # noinspection PyUnresolvedReferences
@@ -92,6 +93,30 @@ class SpectralQty:
                 data[data.colnames[0]].unit = wl_unit_default
                 data[data.colnames[1]].unit = qty_unit_default
         return cls(data[data.colnames[0]].quantity, data[data.colnames[1]].quantity, fill_value=fill_value)
+
+    def __str__(self, precision: int = 4) -> str:
+        """
+        Convert a SpectralQty object to a string representation
+
+        Parameters
+        ----------
+        precision : int
+            Precision of the printed values
+
+        Returns
+        -------
+        ret : str
+            String representation of the object
+        """
+        wl_str = []
+        qty_str = []
+        for i in range(len(self.wl)):
+            wl_str_temp = "%%.%dg" % precision % self.wl[i].value
+            qty_str_temp = "%%.%dg" % precision % self.qty[i].value
+            wl_str.append(wl_str_temp.ljust(max(len(wl_str_temp), len(qty_str_temp)), " "))
+            qty_str.append(qty_str_temp.ljust(max(len(wl_str_temp), len(qty_str_temp)), " "))
+        return "Wavelength: [" + ", ".join(wl_str) + "] " + self.wl.unit.to_string("ogip") + os.linesep +\
+               "Quantitiy:  [" + ", ".join(qty_str) + "] " + self.qty.unit.to_string("ogip")
 
     def __eq__(self, other) -> bool:
         """
