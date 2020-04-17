@@ -16,5 +16,5 @@ class TestFileTarget(TestCase):
 
     def test_noise(self):
         noise = SpectralQty(np.arange(200, 210, 1) << u.nm,
-                            [0.] * 10 << u.W / (u.m ** 2 * u.nm * u.sr))
+                            np.repeat(0, 10) << u.W / (u.m ** 2 * u.nm * u.sr))
         self.assertEqual(self.target.calcNoise(), noise)
