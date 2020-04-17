@@ -127,6 +127,6 @@ class Configuration(object):
             wl_delta = self.conf.common.wl_delta()
         else:
             wl_delta = self.conf.common.wl_min() / self.conf.common.res()
-        setattr(self.conf.common, 'wl_bins', np.arange(self.conf.common.wl_min().to(u.micron).value,
-                                                       self.conf.common.wl_max().to(u.micron).value,
-                                                       wl_delta.to(u.micron).value) * u.micron)
+        setattr(self.conf.common, 'wl_bins',
+                Entry(val=np.arange(self.conf.common.wl_min().to(u.nm).value, self.conf.common.wl_max().to(u.nm).value,
+                                    wl_delta.to(u.nm).value) << u.nm))
