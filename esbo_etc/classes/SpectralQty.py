@@ -14,7 +14,7 @@ class SpectralQty:
     A class to hold and work with spectral quantities
     """
 
-    def __init__(self, wl: u.Quantity, qty: u.Quantity, extrapolate: bool = False):
+    def __init__(self, wl: u.Quantity, qty: u.Quantity, fill_value: Union[bool, int, float] = 0):
         """
         Initialize a new spectral quantity
 
@@ -25,8 +25,9 @@ class SpectralQty:
         qty : Quantity
             The quantity values corresponding to the binned wavelengths. If the values are supplied without a unit,
             they are assumed to be dimensionless.
-        extrapolate : bool
-            Whether extrapolation should be allowed. If disabled, the spectrum will be truncated and a warning given.
+        fill_value : Union[bool, int, float]
+            How to treat missing values. True enables extrapolation, False disables extrapolation and the spectrum will
+            be truncated. If a numeric value is given, the missing values will be filled with this value.
         Returns
         -------
         sqty : SpectralQty
@@ -45,11 +46,11 @@ class SpectralQty:
                 self.qty = qty * u.dimensionless_unscaled
         else:
             error("Lengths not matching")
-        self._extrapolate = extrapolate
+        self._fill_value = fill_value
 
     @classmethod
     def fromFile(cls, file: str, wl_unit_default: u.Quantity = None, qty_unit_default: u.Quantity = None,
-                 extrapolate: bool = False) -> "SpectralQty":
+                 fill_value: Union[bool, int, float] = 0) -> "SpectralQty":
         """
         Initialize a new spectral quantity and read the values from a file
 
@@ -64,8 +65,9 @@ class SpectralQty:
             Default unit to be used for the wavelength column if no units are provided by the file.
         qty_unit_default : Quantity
             Default unit to be used for the quantity column if no units are provided by the file.
-        extrapolate : bool
-            Whether extrapolation should be allowed. If disabled, the spectrum will be truncated and a warning given.
+        fill_value : Union[bool, int, float]
+            How to treat missing values. True enables extrapolation, False disables extrapolation and the spectrum will
+            be truncated. If a numeric value is given, the missing values will be filled with this value.
         Returns
         -------
         sqty : SpectralQty
@@ -89,7 +91,7 @@ class SpectralQty:
             elif wl_unit_default is not None and qty_unit_default is not None:
                 data[data.colnames[0]].unit = wl_unit_default
                 data[data.colnames[1]].unit = qty_unit_default
-        return cls(data[data.colnames[0]].quantity, data[data.colnames[1]].quantity, extrapolate=extrapolate)
+        return cls(data[data.colnames[0]].quantity, data[data.colnames[1]].quantity, fill_value=fill_value)
 
     def __eq__(self, other) -> bool:
         """
@@ -141,12 +143,11 @@ class SpectralQty:
         # Summand is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit) and other.qty.unit.is_equivalent(self.qty.unit):
-                # Wavelengths are matching, just add the quantities
                 if len(self.wl) == len(other.wl) and (self.wl == other.wl).all():
+                    # Wavelengths are matching, just add the quantities
                     return SpectralQty(self.wl, self.qty + other.qty)
-                # Wavelengths are not matching, rebinning needed
                 else:
-                    # Rebin addend
+                    # Wavelengths are not matching, rebinning needed
                     other_rebinned = other.rebin(self.wl)
                     if len(self.wl) == len(other_rebinned.wl) and (self.wl == other_rebinned.wl).all():
                         return SpectralQty(self.wl, self.qty + other_rebinned.qty)
@@ -264,10 +265,15 @@ class SpectralQty:
 
         if not wl.unit.is_equivalent(self.wl.unit):
             error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
-        if not self._extrapolate:
-            if min(wl) < min(self.wl) or max(wl) > max(self.wl):
-                logging.warning("Extrapolation disabled, bandwidth will be reduced.")
-                # Remove new wavelengths where extrapolation would have been necessary
-                wl = [x.value for x in wl if min(self.wl) <= x <= max(self.wl)] * wl.unit
-        f = interp1d(self.wl, self.qty.value, fill_value="extrapolate")
+        if min(wl) < min(self.wl) or max(wl) > max(self.wl):
+            if isinstance(self._fill_value, bool):
+                if not self._fill_value:
+                    logging.warning("Extrapolation disabled, bandwidth will be reduced.")
+                    # Remove new wavelengths where extrapolation would have been necessary
+                    wl = [x.value for x in wl if min(self.wl) <= x <= max(self.wl)] * wl.unit
+                f = interp1d(self.wl, self.qty.value, fill_value="extrapolate")
+            else:
+                f = interp1d(self.wl, self.qty.value, fill_value=self._fill_value, bounds_error=False)
+        else:
+            f = interp1d(self.wl, self.qty.value)
         return SpectralQty(wl, f(wl.to(self.wl.unit)) * self.qty.unit)
