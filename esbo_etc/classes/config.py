@@ -14,6 +14,10 @@ class Entry(object):
     """
     val: Union[str, bool, u.Quantity]
 
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            self.__setattr__(key, value)
+
     def __call__(self):
         return self.val if hasattr(self, "val") else None
 
