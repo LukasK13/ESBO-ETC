@@ -5,6 +5,7 @@ import os
 import logging
 from ..lib.helpers import error
 from typing import Union
+import re
 
 
 class Entry(object):
@@ -33,17 +34,22 @@ class Entry(object):
         # Copy the XML attributes to object attributes
         for attrib in xml.attrib.keys():
             setattr(self, attrib, xml.attrib[attrib])
-
-        # Convert to python datatype and apply the corresponding unit (if applicable)
-        if hasattr(self, 'units'):
-            try:
-                self.val = u.Quantity(list(map(float, self.val.split(','))),
-                                      self.units)
-                if len(self.val) == 1:
-                    self.val = self.val[0]
-            except (ValueError, LookupError):
-                error("unable to convert units in entry '" + xml.tag + "': " + self.val + " " + self.units, exit_=False)
-        elif hasattr(self, "val") and self.val.lower() in ["false", "true"]:
+        # parse units
+        attribs = list(xml.attrib.keys())
+        units = list(filter(re.compile(".*_unit$").match, attribs))
+        for unit in units:
+            var = unit.replace("_unit", "")
+            if hasattr(self, var):
+                try:
+                    val = u.Quantity(list(map(float, getattr(self, var).split(','))), getattr(self, unit))
+                    if len(val) == 1:
+                        val = val[0]
+                    setattr(self, var, val)
+                except (ValueError, LookupError):
+                    error("unable to convert units in entry '" + xml.tag + "': " + getattr(self, var) + " "  +
+                          getattr(self, unit),  exit_=False)
+        # Convert boolean values
+        if hasattr(self, "val") and type(self.val) == str and self.val.lower() in ["false", "true"]:
             self.val = (self.val.lower() == "true")
 
 
