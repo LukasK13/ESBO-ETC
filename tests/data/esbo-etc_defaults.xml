@@ -27,7 +27,8 @@
 
     <common_optics>
         <optical_component type="Mirror" reflectance="data/mirror/reflectance.csv"
-                           emissivity="data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M1"/>
+                           emissivity="data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M1"
+                           obstruction="0.1" obstructor_temp="70" obstructor_temp_unit="K"/>
         <optical_component type="Mirror" reflectance="data/mirror/reflectance.csv"
                            emissivity="data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M2"/>
         <optical_component type="Mirror" reflectance="data/mirror/reflectance.csv"
