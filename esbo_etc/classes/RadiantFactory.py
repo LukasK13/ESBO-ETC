@@ -6,6 +6,7 @@ from ..classes import target as tg
 from ..lib.helpers import error
 import copy
 import re
+from .config import Entry
 
 
 class RadiantFactory:
@@ -62,6 +63,8 @@ class RadiantFactory:
             else:
                 # New component is of type Optical Component
                 attribs["parent"] = parent
+                if "obstruction" in attribs:
+                    attribs["obstruction"] = float(attribs["obstruction"])
                 class_ = getattr(oc, options.type)
                 if options.type in ["Atmosphere", "StrayLight", "Mirror", "Lens", "BeamSplitter"]:
                     return class_(**attribs)
@@ -78,3 +81,32 @@ class RadiantFactory:
                     error("Unknown optical component type: '" + options.type + "'")
         else:
             error("Optical component needs to have a type specified.")
+
+    def fromConfig(self, conf: Entry) -> IRadiant:
+        """
+        Initialize a decorated target from a configuration.
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration defining the target and the decorators.
+
+        Returns
+        -------
+        parent : IRadiant
+            The decorated target.
+        """
+        parent = self.create(conf.astroscene.target)
+        if hasattr(conf.astroscene, "optical_component"):
+            for entry in conf.astroscene.optical_component if type(conf.astroscene.optical_component) == list else\
+                    [conf.astroscene.optical_component]:
+                parent = self.create(entry, parent)
+        if hasattr(conf, "common_optics") and hasattr(conf.common_optics, "optical_component"):
+            for entry in conf.common_optics.optical_component if type(conf.common_optics.optical_component) == \
+                                                                 list else [conf.common_optics.optical_component]:
+                parent = self.create(entry, parent)
+        if hasattr(conf, "instrument") and hasattr(conf.instrument, "optical_component"):
+            for entry in conf.instrument.optical_component if type(conf.instrument.optical_component) == list else\
+                    [conf.instrument.optical_component]:
+                parent = self.create(entry, parent)
+        return parent
