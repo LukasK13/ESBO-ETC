@@ -3,7 +3,7 @@ import astropy.units as u
 from abc import abstractmethod
 
 
-class Sensor:
+class ASensor:
     """
     Abstract super class for sensor models
     """
