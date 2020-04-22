@@ -11,6 +11,7 @@ class Filter(AHotOpticalComponent):
     A class to model a filter component and its thermal emission. The model can be created from a file, the name of
     a band or a custom spectral range.
     """
+    # Bands from Handbook of Space Astronomy and Astrophysics p. 139
     _band = dict(U=dict(cwl=365 * u.nm, bw=68 * u.nm), B=dict(cwl=440 * u.nm, bw=98 * u.nm),
                  V=dict(cwl=550 * u.nm, bw=89 * u.nm), R=dict(cwl=700 * u.nm, bw=220 * u.nm),
                  I=dict(cwl=900 * u.nm, bw=240 * u.nm), J=dict(cwl=1250 * u.nm, bw=300 * u.nm),

@@ -9,7 +9,7 @@ class BlackBodyTarget(ATarget):
     """
     This class models the spectral flux density of a star of given magnitude using as black body radiator
     """
-    # Bands from Handbook of Space Astronomy and Astrophysics
+    # Bands from Handbook of Space Astronomy and Astrophysics p. 139
     _band = dict(U=dict(wl=365 * u.nm, sfd=4.27e-11 * u.W / (u.m ** 2 * u.nm)),
                  B=dict(wl=440 * u.nm, sfd=6.61e-11 * u.W / (u.m ** 2 * u.nm)),
                  V=dict(wl=550 * u.nm, sfd=3.64e-11 * u.W / (u.m ** 2 * u.nm)),
