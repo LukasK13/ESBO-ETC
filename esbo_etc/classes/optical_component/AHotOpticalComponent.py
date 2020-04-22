@@ -45,9 +45,14 @@ class AHotOpticalComponent(AOpticalComponent):
                 bb = self.__gb_factory(temp)
                 self.__noise = SpectralQty(emissivity.wl, bb(emissivity.wl)) * emissivity
             elif isinstance(emissivity, str):
-                em = SpectralQty.fromFile(emissivity, u.nm, u.dimensionless_unscaled)
-                bb = self.__gb_factory(temp)
-                self.__noise = SpectralQty(em.wl, bb(em.wl)) * em
+                try:
+                    em = float(emissivity)
+                    bb = self.__gb_factory(temp, em)
+                    self.__noise = bb
+                except ValueError:
+                    em = SpectralQty.fromFile(emissivity, u.nm, u.dimensionless_unscaled)
+                    bb = self.__gb_factory(temp)
+                    self.__noise = SpectralQty(em.wl, bb(em.wl)) * em
             else:
                 bb = self.__gb_factory(temp, emissivity)
                 self.__noise = bb
