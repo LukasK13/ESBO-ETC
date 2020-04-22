@@ -11,10 +11,12 @@ class Filter(AHotOpticalComponent):
     A class to model a filter component and its thermal emission. The model can be created from a file, the name of
     a band or a custom spectral range.
     """
-    _band = dict(U=dict(cwl=366 * u.nm, bw=68 * u.nm), B=dict(cwl=438 * u.nm, bw=98 * u.nm),
-                 V=dict(cwl=545 * u.nm, bw=89 * u.nm), R=dict(cwl=641 * u.nm, bw=220 * u.nm),
-                 I=dict(cwl=798 * u.nm, bw=240 * u.nm), J=dict(cwl=1220 * u.nm, bw=300 * u.nm),
-                 H=dict(cwl=1630 * u.nm, bw=400 * u.nm), K=dict(cwl=2190 * u.nm, bw=600 * u.nm))
+    _band = dict(U=dict(cwl=365 * u.nm, bw=68 * u.nm), B=dict(cwl=440 * u.nm, bw=98 * u.nm),
+                 V=dict(cwl=550 * u.nm, bw=89 * u.nm), R=dict(cwl=700 * u.nm, bw=220 * u.nm),
+                 I=dict(cwl=900 * u.nm, bw=240 * u.nm), J=dict(cwl=1250 * u.nm, bw=300 * u.nm),
+                 H=dict(cwl=1650 * u.nm, bw=400 * u.nm), K=dict(cwl=2200 * u.nm, bw=600 * u.nm),
+                 L=dict(cwl=3600 * u.nm, bw=1200 * u.nm), M=dict(cwl=4800 * u.nm, bw=800 * u.nm),
+                 N=dict(cwl=10200 * u.nm, bw=2500 * u.nm))
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
     def __init__(self, parent: IRadiant, transmittance: Union[SpectralQty, Callable[[u.Quantity], u.Quantity]],
