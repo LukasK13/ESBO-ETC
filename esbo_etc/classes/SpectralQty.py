@@ -116,8 +116,8 @@ class SpectralQty:
             qty_str_temp = "%%.%dg" % precision % self.qty[i].value
             wl_str.append(wl_str_temp.ljust(max(len(wl_str_temp), len(qty_str_temp)), " "))
             qty_str.append(qty_str_temp.ljust(max(len(wl_str_temp), len(qty_str_temp)), " "))
-        return "Wavelength: [" + ", ".join(wl_str) + "] " + self.wl.unit.to_string("ogip") + os.linesep +\
-               "Quantitiy:  [" + ", ".join(qty_str) + "] " + self.qty.unit.to_string("ogip")
+        return "Wavelength: [" + ", ".join(wl_str) + "] " + self.wl.unit.to_string() + os.linesep +\
+               "Quantitiy:  [" + ", ".join(qty_str) + "] " + self.qty.unit.to_string()
 
     def __eq__(self, other) -> bool:
         """
