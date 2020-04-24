@@ -7,10 +7,10 @@ import astropy.units as u
 
 
 class TestRadiantFactory(TestCase):
-    def test_fromConfig(self):
+    def test_fromConfigBatch(self):
         conf = Configuration("data/esbo-etc_defaults.xml").conf
         factory = RadiantFactory(conf.common.wl_bins())
-        parent = factory.fromConfig(conf)
+        parent = factory.fromConfigBatch(conf)
 
         parent_2 = BlackBodyTarget(conf.common.wl_bins(), 5778 * u.K, 10 * u.mag, "V")
         parent_2 = oc.Atmosphere(parent_2, "data/atmosphere/transmittance.csv", "data/atmosphere/emission.csv")
