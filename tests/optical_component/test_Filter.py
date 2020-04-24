@@ -9,8 +9,8 @@ class TestFilter(TestCase):
         wl = np.array([400, 500, 501, 545, 589, 590, 600]) << u.nm
         target = BlackBodyTarget(wl, temp=5778 * u.K, mag=10 * u.mag, band="U")
         filt = Filter.fromBand(target, "V")
-        self.assertEqual(filt.calcSignal(), SpectralQty(wl, np.array([0.0, 0.0, 5.46516556e-15, 5.37748512e-15,
-                                                                      5.15313966e-15, 0.0, 0.0]) << u.W /
+        self.assertEqual(filt.calcSignal(), SpectralQty(wl, np.array([0.0, 0.0, 0.0, 5.52730709e-15, 5.29671115e-15,
+                                                                      5.29030718e-15, 0.0]) << u.W /
                                                         (u.m ** 2 * u.nm)))
 
     def test_fromFile(self):

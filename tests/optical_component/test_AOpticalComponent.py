@@ -22,8 +22,8 @@ class TestAOpticalComponent(TestCase):
 
     def test_calcSignal(self):
         self.assertEqual(self.comp.calcSignal(),
-                         SpectralQty(self.wl, np.array([1.25575776e-17, 5.50570557e-18, 2.77637739e-18,
-                                                        1.54664415e-18]) << u.W / (u.m ** 2 * u.nm)))
+                         SpectralQty(self.wl, np.array([1.29074440e-17, 5.65909989e-18, 2.85372997e-18,
+                                                        1.58973516e-18]) << u.W / (u.m ** 2 * u.nm)))
 
     def test_calcNoise(self):
         self.assertEqual(self.comp.calcNoise(),
