@@ -4,7 +4,8 @@ from .SpectralQty import SpectralQty
 
 class IRadiant(ABC):
     """
-    Interface for getting the signal and the noise of a emitting, reflecting or transmitting component in the beam.
+    Interface for getting the signal and the background radiation of a emitting, reflecting or transmitting component
+    in the beam.
     """
     @abstractmethod
     def calcSignal(self) -> SpectralQty:
@@ -19,13 +20,13 @@ class IRadiant(ABC):
         pass
 
     @abstractmethod
-    def calcNoise(self) -> SpectralQty:
+    def calcBackground(self) -> SpectralQty:
         """
-        Calculate the noise coming from the component
+        Calculate the background radiation coming from the component
 
         Returns
         -------
         signal : SpectralQty
-            The emitted, reflected or transmitted noise
+            The emitted, reflected or transmitted background radiation
         """
         pass
