@@ -43,6 +43,29 @@ class TestSpectralQty(TestCase):
         self.assertEqual(self.sqty * (lambda wl: 0.7 * u.dimensionless_unscaled),
                          SpectralQty(self.wl, self.qty * 0.7))
 
+    def test___truediv__(self):
+        # Integer
+        self.assertEqual(self.sqty / 2, SpectralQty(np.arange(200, 204, 1) << u.nm,
+                                                    np.arange(5.5e-1, 7.5e-1, 5e-2) << u.W / (u.m ** 2 * u.nm)))
+        # Float
+        self.assertEqual(self.sqty / 2., SpectralQty(np.arange(200, 204, 1) << u.nm,
+                                                     np.arange(5.5e-1, 7.5e-1, 5e-2) << u.W / (u.m ** 2 * u.nm)))
+        # SpectralQty
+        self.assertEqual(self.sqty / SpectralQty(self.wl, np.arange(1, 5, 1) << u.m),
+                         SpectralQty(self.wl, np.array([1.1, 0.6, 1.3 / 3, 0.35]) << u.W / (u.m ** 3 * u.nm)))
+        # rebin without extrapolation and without reduction
+        self.assertEqual(
+            self.sqty / SpectralQty(np.arange(199.5, 204.5, 1) << u.nm, np.arange(1, 6, 1) << u.m),
+            SpectralQty(self.wl, [1.1 / 1.5, 1.2 / 2.5, 1.3 / 3.5, 1.4 / 4.5] * u.W / (u.m ** 3 * u.nm)))
+        # rebin without extrapolation and with reduction
+        self.assertEqual(
+            self.sqty / SpectralQty(np.arange(200.5, 204.5, 1) << u.nm, np.arange(1, 5, 1) << u.m, fill_value=False),
+            SpectralQty(np.arange(201, 204) << u.nm, np.array([1.2 / 1.5, 1.3 / 2.5, 1.4 / 3.5]) << u.W /
+                        (u.m ** 3 * u.nm)))
+        # lambda
+        self.assertEqual(self.sqty / (lambda wl: 0.7 * u.dimensionless_unscaled),
+                         SpectralQty(self.wl, self.qty / 0.7))
+
     def test___sub__(self):
         # Quantity
         self.assertEqual(self.sqty - 0.1 * u.W / (u.m ** 2 * u.nm),

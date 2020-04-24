@@ -272,6 +272,46 @@ class SpectralQty:
 
     __rmul__ = __mul__
 
+    def __truediv__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable[[u.Quantity], u.Quantity]]) ->\
+            "SpectralQty":
+        """
+        Calculate the quotient with another object
+
+        Parameters
+        ----------
+        other : Union[int, float, u.Quantity, "SpectralQty", Callable]
+            Divisor for this object. If the binning of the object on the right hand side differs
+            from the binning of the left object, the object on the right hand side will be rebinned.
+
+        Returns
+        -------
+        sum : SpectralQty
+            The quotient of both objects
+        """
+        # Factor is of type int, float or Quantity, just multiply
+        if isinstance(other, int) or isinstance(other, float) or isinstance(other, u.Quantity):
+            return SpectralQty(self.wl, self.qty / other)
+        # Factor is of type lambda
+        elif isLambda(other):
+            return SpectralQty(self.wl, self.qty / [other(wl).value for wl in self.wl] * other(self.wl[0]).unit)
+        # Factor is of type SpectralQty
+        else:
+            if other.wl.unit.is_equivalent(self.wl.unit):
+                # Wavelengths are matching, just multiply the quantities
+                if len(self.wl) == len(other.wl) and (self.wl == other.wl).all():
+                    return SpectralQty(self.wl, self.qty / other.qty)
+                # Wavelengths are not matching, rebinning needed
+                else:
+                    # Rebin factor
+                    other_rebinned = other.rebin(self.wl)
+                    if len(self.wl) == len(other_rebinned.wl) and (self.wl == other_rebinned.wl).all():
+                        return SpectralQty(self.wl, self.qty / other_rebinned.qty)
+                    else:
+                        # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
+                        return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty / other_rebinned.qty)
+            else:
+                error("Units are not matching for division.")
+
     def rebin(self, wl: u.Quantity) -> "SpectralQty":
         """
         Resample the spectral quantity sqty(wl) over the new grid wl, rebinning if necessary, otherwise interpolates.
