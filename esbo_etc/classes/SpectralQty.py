@@ -294,7 +294,7 @@ class SpectralQty:
             return SpectralQty(self.wl, self.qty / other)
         # Factor is of type lambda
         elif isLambda(other):
-            return SpectralQty(self.wl, self.qty / other(self.wl).value * other(self.wl[0]).unit)
+            return SpectralQty(self.wl, self.qty / other(self.wl).value / other(self.wl[0]).unit)
         # Factor is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit):
