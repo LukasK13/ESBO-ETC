@@ -5,6 +5,7 @@ from abc import abstractmethod
 import astropy.units as u
 from astropy.modeling.models import BlackBody
 from typing import Union, Callable
+from logging import info, debug
 
 
 class AOpticalComponent(IRadiant):
@@ -59,7 +60,11 @@ class AOpticalComponent(IRadiant):
         signal : SpectralQty
             The spectral flux density of the target's signal
         """
-        return self._propagate(self.__parent.calcSignal()) * (1 - self.__obstruction)
+        signal = self.__parent.calcSignal()
+        info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
+        signal = self._propagate(signal) * (1 - self.__obstruction)
+        debug(signal)
+        return signal
 
     def calcNoise(self) -> SpectralQty:
         """
@@ -70,14 +75,18 @@ class AOpticalComponent(IRadiant):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        parent = self._propagate(self.__parent.calcNoise())
+        parent = self.__parent.calcNoise()
+        info("Calculating Noise for class '" + self.__class__.__name__ + "'.")
+        parent = self._propagate(parent)
         if self.__obstructor_temp > 0 * u.K:
             bb = BlackBody(temperature=self.__obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
             obstructor = bb(parent.wl) * self.__obstructor_emissivity
             noise = parent * (1. - self.__obstruction) + obstructor * self.__obstruction
         else:
             noise = parent * (1. - self.__obstruction)
-        return noise + self._ownNoise()
+        noise = noise + self._ownNoise()
+        debug(noise)
+        return noise
 
     def _propagate(self, rad: SpectralQty) -> SpectralQty:
         """

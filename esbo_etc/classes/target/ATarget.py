@@ -3,6 +3,7 @@ from ..IRadiant import IRadiant
 from ..SpectralQty import SpectralQty
 import astropy.units as u
 import numpy as np
+from logging import info, debug
 
 
 class ATarget(IRadiant):
@@ -33,7 +34,10 @@ class ATarget(IRadiant):
         noise : SpectralQty
             The spectral radiance of the target's noise
         """
-        return SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
+        info("Calculating Noise for class '" + self.__class__.__name__ + "'.")
+        noise = SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
+        debug(noise)
+        return noise
 
     def calcSignal(self) -> SpectralQty:
         """
@@ -44,4 +48,6 @@ class ATarget(IRadiant):
         signal : SpectralQty
             The spectral flux density of the target's signal
         """
+        info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
+        debug(self.__sfd)
         return self.__sfd
