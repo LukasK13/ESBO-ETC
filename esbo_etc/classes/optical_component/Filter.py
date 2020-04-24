@@ -4,6 +4,7 @@ from ..IRadiant import IRadiant
 from ...lib.helpers import error
 from astropy import units as u
 from typing import Union, Callable
+import numpy as np
 
 
 class Filter(AHotOpticalComponent):
@@ -199,4 +200,5 @@ class Filter(AHotOpticalComponent):
         lambda : Callable[[u.Quantity], u.Quantity]
             The filter function
         """
-        return lambda wl: 1 * u.dimensionless_unscaled if start <= wl <= end else 0 * u.dimensionless_unscaled
+        return lambda wl: np.logical_and(np.greater_equal(wl, start), np.greater_equal(end, wl)).astype(int) *\
+            u.dimensionless_unscaled
