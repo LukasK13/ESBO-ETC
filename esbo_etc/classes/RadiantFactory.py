@@ -82,7 +82,7 @@ class RadiantFactory:
         else:
             error("Optical component needs to have a type specified.")
 
-    def fromConfig(self, conf: Entry) -> IRadiant:
+    def fromConfigBatch(self, conf: Entry) -> IRadiant:
         """
         Initialize a decorated target from a configuration.
 
