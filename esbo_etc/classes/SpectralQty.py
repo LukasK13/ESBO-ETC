@@ -164,7 +164,7 @@ class SpectralQty:
                 raise TypeError("Units are not matching for addition.")
         # Summand is of type lambda
         elif isLambda(other):
-            return SpectralQty(self.wl, self.qty + [other(wl).value for wl in self.wl] * other(self.wl[0]).unit)
+            return SpectralQty(self.wl, self.qty + other(self.wl).value * other(self.wl[0]).unit)
         # Summand is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit) and other.qty.unit.is_equivalent(self.qty.unit):
@@ -211,7 +211,7 @@ class SpectralQty:
                 raise TypeError('Units are not matching for subtraction.')
         # Subtrahend is of type lambda
         elif isLambda(other):
-            return SpectralQty(self.wl, self.qty - [other(wl).value for wl in self.wl] * other(self.wl[0]).unit)
+            return SpectralQty(self.wl, self.qty - other(self.wl).value * other(self.wl[0]).unit)
         # Subtrahend is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit) and other.qty.unit.is_equivalent(self.qty.unit):
@@ -251,7 +251,7 @@ class SpectralQty:
             return SpectralQty(self.wl, self.qty * other)
         # Factor is of type lambda
         elif isLambda(other):
-            return SpectralQty(self.wl, self.qty * [other(wl).value for wl in self.wl] * other(self.wl[0]).unit)
+            return SpectralQty(self.wl, self.qty * other(self.wl).value * other(self.wl[0]).unit)
         # Factor is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit):
@@ -293,7 +293,7 @@ class SpectralQty:
             return SpectralQty(self.wl, self.qty / other)
         # Factor is of type lambda
         elif isLambda(other):
-            return SpectralQty(self.wl, self.qty / [other(wl).value for wl in self.wl] * other(self.wl[0]).unit)
+            return SpectralQty(self.wl, self.qty / other(self.wl).value * other(self.wl[0]).unit)
         # Factor is of type SpectralQty
         else:
             if other.wl.unit.is_equivalent(self.wl.unit):
