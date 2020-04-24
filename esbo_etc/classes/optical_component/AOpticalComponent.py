@@ -61,7 +61,7 @@ class AOpticalComponent(IRadiant):
             The spectral flux density of the target's signal
         """
         signal = self.__parent.calcSignal()
-        info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
+        info("Calculating signal for class '" + self.__class__.__name__ + "'.")
         signal = self._propagate(signal) * (1 - self.__obstruction)
         debug(signal)
         return signal
@@ -76,7 +76,7 @@ class AOpticalComponent(IRadiant):
             The spectral radiance of the background
         """
         parent = self.__parent.calcBackground()
-        info("Calculating Noise for class '" + self.__class__.__name__ + "'.")
+        info("Calculating background for class '" + self.__class__.__name__ + "'.")
         parent = self._propagate(parent)
         if self.__obstructor_temp > 0 * u.K:
             bb = BlackBody(temperature=self.__obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
