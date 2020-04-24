@@ -145,3 +145,8 @@ class TestSpectralQty(TestCase):
 
         sqty = SpectralQty.fromFile("data/target/target_demo_2.csv", u.nm, u.W / (u.m ** 2 * u.nm))
         self.assertEqual(sqty, res)
+
+    def test_integrate(self):
+        integral = self.sqty.integrate()
+        self.assertAlmostEqual(integral.value, 3.75)
+        self.assertTrue(integral.unit.is_equivalent(u.W / u.m ** 2))

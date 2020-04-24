@@ -7,6 +7,7 @@ import logging
 from astropy.io import ascii
 import re
 import os
+from scipy.integrate import trapz
 
 
 # noinspection PyUnresolvedReferences
@@ -342,3 +343,14 @@ class SpectralQty:
         else:
             f = interp1d(self.wl, self.qty.value)
         return SpectralQty(wl, f(wl.to(self.wl.unit)) * self.qty.unit)
+
+    def integrate(self) -> u.Quantity:
+        """
+        Integrate the spectral quantity over the given spectrum using
+
+        Returns
+        -------
+        int : Quantity
+            The integrated quantity
+        """
+        return u.Quantity(trapz(self.qty, self.wl))
