@@ -66,27 +66,27 @@ class AOpticalComponent(IRadiant):
         debug(signal)
         return signal
 
-    def calcNoise(self) -> SpectralQty:
+    def calcBackground(self) -> SpectralQty:
         """
-        Calculate the spectral radiance of the target's noise
+        Calculate the spectral radiance of the background
 
         Returns
         -------
-        noise : SpectralQty
-            The spectral radiance of the target's noise
+        background : SpectralQty
+            The spectral radiance of the background
         """
-        parent = self.__parent.calcNoise()
+        parent = self.__parent.calcBackground()
         info("Calculating Noise for class '" + self.__class__.__name__ + "'.")
         parent = self._propagate(parent)
         if self.__obstructor_temp > 0 * u.K:
             bb = BlackBody(temperature=self.__obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
             obstructor = bb(parent.wl) * self.__obstructor_emissivity
-            noise = parent * (1. - self.__obstruction) + obstructor * self.__obstruction
+            background = parent * (1. - self.__obstruction) + obstructor * self.__obstruction
         else:
-            noise = parent * (1. - self.__obstruction)
-        noise = noise + self._ownNoise()
-        debug(noise)
-        return noise
+            background = parent * (1. - self.__obstruction)
+        background = background + self._ownNoise()
+        debug(background)
+        return background
 
     def _propagate(self, rad: SpectralQty) -> SpectralQty:
         """

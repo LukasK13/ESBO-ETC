@@ -25,13 +25,13 @@ class TestAOpticalComponent(TestCase):
                          SpectralQty(self.wl, np.array([1.29074440e-17, 5.65909989e-18, 2.85372997e-18,
                                                         1.58973516e-18]) << u.W / (u.m ** 2 * u.nm)))
 
-    def test_calcNoise(self):
-        self.assertEqual(self.comp.calcNoise(),
+    def test_calcBackground(self):
+        self.assertEqual(self.comp.calcBackground(),
                          SpectralQty(self.wl, np.array([8.21976423e-05, 2.70268340e-04, 5.27503292e-04,
                                                         7.60597616e-04]) << u.W / (u.m ** 2 * u.nm * u.sr)))
         comp = OpticalComponent(self.comp, SpectralQty(self.wl, np.repeat(0.5, 4) << u.dimensionless_unscaled),
                                 SpectralQty(self.wl, np.repeat(0, 4) << u.W / (u.m ** 2 * u.nm * u.sr)),
                                 obstruction=0.1, obstructor_temp=300 * u.K, obstructor_emissivity=1)
-        self.assertEqual(comp.calcNoise(),
+        self.assertEqual(comp.calcBackground(),
                          SpectralQty(self.wl, np.array([1.09186581e-04, 3.81889092e-04, 7.54879773e-04,
                                                         10.92866544e-04]) << u.W / (u.m ** 2 * u.nm * u.sr)))

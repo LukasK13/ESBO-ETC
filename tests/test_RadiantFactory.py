@@ -23,4 +23,4 @@ class TestRadiantFactory(TestCase):
         parent_2 = oc.Lens(parent_2, "data/lens/transmittance.csv", "data/lens/emissivity.csv", 70 * u.K)
 
         self.assertEqual(parent.calcSignal(), parent_2.calcSignal())
-        self.assertEqual(parent.calcNoise(), parent_2.calcNoise())
+        self.assertEqual(parent.calcBackground(), parent_2.calcBackground())

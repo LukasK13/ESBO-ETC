@@ -14,7 +14,7 @@ class TestMirror(TestCase):
         self.mirror = Mirror(self.target, "data/mirror/mirror_reflectance.csv", 0.5, temp=300 * u.K)
 
     def test___init__(self):
-        self.assertEqual(self.mirror.calcNoise(),
+        self.assertEqual(self.mirror.calcBackground(),
                          SpectralQty(self.wl, np.array([4.31413931e-96, 1.37122214e-95, 4.30844544e-95,
                                                         1.33846280e-94]) << u.W / (u.m ** 2 * u.nm * u.sr)))
         self.assertEqual(self.mirror.calcSignal(),

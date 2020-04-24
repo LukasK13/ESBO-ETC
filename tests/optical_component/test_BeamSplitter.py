@@ -15,7 +15,7 @@ class TestBeamSplitter(TestCase):
                                      temp=300 * u.K)
 
     def test___init__(self):
-        self.assertEqual(self.splitter.calcNoise(),
+        self.assertEqual(self.splitter.calcBackground(),
                          SpectralQty(self.wl, np.array([4.31413931e-96, 1.37122214e-95, 4.30844544e-95,
                                                         1.33846280e-94]) << u.W / (u.m ** 2 * u.nm * u.sr)))
         self.assertEqual(self.splitter.calcSignal(),

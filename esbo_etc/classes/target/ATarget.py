@@ -25,19 +25,19 @@ class ATarget(IRadiant):
         self.__sfd = sfd
         self.__wl_bins = wl_bins
 
-    def calcNoise(self) -> SpectralQty:
+    def calcBackground(self) -> SpectralQty:
         """
-        Calculate the spectral radiance of the target's noise
+        Calculate the spectral radiance of the target's background
 
         Returns
         -------
-        noise : SpectralQty
-            The spectral radiance of the target's noise
+        background : SpectralQty
+            The spectral radiance of the target's background
         """
         info("Calculating Noise for class '" + self.__class__.__name__ + "'.")
-        noise = SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
-        debug(noise)
-        return noise
+        background = SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
+        debug(background)
+        return background
 
     def calcSignal(self) -> SpectralQty:
         """

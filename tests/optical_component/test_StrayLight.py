@@ -15,8 +15,8 @@ class TestStrayLight(TestCase):
                                                                             1.6e-15, 1.7e-15, 1.8e-15, 1.9e-15,
                                                                             2.0e-15]) << u.W / (u.m ** 2 * u.nm)))
 
-    def test_calcNoise(self):
-        self.assertEqual(self.zodiac.calcNoise(),
+    def test_calcBackground(self):
+        self.assertEqual(self.zodiac.calcBackground(),
                          SpectralQty(np.arange(200, 210) << u.nm, np.array([1.1e-16, 1.2e-16, 1.3e-16, 1.4e-16, 1.5e-16,
                                                                             1.6e-16, 1.7e-16, 1.8e-16, 1.9e-16,
                                                                             2.0e-16]) << u.W /

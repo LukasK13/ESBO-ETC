@@ -14,7 +14,7 @@ class TestLens(TestCase):
         self.lens = Lens(self.target, "data/lens/lens_transmittance.csv", 0.5, temp=300 * u.K)
 
     def test___init__(self):
-        self.assertEqual(self.lens.calcNoise(),
+        self.assertEqual(self.lens.calcBackground(),
                          SpectralQty(self.wl, np.array([4.31413931e-96, 1.37122214e-95, 4.30844544e-95,
                                                         1.33846280e-94]) << u.W / (u.m ** 2 * u.nm * u.sr)))
         self.assertEqual(self.lens.calcSignal(),
