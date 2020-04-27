@@ -52,7 +52,7 @@ class RadiantFactory:
                 attribs["wl_bins"] = self.__wl_bins
                 if options.type == "BlackBodyTarget":
                     # Black Body Target
-                    if "mag" in attribs:
+                    if "mag" in attribs and type(attribs["mag"]) == str:
                         attribs["mag"] = float(attribs["mag"]) * u.mag
                     return tg.BlackBodyTarget(**attribs)
                 elif options.type == "FileTarget":
