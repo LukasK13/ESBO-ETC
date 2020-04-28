@@ -24,7 +24,7 @@ class BlackBodyTarget(ATarget):
 
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], mag=u.mag)
     def __init__(self, wl_bins: u.Quantity, temp: u.Quantity = 5778 * u.K,
-                 mag: u.Quantity = 0 * u.mag, band: str = "V"):
+                 mag: u.Quantity = 0 * u.mag, band: str = "V", size: str = "Point"):
         """
         Initialize a new black body point source
 
@@ -38,6 +38,8 @@ class BlackBodyTarget(ATarget):
             Desired apparent magnitude of the point source
         band : str
             Band used for fitting the planck curve to a star of 0th magnitude. Can be one of [U, B, V, R, I, J, H, K].
+        size : str
+            The size of the target. Can be either point or extended
 
         Returns
         -------
@@ -54,4 +56,4 @@ class BlackBodyTarget(ATarget):
         sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)
 
         # Initialize super class
-        super().__init__(SpectralQty(wl_bins, sfd), wl_bins)
+        super().__init__(SpectralQty(wl_bins, sfd), wl_bins, size)

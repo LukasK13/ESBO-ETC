@@ -4,7 +4,7 @@ from ...lib.helpers import error
 from abc import abstractmethod
 import astropy.units as u
 from astropy.modeling.models import BlackBody
-from typing import Union, Callable
+from typing import Union, Callable, Tuple
 from logging import info, debug
 
 
@@ -51,7 +51,7 @@ class AOpticalComponent(IRadiant):
         self.__obstructor_temp = obstructor_temp
         self.__obstructor_emissivity = obstructor_emissivity
 
-    def calcSignal(self) -> SpectralQty:
+    def calcSignal(self) -> Tuple[SpectralQty, str]:
         """
         Calculate the spectral flux density of the target's signal
 
@@ -59,12 +59,14 @@ class AOpticalComponent(IRadiant):
         -------
         signal : SpectralQty
             The spectral flux density of the target's signal
+        size : str
+            The size of the target.
         """
-        signal = self.__parent.calcSignal()
+        signal, size = self.__parent.calcSignal()
         info("Calculating signal for class '" + self.__class__.__name__ + "'.")
         signal = self._propagate(signal) * (1 - self.__obstruction)
         debug(signal)
-        return signal
+        return signal, size
 
     def calcBackground(self) -> SpectralQty:
         """

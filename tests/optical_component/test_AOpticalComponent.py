@@ -21,7 +21,7 @@ class TestAOpticalComponent(TestCase):
                                      obstruction=0.1, obstructor_temp=300 * u.K, obstructor_emissivity=1)
 
     def test_calcSignal(self):
-        self.assertEqual(self.comp.calcSignal(),
+        self.assertEqual(self.comp.calcSignal()[0],
                          SpectralQty(self.wl, np.array([1.29074440e-17, 5.65909989e-18, 2.85372997e-18,
                                                         1.58973516e-18]) << u.W / (u.m ** 2 * u.nm)))
 

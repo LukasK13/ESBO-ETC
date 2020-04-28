@@ -11,7 +11,7 @@ class TestAtmosphere(TestCase):
                                      "data/atmosphere/atmosphere_emission_1.csv")
 
     def test_calcSignal(self):
-        self.assertEqual(self.atmosphere.calcSignal(),
+        self.assertEqual(self.atmosphere.calcSignal()[0],
                          SpectralQty(np.arange(200, 210) << u.nm,
                                      np.array([1.10e-15, 1.20e-15, 1.30e-15, 1.26e-15, 1.20e-15, 1.12e-15, 1.02e-15,
                                                0.9e-15, 0, 0]) << u.W / (u.m ** 2 * u.nm)))

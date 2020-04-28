@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from .SpectralQty import SpectralQty
+from typing import Tuple
 
 
 class IRadiant(ABC):
@@ -8,7 +9,7 @@ class IRadiant(ABC):
     in the beam.
     """
     @abstractmethod
-    def calcSignal(self) -> SpectralQty:
+    def calcSignal(self) -> Tuple[SpectralQty, str]:
         """
         Calculate the signal coming from the component
 
@@ -16,6 +17,8 @@ class IRadiant(ABC):
         -------
         signal : SpectralQty
             The emitted, reflected or transmitted signal
+        size : str
+            The size of the target.
         """
         pass
 

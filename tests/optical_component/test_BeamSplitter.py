@@ -18,7 +18,7 @@ class TestBeamSplitter(TestCase):
         self.assertEqual(self.splitter.calcBackground(),
                          SpectralQty(self.wl, np.array([4.31413931e-96, 1.37122214e-95, 4.30844544e-95,
                                                         1.33846280e-94]) << u.W / (u.m ** 2 * u.nm * u.sr)))
-        self.assertEqual(self.splitter.calcSignal(),
+        self.assertEqual(self.splitter.calcSignal()[0],
                          SpectralQty(np.arange(200, 210, 1) << u.nm,
                                      np.array([0, 1.20e-15, 1.30e-15, 1.40e-15, 1.35e-15, 0, 0, 0, 0, 0]) << u.W /
                                      (u.m ** 2 * u.nm)))
