@@ -13,6 +13,7 @@ class Zemax(IPSF):
     A class for modelling the PSF from a Zemax output file
     """
 
+    @u.quantity_input(wl="length", d_aperture="length")
     def __init__(self, file: str, f_number: float, wl: u.Quantity, d_aperture: u.Quantity):
         """
         Initialize a new PSF from a Zemax file.
