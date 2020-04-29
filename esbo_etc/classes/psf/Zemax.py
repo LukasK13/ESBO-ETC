@@ -5,9 +5,10 @@ import astropy.units as u
 from scipy.interpolate import RegularGridInterpolator
 from scipy.integrate import nquad
 from scipy.optimize import bisect
+from .IPSF import IPSF
 
 
-class Zemax:
+class Zemax(IPSF):
     """
     A class for modelling the PSF from a Zemax output file
     """
@@ -89,3 +90,19 @@ class Zemax:
         reduced_observation_angle = r * self.__grid_delta[0] / (self.__f_number * self.__d_aperture) * \
             self.__d_aperture / self.__wl
         return reduced_observation_angle * u.dimensionless_unscaled
+
+    def mapToGrid(self, grid: np.ndarray) -> np.ndarray:
+        """
+        Map the integrated PSF values to a sensor grid.
+
+        Parameters
+        ----------
+        grid : ndarray
+            The grid to map the values to. The values will only be mapped onto entries with the value 1.
+
+        Returns
+        -------
+        grid : ndarray
+            The grid with the mapped values.
+        """
+        pass
