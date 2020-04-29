@@ -6,6 +6,8 @@ from scipy.interpolate import RegularGridInterpolator
 from scipy.integrate import nquad
 from scipy.optimize import bisect
 from .IPSF import IPSF
+from typing import Union
+from ...lib.helpers import error
 
 
 class Zemax(IPSF):
@@ -53,7 +55,7 @@ class Zemax(IPSF):
         self.__center_point = [int(x) for x in
                                re.findall("[0-9]+", list(filter(re.compile("Center point is: ").match, head))[0])]
 
-    def calcReducedObservationAngle(self, contained_energy: float) -> u.Quantity:
+    def calcReducedObservationAngle(self, contained_energy: Union[str, int, float, u.Quantity]) -> u.Quantity:
         """
         Calculate the reduced observation angle in lambda / d_ap for the given contained energy.
 
@@ -67,6 +69,13 @@ class Zemax(IPSF):
         reduced_observation_angle: Quantity
             The reduced observation angle in lambda / d_ap
         """
+        if type(contained_energy) == str:
+            try:
+                contained_energy = float(contained_energy) / 100.0 * u.dimensionless_unscaled
+            except ValueError:
+                error("Could not convert encircled energy to float.")
+        elif type(contained_energy) in [int, float]:
+            contained_energy = contained_energy * u.dimensionless_unscaled
         # Create an linear interpolation function for the PSF and the corresponding grid coordinates
         x_range = np.arange(-(self.__center_point[0] - 1), self.__psf.shape[0] - self.__center_point[0] + 1)
         y_range = np.arange(-(self.__center_point[1] - 1), self.__psf.shape[1] - self.__center_point[1] + 1)
@@ -80,7 +89,7 @@ class Zemax(IPSF):
         # Find the radius of the circle containing the given percentage of energy. Therefore, the interpolation
         # function is numerically integrated within the radius. The Integration radius is optimized using bisection.
         try:
-            r = bisect(lambda r_c: contained_energy -
+            r = bisect(lambda r_c: contained_energy.value -
                        nquad(lambda x, y: interp(np.array([y, x])),
                              [lambda y: [-1 * np.sqrt(r_c ** 2 - y ** 2), np.sqrt(r_c ** 2 - y ** 2)],
                              [-r_c, r_c]], opts={"epsrel": 1e-1})[0] / total, 0, r_max, xtol=0.1)
