@@ -1,13 +1,13 @@
+from .IPSF import IPSF
+from ...lib.helpers import error, rasterizeCircle
 import numpy as np
+import astropy.units as u
 import re
 from logging import warning
-import astropy.units as u
-from scipy.interpolate import RegularGridInterpolator
-from scipy.integrate import nquad
-from scipy.optimize import bisect
-from .IPSF import IPSF
 from typing import Union
-from ...lib.helpers import error
+from scipy.optimize import bisect
+from scipy.ndimage.interpolation import zoom
+from scipy.signal import fftconvolve
 
 
 class Zemax(IPSF):
@@ -15,8 +15,9 @@ class Zemax(IPSF):
     A class for modelling the PSF from a Zemax output file
     """
 
-    @u.quantity_input(wl="length", d_aperture="length")
-    def __init__(self, file: str, f_number: float, wl: u.Quantity, d_aperture: u.Quantity):
+    @u.quantity_input(wl="length", d_aperture="length", pixel_size="length")
+    def __init__(self, file: str, f_number: float, wl: u.Quantity, d_aperture: u.Quantity, osf: float,
+                 pixel_size: u.Quantity):
         """
         Initialize a new PSF from a Zemax file.
 
@@ -30,11 +31,17 @@ class Zemax(IPSF):
             The central wavelength which is used for calculating the PSF
         d_aperture : Quantity
             The diameter of the telescope's aperture.
+        osf : float
+            The oversampling factor to be used for oversampling the PSF with regards to the pixel size.
+        pixel_size : Quantity
+            The size of a pixel as length-quantity.
         """
         # Store parameters
         self.__f_number = f_number
         self.__wl = wl
         self.__d_aperture = d_aperture
+        self.__osf = osf
+        self.__pixel_size = pixel_size
         # Read PSF from file
         with open(file, encoding="utf16") as fp:
             self.__psf = np.genfromtxt((x.replace(",", ".") for x in fp), delimiter='\t', skip_header=21)
@@ -47,15 +54,20 @@ class Zemax(IPSF):
             warning("Not all PSF entries read.")
         # Parse and calculate the grid width
         grid_delta = [float(x.replace(",", ".")) for x in
-                     re.findall("[0-9]+,*[0-9]*", list(filter(re.compile("Data area is ").match, head))[0])]
+                      re.findall("[0-9]+,*[0-9]*", list(filter(re.compile("Data area is ").match, head))[0])]
         unit = re.findall(".+(?=\\.$)", re.sub("Data area is [0-9]+,*[0-9]* by [0-9]+,*[0-9]* ", "",
                                                list(filter(re.compile("Data area is ").match, head))[0]))[0]
+        # noinspection PyArgumentList
         self.__grid_delta = np.array(grid_delta) / np.array(shape) << u.Unit(unit)
         # Parse the center point of the PSF in the grid
         self.__center_point = [int(x) for x in
                                re.findall("[0-9]+", list(filter(re.compile("Center point is: ").match, head))[0])]
+        self.__center_point[0] = self.__psf.shape[0] - self.__center_point[0]
+        self.__center_point[1] -= 1
 
-    def calcReducedObservationAngle(self, contained_energy: Union[str, int, float, u.Quantity]) -> u.Quantity:
+    # @u.quantity_input(jitter_sigma=u.arcsec)
+    def calcReducedObservationAngle(self, contained_energy: Union[str, int, float, u.Quantity],
+                                    jitter_sigma: u.Quantity = None) -> u.Quantity:
         """
         Calculate the reduced observation angle in lambda / d_ap for the given contained energy.
 
@@ -63,12 +75,15 @@ class Zemax(IPSF):
         ----------
         contained_energy : Union[str, int, float, u.Quantity]
             The percentage of energy to be contained within a circle with the diameter reduced observation angle.
+        jitter_sigma : Quantity
+            Sigma of the telescope's jitter in arcsec
 
         Returns
         -------
         reduced_observation_angle: Quantity
             The reduced observation angle in lambda / d_ap
         """
+        # Parse the contained energy
         if type(contained_energy) == str:
             try:
                 contained_energy = float(contained_energy) / 100.0 * u.dimensionless_unscaled
@@ -76,29 +91,62 @@ class Zemax(IPSF):
                 error("Could not convert encircled energy to float.")
         elif type(contained_energy) in [int, float]:
             contained_energy = contained_energy * u.dimensionless_unscaled
-        # Create an linear interpolation function for the PSF and the corresponding grid coordinates
-        x_range = np.arange(-(self.__center_point[0] - 1), self.__psf.shape[0] - self.__center_point[0] + 1)
-        y_range = np.arange(-(self.__center_point[1] - 1), self.__psf.shape[1] - self.__center_point[1] + 1)
-        interp = RegularGridInterpolator((y_range, x_range), np.flip(self.__psf, axis=0))
-        # Calculate the maximum possible radius as the smallest distance from the center of the PSF to the borders of
-        # the grid.
-        r_max = min(self.__center_point[0] - 1, self.__center_point[1] - 1,
-                    self.__psf.shape[0] - self.__center_point[0], self.__psf.shape[1] - self.__center_point[1])
-        # Calculate the overall integral of the PSF
-        total = np.sum(self.__psf)
-        # Find the radius of the circle containing the given percentage of energy. Therefore, the interpolation
-        # function is numerically integrated within the radius. The Integration radius is optimized using bisection.
-        try:
-            r = bisect(lambda r_c: contained_energy.value -
-                       nquad(lambda x, y: interp(np.array([y, x])),
-                             [lambda y: [-1 * np.sqrt(r_c ** 2 - y ** 2), np.sqrt(r_c ** 2 - y ** 2)],
-                             [-r_c, r_c]], opts={"epsrel": 1e-1})[0] / total, 0, r_max, xtol=0.1)
-        except ValueError:
-            r = r_max
-        # Calculate the reduced observation angle for the radius of the circle. Therefore, first convert the radius in
-        # grid elements to plate size, then calculate the corresponding observation angle and reduce it.
-        reduced_observation_angle = r * self.__grid_delta[0] / (self.__f_number * self.__d_aperture) * \
-            self.__d_aperture / self.__wl
+
+        # Calculate the osf for the PSF based on the current resolution of the PSF
+        psf_osf = np.ceil(max(self.__grid_delta) / (2 * self.__pixel_size / self.__osf)).value * 2
+        if psf_osf == 1.0:
+            # No oversampling is necessary
+            psf = self.__psf
+            center_point = self.__center_point
+        else:
+            # Oversampling is necessary, oversample the PSF and calculate the new center point.
+            psf = zoom(self.__psf, zoom=psf_osf, order=1)
+            center_point = [(x + 0.5) * psf_osf - 0.5 for x in self.__center_point]
+        if jitter_sigma is not None:
+            # Convert angular jitter to jitter on focal plane
+            jitter_sigma_um = (jitter_sigma.to(u.rad) * self.__f_number * self.__d_aperture / u.rad).to(u.um)
+            # Jitter is enabled. Calculate the corresponding gaussian bell and convolve it with the PSF
+            if min(self.__grid_delta) / psf_osf < 6 * jitter_sigma_um:
+                # 3-sigma interval of the gaussian bell is larger than the grid width
+                # Calculate the necessary grid length for the 3-sigma interval of the gaussian bell
+                jitter_grid_length = np.ceil(6 * jitter_sigma_um / (min(self.__grid_delta) / psf_osf)).value
+                # Make sure, the grid size is odd in order to have a defined kernel center
+                jitter_grid_length = int(jitter_grid_length if jitter_grid_length % 2 == 1 else jitter_grid_length + 1)
+
+                # Create a meshgrid containing the x and y coordinates of each point within the first quadrant of the
+                # gaussian kernel
+                xv, yv = np.meshgrid(range(-int((jitter_grid_length - 1) / 2), 1),
+                                     range(-int((jitter_grid_length - 1) / 2), 1))
+                # Calculate the gaussian kernel in the first quadrant
+                kernel = 1 / (2 * np.pi * jitter_sigma_um.value ** 2) * np.exp(
+                    -((xv * min(self.__grid_delta.value) / psf_osf) ** 2 +
+                      (yv * min(self.__grid_delta.value) / psf_osf) ** 2) / (2 * jitter_sigma_um.value ** 2))
+                # Mirror the kernel from the first quadrant to all other quadrants
+                kernel = np.concatenate((kernel, np.flip(kernel, axis=1)[:, 1:]), axis=1)
+                kernel = np.concatenate((kernel, np.flip(kernel, axis=0)[1:, :]), axis=0)
+                # Normalize kernel
+                kernel = kernel / np.sum(kernel)
+                # Convolve PSF with gaussian kernel
+                psf = fftconvolve(np.pad(psf, int((jitter_grid_length - 1) / 2), mode="constant", constant_values=0),
+                                  kernel, mode="same")
+                # Calculate new center point
+                center_point = [x + int((jitter_grid_length - 1) / 2) for x in center_point]
+        # Calculate the maximum possible radius for the circle containing the photometric aperture
+        # r_max = min(center_point[0] - 1, center_point[1] - 1, psf.shape[0] - center_point[0],
+        #             psf.shape[1] - center_point[1])
+        r_max = min(np.sqrt(center_point[0]**2 + center_point[1]**2),
+                    np.sqrt((psf.shape[0] - center_point[0])**2 + center_point[1]**2),
+                    np.sqrt(center_point[0]**2 + (psf.shape[1] - center_point[1])**2),
+                    np.sqrt((psf.shape[0] - center_point[0])**2 + (psf.shape[1] - center_point[1])**2))
+        # Calculate the total contained energy of the PSF
+        total = np.sum(psf)
+        # Iterate the optimal radius for the contained energy
+        r = bisect(lambda r_c: contained_energy.value - np.sum(
+            psf * rasterizeCircle(psf.shape[0], r_c, center_point[0], center_point[1])) / total, 0, r_max, xtol=1e-1)
+        # Calculate the reduced observation angle in d_ap / lambda
+        # noinspection PyTypeChecker
+        reduced_observation_angle = r / psf_osf * self.__grid_delta[0] / (
+                    self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl
         return reduced_observation_angle * u.dimensionless_unscaled
 
     def mapToGrid(self, grid: np.ndarray) -> np.ndarray:
