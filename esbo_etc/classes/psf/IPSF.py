@@ -9,7 +9,8 @@ class IPSF(ABC):
     Interface for modelling a PSF
     """
     @abstractmethod
-    def calcReducedObservationAngle(self, contained_energy: Union[str, int, float, u.Quantity]) -> u.Quantity:
+    def calcReducedObservationAngle(self, contained_energy: Union[str, int, float, u.Quantity],
+                                    jitter_sigma: u.Quantity = None) -> u.Quantity:
         """
         Calculate the reduced observation angle in lambda / d_ap for the given contained energy.
 
@@ -17,6 +18,8 @@ class IPSF(ABC):
         ----------
         contained_energy : Union[str, int, float, u.Quantity]
             The percentage of energy to be contained within a circle with the diameter reduced observation angle.
+        jitter_sigma : Quantity
+            Sigma of the telescope's jitter in arcsec
 
         Returns
         -------
