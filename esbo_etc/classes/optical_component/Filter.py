@@ -2,6 +2,7 @@ from .AHotOpticalComponent import AHotOpticalComponent
 from ..SpectralQty import SpectralQty
 from ..IRadiant import IRadiant
 from ...lib.helpers import error
+from ..Entry import Entry
 from astropy import units as u
 from typing import Union, Callable
 import numpy as np
@@ -22,8 +23,8 @@ class Filter(AHotOpticalComponent):
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
     def __init__(self, parent: IRadiant, transmittance: Union[SpectralQty, Callable[[u.Quantity], u.Quantity]],
-                 emissivity: Union[int, float, str] = 1, temp: u.Quantity = 0 * u.K,
-                 obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
+                 emissivity: Union[str, float] = 1, temp: u.Quantity = 0 * u.K, obstruction: float = 0,
+                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
         Instantiate a new filter model
 
@@ -33,7 +34,7 @@ class Filter(AHotOpticalComponent):
             The parent element of the optical component from which the electromagnetic radiation is received.
         transmittance : Union[SpectralQty, Callable]
             The spectral transmittance coefficients of the filter.
-        emissivity : Union[str, int, float]
+        emissivity : Union[str, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -52,8 +53,8 @@ class Filter(AHotOpticalComponent):
 
     @classmethod
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromBand(cls, parent: IRadiant, band: str, emissivity: Union[str, int, float] = 1,
-                 temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
+    def fromBand(cls, parent: IRadiant, band: str, emissivity: Union[str, float] = 1, temp: u.Quantity = 0 * u.K,
+                 obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                  obstructor_emissivity: float = 1) -> "Filter":
         """
         Instantiate a new filter model from a spectral band. The filter will be modelled as bandpass filter of
@@ -65,7 +66,7 @@ class Filter(AHotOpticalComponent):
             The parent element of the optical component from which the electromagnetic radiation is received.
         band : str
             The spectral band of the filter. Can be one of [U, B, V, R, I, J, H, K].
-        emissivity : Union[str, int, float]
+        emissivity : Union[str, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -92,7 +93,7 @@ class Filter(AHotOpticalComponent):
 
     @classmethod
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromFile(cls, parent: IRadiant, transmittance: str, emissivity: Union[str, int, float] = 1,
+    def fromFile(cls, parent: IRadiant, transmittance: str, emissivity: Union[str, float] = 1,
                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                  obstructor_emissivity: float = 1) -> "Filter":
         """
@@ -105,7 +106,7 @@ class Filter(AHotOpticalComponent):
         transmittance : str
             Path to the file containing the spectral transmittance-coefficients of the filter element.
             The format of the file will be guessed by `astropy.io.ascii.read()`.
-        emissivity : Union[str, int, float]
+        emissivity : Union[str, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -129,9 +130,9 @@ class Filter(AHotOpticalComponent):
 
     @classmethod
     # @u.quantity_input(start="length", end="length", temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromRange(cls, parent: IRadiant, start: u.Quantity, end: u.Quantity,
-                  emissivity: Union[str, int, float] = 1, temp: u.Quantity = 0 * u.K, obstruction: float = 0,
-                  obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1) -> "Filter":
+    def fromRange(cls, parent: IRadiant, start: u.Quantity, end: u.Quantity, emissivity: Union[str, float] = 1,
+                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
+                  obstructor_emissivity: float = 1) -> "Filter":
         """
         Instantiate a new filter model from a spectral range. The filter will be modelled as bandpass filter of
         infinite order and therefore similar to a hat-function.
@@ -144,7 +145,7 @@ class Filter(AHotOpticalComponent):
             Start wavelength of the pass-band
         end : length-quantity
             End wavelength of the pass-band
-        emissivity : Union[str, int, float]
+        emissivity : Union[str, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
             Temperature of the optical component
@@ -202,3 +203,54 @@ class Filter(AHotOpticalComponent):
         """
         return lambda wl: np.logical_and(np.greater_equal(wl, start), np.greater_equal(end, wl)).astype(int) *\
             u.dimensionless_unscaled
+
+    @staticmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        if hasattr(conf, "band"):
+            mes = conf.check_selection("band", ["U", "B", "V", "R", "I", "J", "H", "K", "L", "M", "N"])
+        elif hasattr(conf, "transmittance"):
+            mes = conf.check_file("transmittance")
+        elif hasattr(conf, "start") and hasattr(conf, "end"):
+            mes = conf.check_quantity("start", u.m)
+            if mes is not None:
+                return mes
+            mes = conf.check_quantity("end", u.m)
+        else:
+            mes = "Expected one of 'band' / 'transmittance' / 'start' & 'end'."
+        if mes is not None:
+            return mes
+        if hasattr(conf, "emissivity"):
+            mes = conf.check_file("emissivity")
+            if mes is not None:
+                mes = conf.check_float("emissivity")
+                if mes is not None:
+                    return mes
+        if hasattr(conf, "temp"):
+            mes = conf.check_quantity("temp", u.K)
+            if mes is not None:
+                return mes
+        if hasattr(conf, "obstruction"):
+            mes = conf.check_float("obstruction")
+            if mes is not None:
+                return mes
+        if hasattr(conf, "obstructor_temp"):
+            mes = conf.check_quantity("obstructor_temp", u.K)
+            if mes is not None:
+                return mes
+        if hasattr(conf, "obstructor_emissivity"):
+            mes = conf.check_float("obstructor_emissivity")
+            if mes is not None:
+                return mes

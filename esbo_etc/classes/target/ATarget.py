@@ -5,6 +5,7 @@ import astropy.units as u
 import numpy as np
 from logging import info, debug
 from typing import Tuple
+from ..Entry import Entry
 
 
 class ATarget(IRadiant):
@@ -59,3 +60,21 @@ class ATarget(IRadiant):
         info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
         debug(self.__sfd)
         return self.__sfd, self.__size
+
+    @staticmethod
+    @abstractmethod
+    def check_config(conf: Entry) -> bool:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        pass

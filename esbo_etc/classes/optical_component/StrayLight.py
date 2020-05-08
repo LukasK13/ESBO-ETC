@@ -1,7 +1,9 @@
 from .AOpticalComponent import AOpticalComponent
 from ..IRadiant import IRadiant
 from ..SpectralQty import SpectralQty
+from ..Entry import Entry
 import astropy.units as u
+from typing import Union
 
 
 class StrayLight(AOpticalComponent):
@@ -27,3 +29,22 @@ class StrayLight(AOpticalComponent):
                                              qty_unit_default=u.W / (u.m ** 2 * u.nm * u.sr))
         # Initialize the super class
         super().__init__(parent, 1.0, emission_sqty)
+
+    @staticmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        mes = conf.check_file("emission")
+        if mes is not None:
+            return mes

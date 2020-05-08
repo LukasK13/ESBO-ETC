@@ -5,6 +5,7 @@ from abc import abstractmethod
 import astropy.units as u
 from astropy.modeling.models import BlackBody
 from typing import Union, Callable
+from ..Entry import Entry
 
 
 class AHotOpticalComponent(AOpticalComponent):
@@ -90,3 +91,21 @@ class AHotOpticalComponent(AOpticalComponent):
         """
         bb = BlackBody(temperature=temp, scale=em * u.W / (u.m ** 2 * u.nm * u.sr))
         return lambda wl: bb(wl)
+
+    @staticmethod
+    @abstractmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        pass

@@ -6,6 +6,7 @@ import astropy.units as u
 from astropy.modeling.models import BlackBody
 from typing import Union, Callable, Tuple
 from logging import info, debug
+from ..Entry import Entry
 
 
 class AOpticalComponent(IRadiant):
@@ -122,3 +123,21 @@ class AOpticalComponent(IRadiant):
             return self.__noise
         except AttributeError:
             error("noise not given. Method ownNoise() needs to be implemented.")
+
+    @staticmethod
+    @abstractmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        pass

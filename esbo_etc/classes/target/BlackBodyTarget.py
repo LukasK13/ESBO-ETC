@@ -3,6 +3,8 @@ from ..SpectralQty import SpectralQty
 import astropy.units as u
 from astropy.modeling.models import BlackBody
 from ...lib.helpers import error
+from ..Entry import Entry
+from typing import Union
 
 
 class BlackBodyTarget(ATarget):
@@ -44,16 +46,44 @@ class BlackBodyTarget(ATarget):
         Returns
         -------
         """
-        if band not in self._band.keys():
+        if band.upper() not in self._band.keys():
             error("Band has to be one of '[" + ", ".join(list(self._band.keys())) + "]'")
         # Create blackbody model with given temperature
         bb = BlackBody(temperature=temp, scale=1 * u.W / (u.m ** 2 * u.nm * u.sr))
 
         # Calculate the correction factor for a star of 0th magnitude using the spectral flux density
         # for the central wavelength of the given band
-        factor = self._band[band]["sfd"] / (bb(self._band[band]["wl"]) * u.sr) * u.sr
+        factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * u.sr) * u.sr
         # Calculate spectral flux density for the given wavelengths and scale it for a star of the given magnitude
         sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)
 
         # Initialize super class
         super().__init__(SpectralQty(wl_bins, sfd), wl_bins, size)
+
+    @staticmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        mes = conf.check_quantity("temp", u.K)
+        if mes is not None:
+            return mes
+        mes = conf.check_quantity("mag", u.mag)
+        if mes is not None:
+            return mes
+        mes = conf.check_selection("band", ["U", "B", "V", "R", "I", "J", "H", "K", "L", "M", "N"])
+        if mes is not None:
+            return mes
+        mes = conf.check_selection("size", ["point", "extended"])
+        if mes is not None:
+            return mes

@@ -1,6 +1,8 @@
 from ..IRadiant import IRadiant
 import astropy.units as u
 from abc import abstractmethod
+from ..Entry import Entry
+from typing import Union
 
 
 class ASensor:
@@ -50,5 +52,22 @@ class ASensor:
         -------
         exp_time : Quantity
             The necessary exposure time in seconds.
+        """
+        pass
+
+    @staticmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        """
+        Check the configuration for this class
+
+        Parameters
+        ----------
+        conf : Entry
+            The configuration entry to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was succesful.
         """
         pass
