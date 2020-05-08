@@ -191,4 +191,4 @@ class Configuration(object):
                   "' does not exist. Did you mean '" + difflib.get_close_matches(conf.instrument.sensor.type,
                                                                                  dir(sensor), 1)[0] + "'?")
         mes = getattr(sensor, conf.instrument.sensor.type).check_config(conf.instrument.sensor)
-        mes is not None and error("Configuration check: instrument -> sensor: " + mes)
+        mes is not None and error("Configuration check: instrument -> sensor -> " + mes)
