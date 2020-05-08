@@ -9,7 +9,7 @@ class IRadiant(ABC):
     in the beam.
     """
     @abstractmethod
-    def calcSignal(self) -> Tuple[SpectralQty, str]:
+    def calcSignal(self) -> Tuple[SpectralQty, str, float]:
         """
         Calculate the signal coming from the component
 
@@ -19,6 +19,8 @@ class IRadiant(ABC):
             The emitted, reflected or transmitted signal
         size : str
             The size of the target.
+        obstruction : float
+            The obstruction factor.
         """
         pass
 

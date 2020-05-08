@@ -11,8 +11,8 @@ class TestFileTarget(TestCase):
 
     def test_calcSignal(self):
         signal = SpectralQty(np.arange(200, 210, 1) << u.nm,
-                                   np.arange(1.1e-15, 2.0e-15, 1e-16) << u.W / (u.m ** 2 * u.nm))
-        self.assertEqual(self.target.calcSignal(), (signal, "Point"))
+                             np.arange(1.1e-15, 2.0e-15, 1e-16) << u.W / (u.m ** 2 * u.nm))
+        self.assertEqual(self.target.calcSignal(), (signal, "Point", 0.0))
 
     def test_calcBackground(self):
         noise = SpectralQty(np.arange(200, 210, 1) << u.nm,

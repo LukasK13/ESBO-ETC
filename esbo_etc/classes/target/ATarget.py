@@ -46,7 +46,7 @@ class ATarget(IRadiant):
         debug(background)
         return background
 
-    def calcSignal(self) -> Tuple[SpectralQty, str]:
+    def calcSignal(self) -> Tuple[SpectralQty, str, float]:
         """
         Calculate the spectral flux density of the target's signal
 
@@ -56,10 +56,12 @@ class ATarget(IRadiant):
             The spectral flux density of the target's signal
         size : str
             The size of the target.
+        obstruction : float
+            The obstruction factor.
         """
         info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
         debug(self.__sfd)
-        return self.__sfd, self.__size
+        return self.__sfd, self.__size, 0.0
 
     @staticmethod
     @abstractmethod
