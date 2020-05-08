@@ -68,6 +68,6 @@ class ASensor:
         Returns
         -------
         mes : Union[None, str]
-            The error message of the check. This will be None if the check was succesful.
+            The error message of the check. This will be None if the check was successful.
         """
         pass
