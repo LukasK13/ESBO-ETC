@@ -10,6 +10,7 @@ from ..classes import optical_component as oc
 from ..classes import sensor as sensor
 import difflib
 import os.path
+from typing import Union
 
 
 class Configuration(object):
@@ -40,12 +41,12 @@ class Configuration(object):
 
         # Read configuration file
         logging.info("Reading configuration from file '" + file + "'.")
-        self.conf = self.parser(eT.parse(file).getroot())
+        self.conf = self.__parser(eT.parse(file).getroot())
 
-        self.check_config(self.conf)
-        self.calc_metaoptions()
+        self.__check_config()
+        self.__calc_metaoptions()
 
-    def parser(self, parent: eT.Element):
+    def __parser(self, parent: eT.Element):
         """
         Parse a XML element tree to an Entry-tree
 
@@ -65,7 +66,7 @@ class Configuration(object):
 
         for child in parent:
             # recursively parse children of child element
-            parsed_child = self.parser(child)
+            parsed_child = self.__parser(child)
             # parse attributes of child element
             parsed_child.parse(child)
 
@@ -79,13 +80,13 @@ class Configuration(object):
                 setattr(obj, child.tag, parsed_child)
         return obj
 
-    def calc_metaoptions(self):
+    def __calc_metaoptions(self):
         """
         Calculate additional attributes e.g. the wavelength grid
         """
-        self.calc_metaoption_wl_delta()
+        self.__calc_metaoption_wl_delta()
 
-    def calc_metaoption_wl_delta(self):
+    def __calc_metaoption_wl_delta(self):
         """
         Calculate the wavelength grid used for the calculations.
         """
@@ -98,96 +99,112 @@ class Configuration(object):
                                               self.conf.common.wl_max().to(u.nm).value, wl_delta.to(u.nm).value),
                                     self.conf.common.wl_max().to(u.nm).value) << u.nm))
 
-    @staticmethod
-    def check_config(conf: Entry):
+    def __check_config(self):
+        """
+        Check and fix the parsed configuration file.
+        """
         # Check common
-        if not hasattr(conf, "common"):
+        if not hasattr(self.conf, "common"):
             error("Configuration check: Missing required container 'common'.")
-        if not hasattr(conf.common, "wl_min"):
+        if not hasattr(self.conf.common, "wl_min"):
             error("Configuration check: common: Missing required container 'wl_min'.")
-        mes = conf.common.wl_min.check_quantity("val", u.m)
+        mes = self.conf.common.wl_min.check_quantity("val", u.m)
         mes is not None and error("Configuration check: common -> wl_min: " + mes)
-        if not hasattr(conf.common, "wl_max"):
+        if not hasattr(self.conf.common, "wl_max"):
             error("Configuration check: common: Missing required container 'wl_max'.")
-        mes = conf.common.wl_max.check_quantity("val", u.m)
+        mes = self.conf.common.wl_max.check_quantity("val", u.m)
         mes is not None and error("Configuration check: common -> wl_max: " + mes)
-        if hasattr(conf.common, "wl_delta"):
-            mes = conf.common.wl_delta.check_quantity("val", u.m)
+        if hasattr(self.conf.common, "wl_delta"):
+            mes = self.conf.common.wl_delta.check_quantity("val", u.m)
             mes is not None and error("Configuration check: common -> wl_delta: " + mes)
-        elif hasattr(conf.common, "res"):
-            mes = conf.common.res.check_quantity("val", u.dimensionless_unscaled)
+        elif hasattr(self.conf.common, "res"):
+            mes = self.conf.common.res.check_quantity("val", u.dimensionless_unscaled)
             mes is not None and error("Configuration check: common -> res: " + mes)
         else:
             error("Configuration check: common: Expected one of the containers 'wl_delta' or 'res' but got none.")
-        if not hasattr(conf.common, "d_aperture"):
+        if not hasattr(self.conf.common, "d_aperture"):
             error("Configuration check: common: Missing required container 'd_aperture'.")
-        mes = conf.common.d_aperture.check_quantity("val", u.m)
+        mes = self.conf.common.d_aperture.check_quantity("val", u.m)
         mes is not None and error("Configuration check: common -> d_aperture: " + mes)
-        if not hasattr(conf.common, "psf"):
-            setattr(conf.common, "psf", Entry(val="Airy"))
+        if not hasattr(self.conf.common, "psf"):
+            setattr(self.conf.common, "psf", Entry(val="Airy"))
         else:
-            if conf.common.psf().lower() != "airy":
-                mes = conf.common.psf.check_file("val")
+            if self.conf.common.psf().lower() != "airy":
+                mes = self.conf.common.psf.check_file("val")
                 mes is not None and error("Configuration check: common -> psf: " + mes)
-        if hasattr(conf.common, "jitter_sigma"):
-            mes = conf.common.jitter_sigma.check_quantity("val", u.arcsec)
+        if hasattr(self.conf.common, "jitter_sigma"):
+            mes = self.conf.common.jitter_sigma.check_quantity("val", u.arcsec)
             mes is not None and error("Configuration check: common -> jitter_sigma: " + mes)
-        if not hasattr(conf.common, "output_path"):
-            setattr(conf.common, "output_path", Entry(val="."))
+        if not hasattr(self.conf.common, "output_path"):
+            setattr(self.conf.common, "output_path", Entry(val="."))
 
         # Check astroscene
-        if not hasattr(conf, "astroscene"):
+        if not hasattr(self.conf, "astroscene"):
             error("Configuration check: Missing required container 'astroscene'.")
-        if not hasattr(conf.astroscene, "target"):
+        if not hasattr(self.conf.astroscene, "target"):
             error("Configuration check: astroscene: Missing required container 'target'.")
-        if not hasattr(conf.astroscene.target, "type"):
+        if not hasattr(self.conf.astroscene.target, "type"):
             error("Configuration check: astroscene -> target: Missing required parameter 'type'.")
-        if conf.astroscene.target.type not in dir(tg):
+        if self.conf.astroscene.target.type not in dir(tg):
             # noinspection PyTypeChecker
-            error("Configuration check: astroscene -> target: Target type '" + conf.astroscene.target.type +
-                  "' does not exist. Did you mean '" + difflib.get_close_matches(conf.astroscene.target.type,
+            error("Configuration check: astroscene -> target: Target type '" + self.conf.astroscene.target.type +
+                  "' does not exist. Did you mean '" + difflib.get_close_matches(self.conf.astroscene.target.type,
                                                                                  dir(tg), 1)[0] + "'?")
-        mes = getattr(tg, conf.astroscene.target.type).check_config(conf.astroscene.target)
+        mes = getattr(tg, self.conf.astroscene.target.type).check_config(self.conf.astroscene.target)
         mes is not None and error("Configuration check: astroscene -> target: " + mes)
 
-        def check_optical_components(conf: Entry):
-            if hasattr(conf, "optical_component"):
-                for component in (conf.optical_component if type(conf.optical_component) == list else
-                                  [conf.optical_component]):
-                    if not hasattr(component, "type"):
-                        return "optical_component: Missing required parameter 'type'."
-                    if component.type not in dir(oc):
-                        # noinspection PyTypeChecker
-                        return "optical_component: optical component type '" + component.type + \
-                               "' does not exist. Did you mean '" + \
-                               difflib.get_close_matches(component.type, dir(tg), 1)[0] + "'?"
-                    mes = getattr(oc, component.type).check_config(component)
-                    if mes is not None:
-                        print(component.type)
-                        print(mes)
-                        return "optical_component -> " + component.type + ": " + mes
-
-        mes = check_optical_components(conf.astroscene)
+        mes = self.__check_optical_components(self.conf.astroscene)
         mes is not None and error("Configuration check: astroscene -> " + mes)
 
         # Check common_optics
-        if hasattr(conf, "common_optics"):
-            mes = check_optical_components(conf.common_optics)
+        if hasattr(self.conf, "common_optics"):
+            mes = self.__check_optical_components(self.conf.common_optics)
             mes is not None and error("Configuration check: common_optics -> " + mes)
 
         # Check instrument
-        if not hasattr(conf, "instrument"):
+        if not hasattr(self.conf, "instrument"):
             error("Configuration check: Missing required container 'instrument'.")
-        mes = check_optical_components(conf.instrument)
+        mes = self.__check_optical_components(self.conf.instrument)
         mes is not None and error("Configuration check: instrument -> " + mes)
-        if not hasattr(conf.instrument, "sensor"):
+        if not hasattr(self.conf.instrument, "sensor"):
             error("Configuration check: instrument: Missing required container 'sensor'.")
-        if not hasattr(conf.instrument.sensor, "type"):
+        if not hasattr(self.conf.instrument.sensor, "type"):
             error("Configuration check: instrument -> target: Missing required parameter 'type'.")
-        if conf.instrument.sensor.type not in dir(sensor):
+        if self.conf.instrument.sensor.type not in dir(sensor):
             # noinspection PyTypeChecker
-            error("Configuration check: sensor -> target: Sensor type '" + conf.instrument.sensor.type +
-                  "' does not exist. Did you mean '" + difflib.get_close_matches(conf.instrument.sensor.type,
+            error("Configuration check: sensor -> target: Sensor type '" + self.conf.instrument.sensor.type +
+                  "' does not exist. Did you mean '" + difflib.get_close_matches(self.conf.instrument.sensor.type,
                                                                                  dir(sensor), 1)[0] + "'?")
-        mes = getattr(sensor, conf.instrument.sensor.type).check_config(conf.instrument.sensor)
+        mes = getattr(sensor, self.conf.instrument.sensor.type).check_config(self.conf.instrument.sensor)
         mes is not None and error("Configuration check: instrument -> sensor -> " + mes)
+
+    @staticmethod
+    def __check_optical_components(conf: Union[Entry, list]):
+        """
+        Check list of optical components in the parsed configuration.
+
+        Parameters
+        ----------
+        conf : Union[Entry, list]
+            The configuration entry or the list of configuration entries of the optical components to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
+        if hasattr(conf, "optical_component"):
+            for component in (conf.optical_component if type(conf.optical_component) == list else
+                              [conf.optical_component]):
+                if not hasattr(component, "type"):
+                    return "optical_component: Missing required parameter 'type'."
+                if component.type not in dir(oc):
+                    # noinspection PyTypeChecker
+                    return "optical_component: optical component type '" + component.type + \
+                           "' does not exist. Did you mean '" + \
+                           difflib.get_close_matches(component.type, dir(tg), 1)[0] + "'?"
+                mes = getattr(oc, component.type).check_config(component)
+                if mes is not None:
+                    print(component.type)
+                    print(mes)
+                    return "optical_component -> " + component.type + ": " + mes
