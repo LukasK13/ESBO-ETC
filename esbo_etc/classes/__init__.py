@@ -1,4 +1,4 @@
-from .config import *
+from .Config import *
 from .IRadiant import *
 from .SpectralQty import *
 from .target import *
