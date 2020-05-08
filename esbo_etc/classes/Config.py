@@ -10,7 +10,6 @@ from ..classes import optical_component as oc
 from ..classes import sensor as sensor
 import difflib
 import os.path
-from typing import Union
 
 
 class Configuration(object):
