@@ -1,12 +1,11 @@
 import astropy.units as u
-from .config import Entry
+from .Entry import Entry
 from .IRadiant import IRadiant
 from ..classes import optical_component as oc
 from ..classes import target as tg
 from ..lib.helpers import error
 import copy
 import re
-from .config import Entry
 
 
 class RadiantFactory:
