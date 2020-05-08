@@ -5,7 +5,7 @@ import astropy.units as u
 
 class TestZemax(TestCase):
     def setUp(self):
-        self.zemax = Zemax("data/psf.txt", 13, 4 * u.um, 0.5 * u.m)
+        self.zemax = Zemax("data/psf.txt", 13, 4 * u.um, 0.5 * u.m, 13, 6.5 * u.um)
 
     def test_calcReducedObservationAngle(self):
-        self.assertAlmostEqual(self.zemax.calcReducedObservationAngle(0.6595336151196701).value, 0.08284705528846155)
+        self.assertAlmostEqual(self.zemax.calcReducedObservationAngle(0.6595336151196701).value, 0.08106259728314079)

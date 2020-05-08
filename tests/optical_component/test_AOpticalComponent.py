@@ -10,6 +10,10 @@ class OpticalComponent(AOpticalComponent):
                  obstructor_emissivity: float = 0):
         super().__init__(parent, transreflectivity, noise, obstruction, obstructor_temp, obstructor_emissivity)
 
+    @staticmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        pass
+
 
 class TestAOpticalComponent(TestCase):
     wl = np.arange(4, 8, 1) << u.um

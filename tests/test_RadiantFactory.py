@@ -1,5 +1,5 @@
 from unittest import TestCase
-from esbo_etc.classes.config import Configuration
+from esbo_etc.classes.Config import Configuration
 from esbo_etc.classes.RadiantFactory import RadiantFactory
 import esbo_etc.classes.optical_component as oc
 from esbo_etc.classes.target import BlackBodyTarget
@@ -22,5 +22,5 @@ class TestRadiantFactory(TestCase):
         parent_2 = oc.Filter.fromRange(parent_2, 400 * u.nm, 480 * u.nm, "data/filter/emissivity.csv", 70 * u.K)
         parent_2 = oc.Lens(parent_2, "data/lens/transmittance.csv", "data/lens/emissivity.csv", 70 * u.K)
 
-        self.assertEqual(parent.calcSignal(), parent_2.calcSignal())
+        self.assertEqual(parent.calcSignal()[0], parent_2.calcSignal()[0])
         self.assertEqual(parent.calcBackground(), parent_2.calcBackground())

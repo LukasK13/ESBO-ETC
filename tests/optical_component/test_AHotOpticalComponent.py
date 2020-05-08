@@ -1,4 +1,6 @@
 from unittest import TestCase
+
+from esbo_etc import Entry
 from esbo_etc.classes.optical_component.AHotOpticalComponent import AHotOpticalComponent
 from esbo_etc.classes.IRadiant import IRadiant
 from esbo_etc.classes.SpectralQty import SpectralQty
@@ -15,6 +17,10 @@ class HotOpticalComponent(AHotOpticalComponent):
 
     def _propagate(self, sqty: SpectralQty) -> SpectralQty:
         return sqty
+
+    @staticmethod
+    def check_config(conf: Entry) -> Union[None, str]:
+        pass
 
 
 class TestAHotOpticalComponent(TestCase):

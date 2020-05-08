@@ -5,7 +5,7 @@ import astropy.units as u
 
 class TestAiry(TestCase):
     def setUp(self):
-        self.airy = Airy(4 * u.um, 0.5 * u.m)
+        self.airy = Airy(13, 4 * u.um, 0.5 * u.m, 10, 6.5 * u.nm)
 
     def test_calc_reduced_observation_angle(self):
         self.assertAlmostEqual(self.airy.calcReducedObservationAngle("peak").value, 0.0)
