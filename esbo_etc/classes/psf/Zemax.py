@@ -132,9 +132,7 @@ class Zemax(IPSF):
                 # Calculate new center point
                 center_point = [x + int((jitter_grid_length - 1) / 2) for x in center_point]
         # Calculate the maximum possible radius for the circle containing the photometric aperture
-        # r_max = min(center_point[0] - 1, center_point[1] - 1, psf.shape[0] - center_point[0],
-        #             psf.shape[1] - center_point[1])
-        r_max = min(np.sqrt(center_point[0]**2 + center_point[1]**2),
+        r_max = max(np.sqrt(center_point[0]**2 + center_point[1]**2),
                     np.sqrt((psf.shape[0] - center_point[0])**2 + center_point[1]**2),
                     np.sqrt(center_point[0]**2 + (psf.shape[1] - center_point[1])**2),
                     np.sqrt((psf.shape[0] - center_point[0])**2 + (psf.shape[1] - center_point[1])**2))
@@ -143,7 +141,7 @@ class Zemax(IPSF):
         # Iterate the optimal radius for the contained energy
         r = bisect(lambda r_c: contained_energy.value - np.sum(
             psf * rasterizeCircle(psf.shape[0], r_c, center_point[0], center_point[1])) / total, 0, r_max, xtol=1e-1)
-        # Calculate the reduced observation angle in d_ap / lambda
+        # Calculate the reduced observation angle in lambda / d_ap
         # noinspection PyTypeChecker
         reduced_observation_angle = r / psf_osf * self.__grid_delta[0] / (
                     self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl
