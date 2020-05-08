@@ -52,6 +52,21 @@ class Entry(object):
             self.val = (self.val.lower() == "true")
 
     def check_quantity(self, name: str, unit: u.Unit) -> Union[None, str]:
+        """
+        Check a parameter as type quantity
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter to be checked.
+        unit : Quantity
+            The default quantity to be used for conversion and equality checking.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
         if not hasattr(self, name):
             return "Parameter '" + name + "' not found."
         attr = getattr(self, name)
@@ -70,6 +85,21 @@ class Entry(object):
         return None
 
     def check_selection(self, name, choices: list) -> Union[None, str]:
+        """
+        Check a parameter against a list of possible choices. In case of a mismatch, a recommendation will be given.
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter to be checked.
+        choices : list
+            List of choices to be used for checking.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
         if not hasattr(self, name):
             return "Parameter '" + name + "' not found."
         attr = getattr(self, name)
@@ -82,12 +112,38 @@ class Entry(object):
         return None
 
     def check_file(self, name) -> Union[None, str]:
+        """
+        Check a parameter to be a valid path to a file.
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
         if not hasattr(self, name):
             return "Parameter '" + name + "' not found."
         if not os.path.isfile(getattr(self, name)):
             return "File '" + getattr(self, name) + "' does not exist."
 
     def check_float(self, name) -> Union[None, str]:
+        """
+        Check a parameter to be a floating point value
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter to be checked.
+
+        Returns
+        -------
+        mes : Union[None, str]
+            The error message of the check. This will be None if the check was successful.
+        """
         if not hasattr(self, name):
             return "Parameter '" + name + "' not found."
         attr = getattr(self, name)
