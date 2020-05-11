@@ -106,9 +106,13 @@ class Entry(object):
         if type(attr) != str:
             return "Expected parameter '" + name + "' to be of type string."
         if attr not in choices:
-            # noinspection PyTypeChecker
-            return "Value '" + attr + "' not allowed for parameter '" + name + "'. Did you mean '" +\
-                   difflib.get_close_matches(attr, choices, 1)[0] + "'?"
+            match = difflib.get_close_matches(attr, choices, 1)
+            if len(match) > 0:
+                # noinspection PyTypeChecker
+                return "Value '" + attr + "' not allowed for parameter '" + name + "'. Did you mean '" +\
+                       match[0] + "'?"
+            else:
+                return "Value '" + attr + "' not allowed for parameter '" + name + "'."
         return None
 
     def check_file(self, name) -> Union[None, str]:
