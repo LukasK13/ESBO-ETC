@@ -132,6 +132,8 @@ class Configuration(object):
             if self.conf.common.psf().lower() != "airy":
                 mes = self.conf.common.psf.check_file("val")
                 mes is not None and error("Configuration check: common -> psf: " + mes)
+            mes = self.conf.common.psf.check_float("osf")
+            mes is not None and error("Configuration check: common -> psf: " + mes)
         if hasattr(self.conf.common, "jitter_sigma"):
             mes = self.conf.common.jitter_sigma.check_quantity("val", u.arcsec)
             mes is not None and error("Configuration check: common -> jitter_sigma: " + mes)
