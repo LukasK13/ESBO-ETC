@@ -92,7 +92,7 @@ class Zemax(IPSF):
             except ValueError:
                 error("Could not convert encircled energy to float.")
         elif type(contained_energy) in [int, float]:
-            contained_energy = contained_energy * u.dimensionless_unscaled
+            contained_energy = contained_energy / 100 * u.dimensionless_unscaled
 
         # Calculate the osf for the PSF based on the current resolution of the PSF
         psf_osf = np.ceil(max(self.__grid_delta) / (2 * self.__pixel_size / self.__osf)).value * 2
