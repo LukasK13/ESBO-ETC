@@ -67,12 +67,11 @@ class Airy(IPSF):
             elif contained_energy.lower() == "fwhm":
                 # Width of the FWHM of the airy disk
                 reduced_observation_angle = 1.028
-                contained_energy = 0.4738 * u.dimensionless_unscaled
                 if not np.isclose(obstruction, 0.0):
                     # Use obstructed airy disk
                     reduced_observation_angle = newton(lambda y: self.airy(np.pi * y, np.sqrt(obstruction)) - 0.5,
                                                        reduced_observation_angle / 2) * 2
-                    contained_energy = self.airy_int(np.pi * reduced_observation_angle / 2, np.sqrt(obstruction))
+                    contained_energy = "fwhm"
             elif contained_energy.lower() == "min":
                 # Width of the first minimum of the airy disk
                 reduced_observation_angle = 1.22 * 2
@@ -81,20 +80,22 @@ class Airy(IPSF):
                     # Use obstructed airy disk
                     reduced_observation_angle = fmin(lambda y: self.airy(np.pi * y, np.sqrt(obstruction)),
                                                      reduced_observation_angle / 2, disp=False)[0] * 2
-                    contained_energy = self.airy_int(np.pi * reduced_observation_angle / 2, np.sqrt(obstruction))
+                    contained_energy = self.airy_int(np.pi * reduced_observation_angle / 2,
+                                                     np.sqrt(obstruction)) * u.dimensionless_unscaled
         else:
             # Calculate the width numerically from the integral of the airy disk
             contained_energy = contained_energy / 100 * u.dimensionless_unscaled
             reduced_observation_angle = 2 * bisect(
                 lambda y: self.airy_int(np.pi * y, np.sqrt(obstruction)) - contained_energy.value, 0, 100)
-        if jitter_sigma is not None:
+        if jitter_sigma is not None and (isinstance(contained_energy, u.Quantity) or isinstance(contained_energy, str)
+                                         and contained_energy.lower() == "fwhm"):
             # Convert jitter to reduced observation angle in lambda / d_ap
             jitter_sigma = jitter_sigma.to(u.rad).value * self.__d_aperture / self.__wl.to(u.m)
             # Calculate necessary grid length to accommodate the psf and 3-sigma of the gaussian
             grid_width = (reduced_observation_angle / 2 + 3 * jitter_sigma)
             # Calculate the reduced observation angle of a single detector pixel
             reduced_observation_angle_pixel = (self.__pixel_size / (
-                    self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl)
+                    self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl).decompose()
             # Calculate the width of each grid element
             dx = reduced_observation_angle_pixel / self.__osf
             # Calculate the necessary number of points on the grid
@@ -117,13 +118,17 @@ class Airy(IPSF):
                               kernel, mode="same")
             # Reduce the PSF to the positive x-domain
             psf = psf[int((psf.shape[0] - 1) / 2):]
-            # Calculate the rolling integral of the PSF
-            psf_int = np.cumsum(psf * np.arange(psf.shape[0])) * reduced_observation_angle_pixel.value / self.__osf
-            # Scale the integral of the disturbed PSF equal to the undisturbed PSF
-            psf_int = psf_int / psf_int[-1] * total / (4 / np.pi)
-            # Calculate the reduced observation angle
-            reduced_observation_angle = np.argmax(
-                psf_int > contained_energy) * reduced_observation_angle_pixel.value / self.__osf * 2
+            if isinstance(contained_energy, str) and contained_energy.lower() == "fwhm":
+                reduced_observation_angle = np.argmax(psf < psf[0] / 2) * reduced_observation_angle_pixel.value /\
+                                            self.__osf * 2
+            else:
+                # Calculate the rolling integral of the PSF
+                psf_int = np.cumsum(psf * np.arange(psf.shape[0])) * reduced_observation_angle_pixel.value / self.__osf
+                # Scale the integral of the disturbed PSF equal to the undisturbed PSF
+                psf_int = psf_int / psf_int[-1] * total / (4 / np.pi)
+                # Calculate the reduced observation angle
+                reduced_observation_angle = np.argmax(
+                    psf_int > contained_energy) * reduced_observation_angle_pixel.value / self.__osf * 2
 
         return reduced_observation_angle * u.dimensionless_unscaled
 
