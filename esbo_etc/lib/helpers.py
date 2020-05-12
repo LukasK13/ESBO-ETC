@@ -42,14 +42,14 @@ def isLambda(obj: object):
     return isinstance(obj, type(lambda: None)) and obj.__name__ == (lambda: None).__name__
 
 
-def rasterizeCircle(n: int, radius: float, xc: float, yc: float):
+def rasterizeCircle(grid: np.ndarray, radius: float, xc: float, yc: float):
     """
     Map a circle on a rectangular grid.
 
     Parameters
     ----------
-    n : int
-        Size of the rectangular grid to map the circle on.
+    grid : ndarray
+        The grid to map the circle onto.
     radius : float
         Radius of the circle to be mapped.
     xc : float
@@ -62,7 +62,6 @@ def rasterizeCircle(n: int, radius: float, xc: float, yc: float):
     grid: ndarray
         The grid with the circle mapped onto. Each point contained within the circle is marked as 1.
     """
-    grid = np.zeros((n, n))  # Initialize an empty grid
     xc_pix = int(round(xc))  # X center in pixel coordinates
     x_shift = xc_pix - xc  # X shift of the circle center
     yc_pix = int(round(yc))  # Y center in pixel coordinates
@@ -73,9 +72,9 @@ def rasterizeCircle(n: int, radius: float, xc: float, yc: float):
     grid[yc_pix, xc_pix] = 1  # Set the center pixel by default
     # Create meshgrid for the x and y range of the circle
     dx, dy = np.meshgrid(range(- radius_pix if xc_pix - radius_pix >= 0 else - xc_pix,
-                               radius_pix + 1 if n > (xc_pix + radius_pix + 1) else n - xc_pix),
+                               radius_pix + 1 if grid.shape[1] > (xc_pix + radius_pix + 1) else grid.shape[1] - xc_pix),
                          range(- radius_pix if yc_pix - radius_pix >= 0 else - yc_pix,
-                               radius_pix + 1 if n > (yc_pix + radius_pix + 1) else n - yc_pix))
+                               radius_pix + 1 if grid.shape[0] > (yc_pix + radius_pix + 1) else grid.shape[0] - yc_pix))
     dx2 = (dx + x_shift) ** 2  # Square of the x-component of the current pixels radius
     dx_side2 = (dx + x_shift + ((dx < 0) - 0.5)) ** 2  # Square of the x-component of the neighbouring pixels radius
     dy2 = (dy + y_shift) ** 2  # Square of the y-component of the current pixels radius

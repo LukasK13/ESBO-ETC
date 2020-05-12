@@ -142,7 +142,8 @@ class Zemax(IPSF):
         total = np.sum(psf)
         # Iterate the optimal radius for the contained energy
         r = bisect(lambda r_c: contained_energy.value - np.sum(
-            psf * rasterizeCircle(psf.shape[0], r_c, center_point[0], center_point[1])) / total, 0, r_max, xtol=1e-1)
+            psf * rasterizeCircle(np.zeros((psf.shape[0], psf.shape[0])), r_c, center_point[0],
+                                  center_point[1])) / total, 0, r_max, xtol=1e-1)
         # Calculate the reduced observation angle in lambda / d_ap
         # noinspection PyTypeChecker
         reduced_observation_angle = r / psf_osf * self.__grid_delta[0] / (
