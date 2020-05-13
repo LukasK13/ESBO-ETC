@@ -28,7 +28,7 @@ class PixelMask(np.ndarray):
         # ndarray input arguments.  This will call the standard
         # ndarray constructor, but return an object of our type.
         # It also triggers a call to PixelMask.__array_finalize__
-        obj = super(PixelMask, cls).__new__(cls, (int(pixel_geometry.value[0]), int(pixel_geometry.value[1])),
+        obj = super(PixelMask, cls).__new__(cls, (int(pixel_geometry.value[1]), int(pixel_geometry.value[0])),
                                             dtype=float, buffer=None, offset=0, strides=None, order=None)
         obj[:, :] = 0
         # set the new attributes to the values passed
@@ -91,7 +91,7 @@ class PixelMask(np.ndarray):
 
         """
         # Calculate the center coordinates
-        if center_offset:
+        if center_offset is not None:
             xc = self.pixel_geometry[1] / 2 - 0.5 * u.pix + center_offset[0]
             yc = self.pixel_geometry[0] / 2 - 0.5 * u.pix + center_offset[1]
         else:
