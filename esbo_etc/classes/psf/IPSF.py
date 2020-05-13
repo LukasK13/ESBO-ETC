@@ -32,19 +32,21 @@ class IPSF(ABC):
         pass
 
     @abstractmethod
-    def mapToGrid(self, grid: np.ndarray) -> np.ndarray:
+    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None) -> PixelMask:
         """
         Map the integrated PSF values to a sensor grid.
 
         Parameters
         ----------
-        grid : ndarray
-            The grid to map the values to. The values will only be mapped onto entries with the value 1.
+        mask : PixelMask
+            The pixel mask to map the values to. The values will only be mapped onto entries with the value 1.
+        jitter_sigma : Quantity
+            Sigma of the telescope's jitter in arcsec
 
         Returns
         -------
-        grid : ndarray
-            The grid with the mapped values.
+        mask : PixelMask
+            The pixel mask with the integrated PSF values mapped onto each pixel.
         """
         pass
 
