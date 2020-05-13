@@ -1,13 +1,14 @@
 from .IPSF import IPSF
 from ...lib.helpers import error, rasterizeCircle
+from ..sensor.PixelMask import PixelMask
 import numpy as np
 import astropy.units as u
 import re
 from logging import warning
 from typing import Union
 from scipy.optimize import bisect
-from scipy.ndimage.interpolation import zoom
 from scipy.signal import fftconvolve
+from scipy.interpolate import interp2d
 
 
 class Zemax(IPSF):
@@ -65,6 +66,10 @@ class Zemax(IPSF):
         self.__center_point[0] = self.__psf.shape[0] - self.__center_point[0]
         self.__center_point[1] -= 1
 
+        self.__center_point_os = None
+        self.__psf_os = None
+        self.__psf_osf = None
+
     # @u.quantity_input(jitter_sigma=u.arcsec)
     def calcReducedObservationAngle(self, contained_energy: Union[str, int, float, u.Quantity],
                                     jitter_sigma: u.Quantity = None, obstruction: float = 0.0) -> u.Quantity:
@@ -94,7 +99,45 @@ class Zemax(IPSF):
         elif type(contained_energy) in [int, float]:
             contained_energy = contained_energy / 100 * u.dimensionless_unscaled
 
-        # Calculate the osf for the PSF based on the current resolution of the PSF
+        center_point, psf, psf_osf = self.calcPSF(jitter_sigma)
+
+        # Calculate the maximum possible radius for the circle containing the photometric aperture
+        r_max = max(np.sqrt(center_point[0] ** 2 + center_point[1] ** 2),
+                    np.sqrt((psf.shape[0] - center_point[0]) ** 2 + center_point[1] ** 2),
+                    np.sqrt(center_point[0] ** 2 + (psf.shape[1] - center_point[1]) ** 2),
+                    np.sqrt((psf.shape[0] - center_point[0]) ** 2 + (psf.shape[1] - center_point[1]) ** 2))
+        # Calculate the total contained energy of the PSF
+        total = np.sum(psf)
+        # Iterate the optimal radius for the contained energy
+        r = bisect(lambda r_c: contained_energy.value - np.sum(
+            psf * rasterizeCircle(np.zeros((psf.shape[0], psf.shape[0])), r_c, center_point[0],
+                                  center_point[1])) / total, 0, r_max, xtol=1e-1) * 2
+        # Calculate the reduced observation angle in lambda / d_ap
+        # noinspection PyTypeChecker
+        reduced_observation_angle = r / psf_osf * self.__grid_delta[0] / (
+                self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl
+        return reduced_observation_angle * u.dimensionless_unscaled
+
+    def calcPSF(self, jitter_sigma: u.Quantity = None):
+        """
+        Calculate the PSF from the Zemax-file. This includes oversampling the PSF and convolving with the
+        jitter-gaussian.
+
+        Parameters
+        ----------
+        jitter_sigma : Quantity
+            Sigma of the telescope's jitter in arcsec
+
+        Returns
+        -------
+        center_point : ndarray
+            The indices of the PSF's center point on the grid.
+        psf : ndarray
+            The PSF.
+        psf_osf : float
+            The oversampling factor of the returned PSF.
+        """
+        # Calculate the psf for the PSF based on the current resolution of the PSF
         psf_osf = np.ceil(max(self.__grid_delta) / (2 * self.__pixel_size / self.__osf)).value * 2
         if psf_osf == 1.0:
             # No oversampling is necessary
@@ -102,8 +145,12 @@ class Zemax(IPSF):
             center_point = self.__center_point
         else:
             # Oversampling is necessary, oversample the PSF and calculate the new center point.
-            psf = zoom(self.__psf, zoom=psf_osf, order=1)
+            f = interp2d(x=np.arange(self.__psf.shape[1]) - self.__center_point[1],
+                         y=np.arange(self.__psf.shape[0]) - self.__center_point[0], z=self.__psf,
+                         kind='cubic', copy=False, bounds_error=False, fill_value=None)
             center_point = [(x + 0.5) * psf_osf - 0.5 for x in self.__center_point]
+            psf = f((np.arange(self.__psf.shape[1] * psf_osf) - center_point[1]) / psf_osf,
+                    (np.arange(self.__psf.shape[0] * psf_osf) - center_point[0]) / psf_osf)
         if jitter_sigma is not None:
             # Convert angular jitter to jitter on focal plane
             jitter_sigma_um = (jitter_sigma.to(u.rad) * self.__f_number * self.__d_aperture / u.rad).to(u.um)
@@ -133,35 +180,60 @@ class Zemax(IPSF):
                                   kernel, mode="same")
                 # Calculate new center point
                 center_point = [x + int((jitter_grid_length - 1) / 2) for x in center_point]
-        # Calculate the maximum possible radius for the circle containing the photometric aperture
-        r_max = max(np.sqrt(center_point[0]**2 + center_point[1]**2),
-                    np.sqrt((psf.shape[0] - center_point[0])**2 + center_point[1]**2),
-                    np.sqrt(center_point[0]**2 + (psf.shape[1] - center_point[1])**2),
-                    np.sqrt((psf.shape[0] - center_point[0])**2 + (psf.shape[1] - center_point[1])**2))
-        # Calculate the total contained energy of the PSF
-        total = np.sum(psf)
-        # Iterate the optimal radius for the contained energy
-        r = bisect(lambda r_c: contained_energy.value - np.sum(
-            psf * rasterizeCircle(np.zeros((psf.shape[0], psf.shape[0])), r_c, center_point[0],
-                                  center_point[1])) / total, 0, r_max, xtol=1e-1)
-        # Calculate the reduced observation angle in lambda / d_ap
-        # noinspection PyTypeChecker
-        reduced_observation_angle = r / psf_osf * self.__grid_delta[0] / (
-                    self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl
-        return reduced_observation_angle * u.dimensionless_unscaled
+        # Save the values as object attribute
+        self.__center_point_os = center_point
+        self.__psf_os = psf
+        self.__psf_osf = psf_osf
+        return center_point, psf, psf_osf
 
-    def mapToGrid(self, grid: np.ndarray) -> np.ndarray:
+    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None) -> PixelMask:
         """
         Map the integrated PSF values to a sensor grid.
 
         Parameters
         ----------
-        grid : ndarray
-            The grid to map the values to. The values will only be mapped onto entries with the value 1.
+        mask : PixelMask
+            The pixel mask to map the values to. The values will only be mapped onto entries with the value 1.
+        jitter_sigma : Quantity
+            Sigma of the telescope's jitter in arcsec
 
         Returns
         -------
-        grid : ndarray
-            The grid with the mapped values.
+        mask : PixelMask
+            The pixel mask with the integrated PSF values mapped onto each pixel.
         """
-        pass
+        # Calculate the indices of all non-zero elements of the mask
+        y_ind, x_ind = np.nonzero(mask)
+        # Extract a rectangle containing all non-zero values of the mask
+        mask_red = mask[y_ind.min():(y_ind.max() + 1), x_ind.min():(x_ind.max() + 1)]
+        # Calculate the new PSF-center indices of the reduced mask
+        psf_center_ind = [mask.psf_center_ind[0] - y_ind.min(), mask.psf_center_ind[1] - x_ind.min()]
+        # Oversample the reduced mask
+        mask_red_os = self.rebin(mask_red, self.__osf).view(PixelMask)
+        # Calculate the new PSF-center indices of the reduced mask
+        psf_center_ind = [x * self.__osf for x in psf_center_ind]
+
+        # Get PSF values or calculate them if not available
+        if self.__psf_os is not None and self.__center_point_os is not None and self.__psf_osf is not None:
+            center_point = self.__center_point_os
+            psf = self.__psf_os
+            psf_osf = self.__psf_osf
+        else:
+            center_point, psf, psf_osf = self.calcPSF(jitter_sigma)
+        # Calculate the coordinates of each PSF value in microns
+        x = (np.arange(psf.shape[1]) - center_point[1]) * self.__grid_delta[1].to(u.um).value / psf_osf
+        y = (np.arange(psf.shape[0]) - center_point[0]) * self.__grid_delta[0].to(u.um).value / psf_osf
+        # Initialize a two-dimensional cubic interpolation function for the PSF
+        psf_interp = interp2d(x=x, y=y, z=psf, kind='cubic', copy=False, bounds_error=False, fill_value=None)
+        # Calculate the values of the PSF for all elements of the reduced mask
+        res = psf_interp((np.arange(mask_red_os.shape[1]) - psf_center_ind[1]) * mask_red_os.pixel_size.to(u.um).value,
+                         (np.arange(mask_red_os.shape[0]) - psf_center_ind[0]) * mask_red_os.pixel_size.to(u.um).value)
+        # Bin the oversampled reduced mask to the original resolution and multiply with the reduced mask to select only
+        # the relevant values
+        res = mask_red * self.rebin(res, 1 / self.__osf)
+        # Integrate the reduced mask and divide by the indefinite integral to get relative intensities
+        res = res * mask_red_os.pixel_size.to(u.um).value ** 2 / (
+                    psf.sum() * (self.__grid_delta[0].to(u.um).value / psf_osf) ** 2)
+        # reintegrate the reduced mask into the complete mask
+        mask[y_ind.min():(y_ind.max() + 1), x_ind.min():(x_ind.max() + 1)] = res
+        return mask
