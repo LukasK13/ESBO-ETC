@@ -9,7 +9,7 @@ class TestZemax(TestCase):
 
     def test_calcReducedObservationAngle(self):
         # No jitter
-        self.assertAlmostEqual(self.zemax.calcReducedObservationAngle(80).value, 0.849307235849535)
+        self.assertAlmostEqual(self.zemax.calcReducedObservationAngle(80).value, 1.6563253147273092)
 
         # Jitter
-        self.assertAlmostEqual(self.zemax.calcReducedObservationAngle(80, 1 * u.arcsec).value, 1.3057369866992834)
+        self.assertAlmostEqual(self.zemax.calcReducedObservationAngle(80, 1 * u.arcsec).value, 2.5910983637231553)
