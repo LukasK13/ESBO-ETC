@@ -69,7 +69,6 @@ def rasterizeCircle(grid: np.ndarray, radius: float, xc: float, yc: float):
     radius_pix = int(np.ceil(radius)) + 1  # Length of the square containing the pixels to be checked
     r2 = radius ** 2  # square of the radius
 
-    grid[yc_pix, xc_pix] = 1  # Set the center pixel by default
     # Create meshgrid for the x and y range of the circle
     dx, dy = np.meshgrid(range(- radius_pix if xc_pix - radius_pix >= 0 else - xc_pix,
                                radius_pix + 1 if grid.shape[1] > (xc_pix + radius_pix + 1) else grid.shape[1] - xc_pix),
@@ -81,6 +80,7 @@ def rasterizeCircle(grid: np.ndarray, radius: float, xc: float, yc: float):
     dy_side2 = (dy + y_shift + ((dy < 0) - 0.5)) ** 2  # Square of the y-component of the neighbouring pixels radius
     res = np.logical_or(dx_side2 + dy2 <= r2, dx2 + dy_side2 < r2)  # Check if pixel is inside or outside
     grid[(dy.min() + yc_pix):(dy.max() + yc_pix + 1), (dx.min() + xc_pix):(dx.max() + xc_pix + 1)] = res
+    grid[yc_pix, xc_pix] = 1  # Set the center pixel by default
     # fig, ax = plt.subplots()
     # plt.imshow(grid)
     # circle = plt.Circle((xc, yc), radius, color='r', fill=False)
