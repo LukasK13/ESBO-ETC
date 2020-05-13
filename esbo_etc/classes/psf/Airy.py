@@ -2,6 +2,7 @@ from typing import Union
 import numpy as np
 from astropy import units as u
 from .IPSF import IPSF
+from ..sensor.PixelMask import PixelMask
 from scipy.optimize import newton, fmin, bisect
 from scipy.special import j0, j1
 from scipy.signal import fftconvolve
@@ -114,8 +115,7 @@ class Airy(IPSF):
             # Normalize the kernel
             kernel = kernel / np.sum(kernel)
             # Convolve the PSF with gaussian kernel
-            psf = fftconvolve(np.pad(psf, int(n_points), mode="constant", constant_values=0),
-                              kernel, mode="same")
+            psf = fftconvolve(np.pad(psf, int(n_points), mode="constant", constant_values=0), kernel, mode="same")
             # Reduce the PSF to the positive x-domain
             psf = psf[int((psf.shape[0] - 1) / 2):]
             if isinstance(contained_energy, str) and contained_energy.lower() == "fwhm":
@@ -153,7 +153,7 @@ class Airy(IPSF):
         if not isinstance(x, np.ndarray):
             x = np.array([x])
         # Initialize return values and assign values for the singularity at x=0
-        res = np.zeros(len(x))
+        res = np.zeros(x.shape)
         res[np.isclose(x, 0.0)] = 1.0
         x_temp = x[np.invert(np.isclose(x, 0.0))]
         if obstruction and not np.isclose(obstruction, 0.0):
@@ -166,7 +166,7 @@ class Airy(IPSF):
             # See also https://en.wikipedia.org/wiki/Airy_disk#Mathematical_formulation
             res[np.invert(np.isclose(x, 0.0))] = (2 * j1(x_temp) / x_temp) ** 2
         # Unbox arrays of length 1
-        if len(res) == 1:
+        if len(res.shape) == 1 and len(res) == 1:
             res = res[0]
         return res
 
@@ -202,18 +202,20 @@ class Airy(IPSF):
                 # See also https://en.wikipedia.org/wiki/Airy_disk#Mathematical_formulation
                 return 1 - j0(x) ** 2 - j1(x) ** 2
 
-    def mapToGrid(self, grid: np.ndarray) -> np.ndarray:
+    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None) -> PixelMask:
         """
         Map the integrated PSF values to a sensor grid.
 
         Parameters
         ----------
-        grid : ndarray
-            The grid to map the values to. The values will only be mapped onto entries with the value 1.
+        mask : PixelMask
+            The pixel mask to map the values to. The values will only be mapped onto entries with the value 1.
+        jitter_sigma : Quantity
+            Sigma of the telescope's jitter in arcsec
 
         Returns
         -------
-        grid : ndarray
-            The grid with the mapped values.
+        mask : PixelMask
+            The pixel mask with the integrated PSF values mapped onto each pixel.
         """
         pass
