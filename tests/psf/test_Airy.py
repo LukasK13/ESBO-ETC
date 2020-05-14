@@ -1,6 +1,8 @@
 from unittest import TestCase
 from esbo_etc.classes.psf.Airy import Airy
+from esbo_etc.classes.sensor.PixelMask import PixelMask
 import astropy.units as u
+import numpy as np
 
 
 class TestAiry(TestCase):
@@ -29,5 +31,38 @@ class TestAiry(TestCase):
         # Jitter, obstructed
         self.assertAlmostEqual(self.airy.calcReducedObservationAngle("peak", 1 * u.arcsec, 0.04).value, 0.0)
         self.assertAlmostEqual(self.airy.calcReducedObservationAngle("fwhm", 1 * u.arcsec, 0.04).value, 1.725)
-        self.assertAlmostEqual(self.airy.calcReducedObservationAngle("min", 1 * u.arcsec, 0.04).value, 3.325)
-        self.assertAlmostEqual(self.airy.calcReducedObservationAngle(80., 1 * u.arcsec, 0.04).value, 3.7)
+        self.assertAlmostEqual(self.airy.calcReducedObservationAngle("min", 1 * u.arcsec, 0.04).value, 3.075)
+        self.assertAlmostEqual(self.airy.calcReducedObservationAngle(80., 1 * u.arcsec, 0.04).value, 3.35)
+
+    def test_mapToPixelArray(self):
+        # No jitter, unobstructed
+        reduced_observation_angle = self.airy.calcReducedObservationAngle(80).value
+        d_ap = (reduced_observation_angle / (6.5 * u.um / (13.0 * 4 * u.um))).decompose() * u.pix
+        mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
+        mask.createPhotometricAperture("circle", d_ap / 2)
+        mask = self.airy.mapToPixelMask(mask)
+        self.assertAlmostEqual(mask.sum(), 0.8140235177533067)
+
+        # Jitter, unobstructed
+        reduced_observation_angle = self.airy.calcReducedObservationAngle(80, 1 * u.arcsec).value
+        d_ap = (reduced_observation_angle / (6.5 * u.um / (13.0 * 4 * u.um))).decompose() * u.pix
+        mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
+        mask.createPhotometricAperture("circle", d_ap / 2)
+        mask = self.airy.mapToPixelMask(mask, 1 * u.arcsec)
+        self.assertAlmostEqual(mask.sum(), 0.8097456506977345)
+
+        # No jitter, obstructed
+        reduced_observation_angle = self.airy.calcReducedObservationAngle(80, obstruction=0.04).value
+        d_ap = (reduced_observation_angle / (6.5 * u.um / (13.0 * 4 * u.um))).decompose() * u.pix
+        mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
+        mask.createPhotometricAperture("circle", d_ap / 2)
+        mask = self.airy.mapToPixelMask(mask, obstruction=0.04)
+        self.assertAlmostEqual(mask.sum(), 0.8088278758034545)
+
+        # Jitter, obstructed
+        reduced_observation_angle = self.airy.calcReducedObservationAngle(80, 1 * u.arcsec, 0.04).value
+        d_ap = (reduced_observation_angle / (6.5 * u.um / (13.0 * 4 * u.um))).decompose() * u.pix
+        mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
+        mask.createPhotometricAperture("circle", d_ap / 2)
+        mask = self.airy.mapToPixelMask(mask, 1 * u.arcsec, 0.04)
+        self.assertAlmostEqual(mask.sum(), 0.807989897660598)
