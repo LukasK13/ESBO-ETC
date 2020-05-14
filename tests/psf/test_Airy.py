@@ -29,5 +29,5 @@ class TestAiry(TestCase):
         # Jitter, obstructed
         self.assertAlmostEqual(self.airy.calcReducedObservationAngle("peak", 1 * u.arcsec, 0.04).value, 0.0)
         self.assertAlmostEqual(self.airy.calcReducedObservationAngle("fwhm", 1 * u.arcsec, 0.04).value, 1.725)
-        self.assertAlmostEqual(self.airy.calcReducedObservationAngle("min", 1 * u.arcsec, 0.04).value, 2.875)
-        self.assertAlmostEqual(self.airy.calcReducedObservationAngle(80., 1 * u.arcsec, 0.04).value, 3.1)
+        self.assertAlmostEqual(self.airy.calcReducedObservationAngle("min", 1 * u.arcsec, 0.04).value, 3.325)
+        self.assertAlmostEqual(self.airy.calcReducedObservationAngle(80., 1 * u.arcsec, 0.04).value, 3.7)

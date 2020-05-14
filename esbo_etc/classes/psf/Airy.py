@@ -37,6 +37,7 @@ class Airy(IPSF):
         self.__d_aperture = d_aperture
         self.__osf = osf
         self.__pixel_size = pixel_size
+        self.__psf_jitter = None
 
     def calcReducedObservationAngle(self, contained_energy: Union[str, int, float],
                                     jitter_sigma: u.Quantity = None, obstruction: float = 0.0) -> u.Quantity:
@@ -98,7 +99,7 @@ class Airy(IPSF):
             reduced_observation_angle_pixel = (self.__pixel_size / (
                     self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl).decompose()
             # Calculate the width of each grid element
-            dx = reduced_observation_angle_pixel / self.__osf
+            dx = reduced_observation_angle_pixel.value / self.__osf
             # Calculate the necessary number of points on the grid
             n_points = np.ceil(grid_width / dx).value
             # Calculate the corresponding x-coordinates of each grid element
@@ -118,14 +119,18 @@ class Airy(IPSF):
             psf = fftconvolve(np.pad(psf, int(n_points), mode="constant", constant_values=0), kernel, mode="same")
             # Reduce the PSF to the positive x-domain
             psf = psf[int((psf.shape[0] - 1) / 2):]
+            # Scale the integral of the disturbed PSF equal to the undisturbed PSF
+            psf = psf / (np.sum(psf * np.arange(psf.shape[0]) * dx) * dx * 2 * np.pi) * total
+
+            self.__psf_jitter = psf
             if isinstance(contained_energy, str) and contained_energy.lower() == "fwhm":
-                reduced_observation_angle = np.argmax(psf < psf[0] / 2) * reduced_observation_angle_pixel.value /\
+                reduced_observation_angle = np.argmax(psf < psf[0] / 2) * reduced_observation_angle_pixel.value / \
                                             self.__osf * 2
             else:
                 # Calculate the rolling integral of the PSF
-                psf_int = np.cumsum(psf * np.arange(psf.shape[0])) * reduced_observation_angle_pixel.value / self.__osf
+                psf_int = np.cumsum(psf * np.arange(psf.shape[0]) * dx) * dx * 2 * np.pi
                 # Scale the integral of the disturbed PSF equal to the undisturbed PSF
-                psf_int = psf_int / psf_int[-1] * total / (4 / np.pi)
+                psf_int = psf_int / (4 / np.pi) * (1 - obstruction) ** 2
                 # Calculate the reduced observation angle
                 reduced_observation_angle = np.argmax(
                     psf_int > contained_energy) * reduced_observation_angle_pixel.value / self.__osf * 2
