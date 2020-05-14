@@ -7,6 +7,7 @@ from scipy.optimize import newton, fmin, bisect
 from scipy.special import j0, j1
 from scipy.signal import fftconvolve
 from scipy.integrate import quad
+from scipy.interpolate import interp1d
 
 
 class Airy(IPSF):
@@ -207,20 +208,59 @@ class Airy(IPSF):
                 # See also https://en.wikipedia.org/wiki/Airy_disk#Mathematical_formulation
                 return 1 - j0(x) ** 2 - j1(x) ** 2
 
-    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None) -> PixelMask:
+    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None, obstruction: float = 0.0) -> PixelMask:
         """
         Map the integrated PSF values to a sensor grid.
 
         Parameters
         ----------
+        obstruction
         mask : PixelMask
             The pixel mask to map the values to. The values will only be mapped onto entries with the value 1.
         jitter_sigma : Quantity
             Sigma of the telescope's jitter in arcsec
+        obstruction : float
+            The central obstruction as ratio A_ob / A_ap
 
         Returns
         -------
         mask : PixelMask
             The pixel mask with the integrated PSF values mapped onto each pixel.
         """
-        pass
+        # Calculate the indices of all non-zero elements of the mask
+        y_ind, x_ind = np.nonzero(mask)
+        # Extract a rectangle containing all non-zero values of the mask
+        mask_red = mask[y_ind.min():(y_ind.max() + 1), x_ind.min():(x_ind.max() + 1)]
+        # Calculate the new PSF-center indices of the reduced mask
+        psf_center_ind = [mask.psf_center_ind[0] - y_ind.min(), mask.psf_center_ind[1] - x_ind.min()]
+        # Oversample the reduced mask
+        mask_red_os = self.rebin(mask_red, self.__osf).view(PixelMask)
+        # Calculate the new PSF-center indices of the reduced mask
+        psf_center_ind = [x * self.__osf for x in psf_center_ind]
+
+        reduced_observation_angle_pixel = (mask.pixel_size / (
+                self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl).decompose()
+        x_mesh, y_mesh = np.meshgrid(
+            (np.arange(mask_red_os.shape[1]) - psf_center_ind[
+                1]) * reduced_observation_angle_pixel.value / self.__osf,
+            (np.arange(mask_red_os.shape[0]) - psf_center_ind[
+                0]) * reduced_observation_angle_pixel.value / self.__osf)
+        dist = np.sqrt(x_mesh ** 2 + y_mesh ** 2)
+        if jitter_sigma is None:
+            res = self.airy(dist * np.pi, np.sqrt(obstruction))
+        else:
+            if self.__psf_jitter is None:
+                self.calcReducedObservationAngle("fwhm", jitter_sigma, obstruction)
+            psf_jitter = self.__psf_jitter
+            x = np.arange(psf_jitter.shape[0]) * reduced_observation_angle_pixel.value / self.__osf
+            psf_interp = interp1d(x=x, y=psf_jitter, kind='cubic', copy=False, bounds_error=False,
+                                  fill_value="extrapolate")
+            res = psf_interp(dist)
+
+        res = self.rebin(res, 1 / self.__osf)
+        res = (mask_red * res).view(np.ndarray)
+        # Integrate the reduced mask and divide by the indefinite integral to get relative intensities
+        res = res * (reduced_observation_angle_pixel.value / self.__osf) ** 2 / (4 / np.pi) * (1 - obstruction) ** 2
+        # reintegrate the reduced mask into the complete mask
+        mask[y_ind.min():(y_ind.max() + 1), x_ind.min():(x_ind.max() + 1)] = res
+        return mask
