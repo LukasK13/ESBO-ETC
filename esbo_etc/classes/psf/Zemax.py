@@ -118,7 +118,7 @@ class Zemax(IPSF):
                 self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl
         return reduced_observation_angle * u.dimensionless_unscaled
 
-    def calcPSF(self, jitter_sigma: u.Quantity = None):
+    def calcPSF(self, jitter_sigma: u.Quantity = None, obstruction: float = None):
         """
         Calculate the PSF from the Zemax-file. This includes oversampling the PSF and convolving with the
         jitter-gaussian.
@@ -127,6 +127,8 @@ class Zemax(IPSF):
         ----------
         jitter_sigma : Quantity
             Sigma of the telescope's jitter in arcsec
+        obstruction : float
+            The central obstruction as ratio A_ob / A_ap
 
         Returns
         -------
@@ -186,12 +188,13 @@ class Zemax(IPSF):
         self.__psf_osf = psf_osf
         return center_point, psf, psf_osf
 
-    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None) -> PixelMask:
+    def mapToPixelMask(self, mask: PixelMask, jitter_sigma: u.Quantity = None, obstruction: float = 0.0) -> PixelMask:
         """
         Map the integrated PSF values to a sensor grid.
 
         Parameters
         ----------
+        obstruction
         mask : PixelMask
             The pixel mask to map the values to. The values will only be mapped onto entries with the value 1.
         jitter_sigma : Quantity
