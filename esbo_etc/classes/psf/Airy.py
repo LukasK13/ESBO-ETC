@@ -131,7 +131,7 @@ class Airy(IPSF):
                 # Calculate the rolling integral of the PSF
                 psf_int = np.cumsum(psf * np.arange(psf.shape[0]) * dx) * dx * 2 * np.pi
                 # Scale the integral of the disturbed PSF equal to the undisturbed PSF
-                psf_int = psf_int / (4 / np.pi) * (1 - obstruction) ** 2
+                psf_int = psf_int / (4 / np.pi) * (1 - obstruction)
                 # Calculate the reduced observation angle
                 reduced_observation_angle = np.argmax(
                     psf_int > contained_energy) * reduced_observation_angle_pixel.value / self.__osf * 2
@@ -260,7 +260,7 @@ class Airy(IPSF):
         res = self.rebin(res, 1 / self.__osf)
         res = (mask_red * res).view(np.ndarray)
         # Integrate the reduced mask and divide by the indefinite integral to get relative intensities
-        res = res * (reduced_observation_angle_pixel.value / self.__osf) ** 2 / (4 / np.pi) * (1 - obstruction) ** 2
+        res = res * (reduced_observation_angle_pixel.value / self.__osf) ** 2 / (4 / np.pi) * (1 - obstruction)
         # reintegrate the reduced mask into the complete mask
         mask[y_ind.min():(y_ind.max() + 1), x_ind.min():(x_ind.max() + 1)] = res
         return mask
