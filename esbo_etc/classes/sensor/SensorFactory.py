@@ -33,7 +33,8 @@ class SensorFactory:
             args = dict(parent=self.__parent, quantum_efficiency=options.pixel.quantum_efficiency(),
                         pixel_geometry=options.pixel_geometry(), pixel_size=options.pixel.pixel_size(),
                         read_noise=options.pixel.sigma_read_out(), dark_current=options.pixel.dark_current(),
-                        f_number=options.f_number(), common_conf=self.__common_conf)
+                        well_capacity=options.pixel.well_capacity(), f_number=options.f_number(),
+                        common_conf=self.__common_conf)
             if hasattr(options, "center_offset"):
                 # noinspection PyCallingNonCallable
                 args["center_offset"] = options.center_offset()

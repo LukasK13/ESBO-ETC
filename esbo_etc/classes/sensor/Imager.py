@@ -19,12 +19,12 @@ class Imager(ASensor):
     __encircled_energy: Union[str, float, u.Quantity]
 
     @u.quantity_input(pixel_size="length", read_noise=u.electron ** 0.5 / u.pix, center_offset=u.pix,
-                      dark_current=u.electron / u.pix / u.second, pixel_geometry=u.pix)
+                      dark_current=u.electron / u.pix / u.second, well_capacity=u.electron, pixel_geometry=u.pix)
     def __init__(self, parent: IRadiant, quantum_efficiency: Union[str, u.Quantity],
                  pixel_geometry: u.Quantity, pixel_size: u.Quantity, read_noise: u.Quantity, dark_current: u.Quantity,
-                 f_number: Union[int, float], common_conf: Entry, center_offset: u.Quantity = np.array([0, 0]) << u.nm,
-                 shape: str = None, contained_energy: Union[str, int, float] = "FWHM",
-                 contained_pixels: u.Quantity = None):
+                 well_capacity: u.Quantity, f_number: Union[int, float], common_conf: Entry,
+                 center_offset: u.Quantity = np.array([0, 0]) << u.nm, shape: str = None,
+                 contained_energy: Union[str, int, float] = "FWHM", contained_pixels: u.Quantity = None):
         """
         Initialize a new Image-sensor model.
         Initialize a new Image-sensor model.
@@ -45,6 +45,8 @@ class Imager(ASensor):
             The RMS-read noise per detector pixel in electrons^0.5 / pixel.
         dark_current : Quantity
             The dark current of a detector pixel in electrons / (pixels * s).
+        well_capacity : Quantity
+            The pixel's well capacity in electrons.
         f_number : Union[int, float]
             The f-number of the optical system.
         common_conf : Entry
@@ -69,6 +71,7 @@ class Imager(ASensor):
         self.__pixel_size = pixel_size
         self.__read_noise = read_noise
         self.__dark_current = dark_current
+        self.__well_capacity = well_capacity
         self.__f_number = f_number
         self.__center_offset = center_offset
         self.__shape = shape
