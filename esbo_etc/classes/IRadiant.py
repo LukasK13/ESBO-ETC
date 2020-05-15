@@ -20,7 +20,7 @@ class IRadiant(ABC):
         size : str
             The size of the target.
         obstruction : float
-            The obstruction factor.
+            The obstruction factor as A_ob / A_ap.
         """
         pass
 

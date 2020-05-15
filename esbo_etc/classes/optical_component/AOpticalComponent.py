@@ -63,7 +63,7 @@ class AOpticalComponent(IRadiant):
         size : str
             The size of the target.
         obstruction : float
-            The obstruction factor.
+            The obstruction factor as A_ob / A_ap.
         """
         signal, size, obstruction = self.__parent.calcSignal()
         info("Calculating signal for class '" + self.__class__.__name__ + "'.")

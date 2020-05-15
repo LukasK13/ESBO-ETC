@@ -57,7 +57,7 @@ class ATarget(IRadiant):
         size : str
             The size of the target.
         obstruction : float
-            The obstruction factor.
+            The obstruction factor as A_ob / A_ap.
         """
         info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
         debug(self.__sfd)
