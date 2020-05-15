@@ -264,7 +264,7 @@ class Imager(ASensor):
             mes = sensor.pixel.quantum_efficiency.check_file("val")
             if mes is not None:
                 return "pixel -> quantum_efficiency: " + mes
-        if not hasattr(conf.pixel, "pixel_size"):
+        if not hasattr(sensor.pixel, "pixel_size"):
             return "Missing container 'pixel_size'."
         mes = sensor.pixel.pixel_size.check_quantity("val", u.m)
         if mes is not None:
