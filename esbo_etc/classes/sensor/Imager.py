@@ -3,7 +3,7 @@ from .ASensor import ASensor
 from ..IRadiant import IRadiant
 from ..Entry import Entry
 import numpy as np
-from typing import Union
+from typing import Union, Tuple
 from ..psf.Airy import Airy
 from ..psf.Zemax import Zemax
 from ..SpectralQty import SpectralQty
@@ -92,7 +92,7 @@ class Imager(ASensor):
                                common_conf.psf.osf, pixel_size)
 
     @u.quantity_input(exp_time="time")
-    def getSNR(self, exp_time: u.Quantity):
+    def getSNR(self, exp_time: u.Quantity) -> u.Quantity:
         """
         Calculate the signal to background ratio (SNR) for the given exposure time using the CCD-equation.
 
@@ -103,91 +103,158 @@ class Imager(ASensor):
 
         Returns
         -------
-        snr : float
-            The calculated SNR
+        snr : Quantity
+            The calculated SNR as dimensionless quantity
         """
+        # Calculate the electron currents
+        signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        # Calculate the number of collected electrons
+        signal = signal_current * exp_time
+        background = background_current * exp_time
+        dark = dark_current * exp_time
+        return self.__calcSNR(signal, background, read_noise, dark)
 
-        snr = self.__calcSNR(*self.__exposePixels(), exp_time)
-        return snr.value
-
-    def getExpTime(self, snr: float) -> u.Quantity:
+    def getExpTime(self, snr: u.Quantity) -> u.Quantity:
         """
         Calculate the necessary exposure time in order to achieve the given SNR.
 
         Parameters
         ----------
-        snr : float
-            The SNR for which the necessary exposure time shall be calculated.
+        snr : Quantity
+            The SNR for which the necessary exposure time shall be calculated as dimensionless quantity.
 
         Returns
         -------
         exp_time : Quantity
             The necessary exposure time in seconds.
         """
-        # # Calculate the number of exposed pixels which will be used for calculating the noise
-        # n_pix_exposed = self.__calcExposedPixels()
-        # # Calculate the electron current from the target and the background
-        # signal_current, background_current = self.__calcElectronCurrent(n_pix_exposed)
-        # # Fix the physical units of the SNR
-        # snr = snr * u.electron**0.5
-        #
-        # # Calculate the ratio of the background- and dark-current to the signal current as auxiliary variable
-        # current_ratio = (background_current + n_pix_exposed * self.__dark_current) / signal_current
-        # # Calculate the necessary exposure time as inverse of the CCD-equation
-        # exp_time = snr ** 2 * (1 + current_ratio + np.sqrt(
-        #     (1 + current_ratio) ** 2 + 4 * (self.__read_noise * n_pix_exposed) ** 2 / snr ** 2)) /\
-        #     (2 * signal_current)
-        # return exp_time
+        # Calculate the electron currents
+        signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        # Calculate the electron currents for all pixels
+        signal_current_tot = signal_current.sum()
+        background_current_tot = background_current.sum()
+        read_noise_tot = read_noise.sum()
+        dark_current_tot = dark_current.sum()
+        # Fix the physical units of the SNR
+        snr = snr * u.electron**0.5
 
-    @u.quantity_input(signal_current=u.electron / u.s, background_current=u.electron / u.s,
-                      read_noise=u.electron ** 0.5, dark_current=u.electron / u.s, exp_time="time")
-    def __calcSNR(self, signal_current: u.Quantity, background_current: u.Quantity, read_noise: u.Quantity,
-                  dark_current: u.Quantity, exp_time: u.Quantity) -> u.dimensionless_unscaled:
-        # Calculate the SNR using the CCD-equation
-        signal = signal_current * exp_time
-        background = background_current * exp_time
-        dark = dark_current * exp_time
+        # Calculate the ratio of the background- and dark-current to the signal current as auxiliary variable
+        current_ratio = (background_current_tot + dark_current_tot) / signal_current_tot
+        # Calculate the necessary exposure time as inverse of the CCD-equation
+        exp_time = snr ** 2 * (1 + current_ratio + np.sqrt(
+            (1 + current_ratio) ** 2 + 4 * read_noise_tot ** 2 / snr ** 2)) /\
+            (2 * signal_current_tot)
+        # Calculate the SNR in order to check for overexposed pixels
+        self.__calcSNR(signal_current * exp_time, background_current * exp_time, read_noise, dark_current * exp_time)
+        return exp_time
+
+    @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
+    def __calcSNR(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
+                  dark: u.Quantity) -> u.dimensionless_unscaled:
+        """
+        Calculate the signal to noise ratio (SNR) of the given electron counts.
+
+        Parameters
+        ----------
+        signal : Quantity
+            The collected electrons from the target in electrons.
+        background : Quantity
+            The collected electrons from the background in electrons.
+        read_noise : Quantity
+            The read noise in electrons.
+        dark : Quantity
+            The electrons from the dark current in electrons.
+
+        Returns
+        -------
+        snr : Quantity
+            The signal to noise ration as dimensionless quantity
+        """
+        # Calculate the total collected electrons per pixel
         total = signal + background + dark
+        # Check for overexposed pixels
         overexposed = total > self.__well_capacity
         if np.any(overexposed):
+            # Show a warning for the overexposed pixels
             warning(str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
         info("Collected electrons from target:     %1.2e electrons" % signal.sum().value)
         info("Collected electrons from background: %1.2e electrons" % background.sum().value)
         info("Electrons from dark current:         %1.2e electrons" % dark.sum().value)
         info("Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
         info("Total collected electrons:           %1.2e electrons" % total.sum().value)
+        # Calculate the SNR using the CCD-equation
         snr = signal.sum() / np.sqrt(total.sum() + (read_noise ** 2).sum())
         # Return the value of the SNR, ignoring the physical units (electrons^0.5)
         return snr.value * u.dimensionless_unscaled
 
-    def __exposePixels(self) -> (u.electron / u.s, u.electron / u.s, u.electron, u.electron / u.s):
-        signal_current, size, obstruction, background_current = self.__calcPixelElectronCurrent()
+    def __exposePixels(self) -> Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
+        """
+        Expose the pixels and calculate the signal and noise electron currents per pixel.
+
+        Returns
+        -------
+        signal_current : Quantity
+            The electron current from the target as PixelMask in electrons / s
+        background_current : Quantity
+            The electron current from the background as PixelMask in electrons / s
+        read_noise : Quantity
+            The read noise per pixel in electrons
+        dark_current : Quantity
+            The electron current from the dark noise as PixelMask in electrons / s
+        """
+        # Calculate the total incoming electron current
+        signal_current, size, obstruction, background_current = self.__calcIncomingElectronCurrent()
+        # Initialize a new PixelMask
         mask = PixelMask(self.__pixel_geometry, self.__pixel_size, self.__center_offset)
         if size.lower() == "extended":
+            # Target is extended, a diameter of 0 pixels results in a mask with one pixel marked
             d_photometric_ap = 0 * u.pix
+            # Mask the pixels to be exposed
             mask.createPhotometricAperture("circle", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
         else:
+            # Target is a point source
             if self.__contained_pixels is not None:
+                # Calculate the diameter of the photometric aperture as square root of the contained pixels
                 d_photometric_ap = np.sqrt(self.__contained_pixels.value) * u.pix
+                # Mask the pixels to be exposed
                 mask.createPhotometricAperture("square", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
             else:
+                # Calculate the diameter of the photometric aperture from the given contained energy
                 d_photometric_ap = self.__calcPhotometricAperture(obstruction)
+                # Mask the pixels to be exposed
                 mask.createPhotometricAperture(self.__shape, d_photometric_ap / 2)
-        background = mask * background_current * u.pix
+        # Calculate the background current PixelMask
+        background_current = mask * background_current * u.pix
+        # Calculate the read noise PixelMask
         read_noise = mask * self.__read_noise * u.pix
+        # Calculate the dark current PixelMask
         dark_current = mask * self.__dark_current * u.pix
         info("The radius of the photometric aperture is %.2f pixels." % (d_photometric_ap.value / 2))
         info("The photometric aperture contains " + str(np.count_nonzero(mask)) + " pixels.")
         if size.lower() != "extended":
+            # Map the PSF onto the pixel mask in order to get the relative irradiance of each pixel
             mask = self.__psf.mapToPixelMask(mask,
                                              getattr(getattr(self.__common_conf, "jitter_sigma", None), "val", None),
                                              obstruction)
-        signal = mask * signal_current
-        return signal, background, read_noise, dark_current
+        # Calculate the signal current PixelMask
+        signal_current = mask * signal_current
+        return signal_current, background_current, read_noise, dark_current
 
     def __calcPhotometricAperture(self, obstruction: float) -> u.Quantity:
+        """
+        Calculate the diameter of the photometric aperture
+
+        Parameters
+        ----------
+        obstruction : float
+            The obstruction factor as A_ob / A_ap.
+
+        Returns
+        -------
+        d_photometric_ap : Quantity
+            The diameter of the photometric aperture in pixels.
+        """
         # Calculate the reduced observation angle
-        # jitter_sigma = self.__common_conf.jitter_sigma() if hasattr(self.__common_conf, "jitter_sigma") else None
         jitter_sigma = getattr(getattr(self.__common_conf, "jitter_sigma", None), "val", None)
         reduced_observation_angle = self.__psf.calcReducedObservationAngle(self.__contained_energy, jitter_sigma,
                                                                            obstruction)
@@ -202,7 +269,7 @@ class Imager(ASensor):
         d_photometric_ap = observation_angle / pixel_fov
         return d_photometric_ap * u.pix
 
-    def __calcPixelElectronCurrent(self) -> (u.electron / u.s, str, float, u.electron / (u.pix * u.s)):
+    def __calcIncomingElectronCurrent(self) -> Tuple[u.Quantity, str, float, u.Quantity]:
         """
         Calculate the detected electron current of the signal and the background.
 
@@ -213,7 +280,7 @@ class Imager(ASensor):
         size : str
             The size of the target.
         obstruction : float
-            The obstruction factor.
+            The obstruction factor as A_ob / A_ap.
         background_current : Quantity
             The electron current on the detector caused by the background in electrons / (s * pix).
         """
