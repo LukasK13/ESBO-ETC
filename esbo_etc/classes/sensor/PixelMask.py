@@ -106,14 +106,14 @@ class PixelMask(np.ndarray):
         elif shape.lower() == "square":
             # Rasterize a square on the grid
             # Calculate the left, right, upper and lower bounds of the square
-            x_right = int(round((xc + radius).value))
+            x_right = int(round((xc + radius - 1e-6 * u.pix).value))
             if x_right > self.pixel_geometry[0].value - 1:
                 x_right = self.pixel_geometry[0].value - 1
-            x_left = 0 if (xc - radius).value < 0 else int(round((xc - radius).value))
-            y_low = int(round((yc + radius).value))
+            x_left = 0 if (xc - radius).value < 0 else int(round((xc - radius + 1e-6 * u.pix).value))
+            y_low = int(round((yc + radius - 1e-6 * u.pix).value))
             if y_low > self.pixel_geometry[1].value - 1:
                 y_low = self.pixel_geometry[1].value - 1
-            y_up = 0 if (yc - radius).value < 0 else int(round((yc - radius).value))
+            y_up = 0 if (yc - radius).value < 0 else int(round((yc - radius + 1e-6 * u.pix).value))
             # Mark the pixels contained in the square with 1
             self[y_up:(y_low + 1), x_left:(x_right + 1)] = 1
         else:
