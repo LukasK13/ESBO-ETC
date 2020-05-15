@@ -139,6 +139,14 @@ class Configuration(object):
             mes is not None and error("Configuration check: common -> jitter_sigma: " + mes)
         if not hasattr(self.conf.common, "output_path"):
             setattr(self.conf.common, "output_path", Entry(val="."))
+        if hasattr(self.conf.common, "exposure_time"):
+            mes = self.conf.common.exposure_time.check_quantity("val", u.s)
+            mes is not None and error("Configuration check: common -> exposure_time: " + mes)
+        elif hasattr(self.conf.common, "snr"):
+            mes = self.conf.common.snr.check_quantity("val", u.dimensionless_unscaled)
+            mes is not None and error("Configuration check: common -> snr: " + mes)
+        else:
+            error("Configuration check: common: Expected one of the containers 'exposure_time' or 'snr' but got none.")
 
         # Check astroscene
         if not hasattr(self.conf, "astroscene"):
