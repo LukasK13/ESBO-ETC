@@ -230,7 +230,20 @@ class Imager(ASensor):
         read_noise = mask * self.__read_noise * u.pix
         # Calculate the dark current PixelMask
         dark_current = mask * self.__dark_current * u.pix
-        info("The radius of the photometric aperture is %.2f pixels." % (d_photometric_ap.value / 2))
+        if self.__contained_pixels is None and size.lower() != "extended":
+            if type(self.__contained_energy) == str:
+                if self.__contained_energy.lower() == "peak":
+                    info("The radius of the photometric aperture is %.2f pixels. This equals the peak value" % (
+                            d_photometric_ap.value / 2))
+                elif self.__contained_energy.lower() == "fwhm":
+                    info("The radius of the photometric aperture is %.2f pixels. This equals the FWHM" % (
+                            d_photometric_ap.value / 2))
+                elif self.__contained_energy.lower() == "min":
+                    info("The radius of the photometric aperture is %.2f pixels. This equals the first minimum" % (
+                            d_photometric_ap.value / 2))
+            else:
+                info("The radius of the photometric aperture is %.2f pixels. This equals %.0f%% encircled energy" %
+                     (d_photometric_ap.value / 2, self.__contained_energy))
         info("The photometric aperture contains " + str(np.count_nonzero(mask)) + " pixels.")
         if size.lower() != "extended":
             # Map the PSF onto the pixel mask in order to get the relative irradiance of each pixel
