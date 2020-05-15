@@ -92,7 +92,7 @@ class Imager(ASensor):
                                common_conf.psf.osf, pixel_size)
 
     @u.quantity_input(exp_time="time")
-    def getSNR(self, exp_time: u.Quantity) -> u.Quantity:
+    def getSNR(self, exp_time: u.Quantity) -> u.dimensionless_unscaled:
         """
         Calculate the signal to background ratio (SNR) for the given exposure time using the CCD-equation.
 
@@ -114,7 +114,8 @@ class Imager(ASensor):
         dark = dark_current * exp_time
         return self.__calcSNR(signal, background, read_noise, dark)
 
-    def getExpTime(self, snr: u.Quantity) -> u.Quantity:
+    @u.quantity_input(snr=u.dimensionless_unscaled)
+    def getExpTime(self, snr: u.Quantity) -> u.s:
         """
         Calculate the necessary exposure time in order to achieve the given SNR.
 
@@ -141,9 +142,9 @@ class Imager(ASensor):
         # Calculate the ratio of the background- and dark-current to the signal current as auxiliary variable
         current_ratio = (background_current_tot + dark_current_tot) / signal_current_tot
         # Calculate the necessary exposure time as inverse of the CCD-equation
-        exp_time = snr ** 2 * (1 + current_ratio + np.sqrt(
-            (1 + current_ratio) ** 2 + 4 * read_noise_tot ** 2 / snr ** 2)) /\
-            (2 * signal_current_tot)
+        exp_time = snr ** 2 * (
+                    1 + current_ratio + np.sqrt((1 + current_ratio) ** 2 + 4 * read_noise_tot ** 2 / snr ** 2)) / (
+                               2 * signal_current_tot)
         # Calculate the SNR in order to check for overexposed pixels
         self.__calcSNR(signal_current * exp_time, background_current * exp_time, read_noise, dark_current * exp_time)
         return exp_time
