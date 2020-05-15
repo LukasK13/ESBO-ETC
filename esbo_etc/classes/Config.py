@@ -171,13 +171,13 @@ class Configuration(object):
         if not hasattr(self.conf.instrument, "sensor"):
             error("Configuration check: instrument: Missing required container 'sensor'.")
         if not hasattr(self.conf.instrument.sensor, "type"):
-            error("Configuration check: instrument -> target: Missing required parameter 'type'.")
+            error("Configuration check: instrument -> sensor: Missing required parameter 'type'.")
         if self.conf.instrument.sensor.type not in dir(sensor):
             # noinspection PyTypeChecker
-            error("Configuration check: sensor -> target: Sensor type '" + self.conf.instrument.sensor.type +
+            error("Configuration check: instrument -> sensor: Sensor type '" + self.conf.instrument.sensor.type +
                   "' does not exist. Did you mean '" + difflib.get_close_matches(self.conf.instrument.sensor.type,
                                                                                  dir(sensor), 1)[0] + "'?")
-        mes = getattr(sensor, self.conf.instrument.sensor.type).check_config(self.conf.instrument.sensor)
+        mes = getattr(sensor, self.conf.instrument.sensor.type).check_config(self.conf.instrument.sensor, self.conf)
         mes is not None and error("Configuration check: instrument -> sensor -> " + mes)
 
     @staticmethod

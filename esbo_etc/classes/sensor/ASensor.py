@@ -56,14 +56,16 @@ class ASensor:
         pass
 
     @staticmethod
-    def check_config(conf: Entry) -> Union[None, str]:
+    def check_config(sensor: Entry, conf: Entry) -> Union[None, str]:
         """
         Check the configuration for this class
 
         Parameters
         ----------
-        conf : Entry
+        sensor : Entry
             The configuration entry to be checked.
+        conf: Entry
+            The complete configuration.
 
         Returns
         -------

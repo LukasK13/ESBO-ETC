@@ -220,75 +220,93 @@ class Imager(ASensor):
         return signal_current, size, obstruction, background_current
 
     @staticmethod
-    def check_config(conf: Entry) -> Union[None, str]:
+    def check_config(sensor: Entry, conf: Entry) -> Union[None, str]:
         """
         Check the configuration for this class
 
         Parameters
         ----------
-        conf : Entry
+        sensor : Entry
             The configuration entry to be checked.
+        conf: Entry
+            The complete configuration.
 
         Returns
         -------
         mes : Union[None, str]
             The error message of the check. This will be None if the check was successful.
         """
-        if not hasattr(conf, "f_number"):
+        if not hasattr(sensor, "f_number"):
             return "Missing container 'f_number'."
-        mes = conf.f_number.check_float("val")
+        mes = sensor.f_number.check_float("val")
         if mes is not None:
             return "f_number: " + mes
-        if not hasattr(conf, "pixel_geometry"):
+        if not hasattr(sensor, "pixel_geometry"):
             return "Missing container 'pixel_geometry'."
-        mes = conf.pixel_geometry.check_quantity("val", u.pix)
+        mes = sensor.pixel_geometry.check_quantity("val", u.pix)
         if mes is not None:
             return "pixel_geometry: " + mes
-        if hasattr(conf, "center_offset") and isinstance(conf.center_offset, Entry):
-            mes = conf.center_offset.check_quantity("val", u.pix)
+        if hasattr(sensor, "center_offset") and isinstance(sensor.center_offset, Entry):
+            mes = sensor.center_offset.check_quantity("val", u.pix)
             if mes is not None:
                 return "center_offset: " + mes
 
         # Check pixel
-        if not hasattr(conf, "pixel"):
+        if not hasattr(sensor, "pixel"):
             return "Missing container 'pixel'."
-        if not hasattr(conf.pixel, "quantum_efficiency"):
+        if not hasattr(sensor.pixel, "quantum_efficiency"):
             return "Missing container 'quantum_efficiency'."
-        mes = conf.pixel.quantum_efficiency.check_float("val")
+        mes = sensor.pixel.quantum_efficiency.check_float("val")
         if mes is not None:
-            mes = conf.pixel.quantum_efficiency.check_file("val")
+            mes = sensor.pixel.quantum_efficiency.check_file("val")
             if mes is not None:
                 return "pixel -> quantum_efficiency: " + mes
         if not hasattr(conf.pixel, "pixel_size"):
             return "Missing container 'pixel_size'."
-        mes = conf.pixel.pixel_size.check_quantity("val", u.m)
+        mes = sensor.pixel.pixel_size.check_quantity("val", u.m)
         if mes is not None:
             return "pixel -> pixel_size: " + mes
-        if not hasattr(conf.pixel, "dark_current"):
+        if not hasattr(sensor.pixel, "dark_current"):
             return "Missing container 'dark_current'."
-        mes = conf.pixel.dark_current.check_quantity("val", u.electron / (u.pix * u.s))
+        mes = sensor.pixel.dark_current.check_quantity("val", u.electron / (u.pix * u.s))
         if mes is not None:
             return "pixel -> dark_current: " + mes
-        if not hasattr(conf.pixel, "sigma_read_out"):
+        if not hasattr(sensor.pixel, "sigma_read_out"):
             return "Missing container 'sigma_read_out'."
-        mes = conf.pixel.sigma_read_out.check_quantity("val", u.electron ** 0.5 / u.pix)
+        mes = sensor.pixel.sigma_read_out.check_quantity("val", u.electron ** 0.5 / u.pix)
         if mes is not None:
             return "pixel -> sigma_read_out: " + mes
+        if not hasattr(sensor.pixel, "well_capacity"):
+            return "Missing container 'well_capacity'."
+        mes = sensor.pixel.well_capacity.check_quantity("val", u.electron)
+        if mes is not None:
+            return "pixel -> well_capacity: " + mes
 
         # Check photometric aperture
-        if not hasattr(conf, "photometric_aperture"):
-            return "Missing container 'photometric_aperture'."
-        if hasattr(conf.photometric_aperture, "shape"):
-            mes = conf.photometric_aperture.shape.check_selection("val", ["square", "circle"])
-            if mes is not None:
-                return "photometric_aperture -> shape: " + mes
-        if hasattr(conf.photometric_aperture, "contained_energy"):
-            mes = conf.photometric_aperture.contained_energy.check_float("val")
-            if mes is not None:
-                mes = conf.photometric_aperture.contained_energy.check_selection("val", ["peak", "FWHM", "fwhm", "min"])
+        if conf.astroscene.target.size == "point":
+            if not hasattr(sensor, "photometric_aperture"):
+                return "Missing container 'photometric_aperture'."
+            if hasattr(sensor.photometric_aperture, "contained_pixels"):
+                mes = sensor.photometric_aperture.contained_pixels.check_quantity("val", u.pix)
                 if mes is not None:
-                    return "photometric_aperture -> contained_energy: " + mes
-        if hasattr(conf.photometric_aperture, "contained_pixels"):
-            mes = conf.photometric_aperture.contained_pixels.check_quantity("val", u.pix)
-            if mes is not None:
-                return "photometric_aperture -> contained_pixels: " + mes
+                    return "photometric_aperture -> contained_pixels: " + mes
+            else:
+                if not hasattr(sensor.photometric_aperture, "shape"):
+                    return "Missing container 'shape'."
+                mes = sensor.photometric_aperture.shape.check_selection("val", ["square", "circle"])
+                if mes is not None:
+                    return "photometric_aperture -> shape: " + mes
+                if not hasattr(sensor.photometric_aperture, "contained_energy"):
+                    return "Missing container 'contained_energy'."
+                mes = sensor.photometric_aperture.contained_energy.check_float("val")
+                if mes is not None:
+                    if conf.common.psf().lower() == "airy":
+                        mes = sensor.photometric_aperture.contained_energy.check_selection("val",
+                                                                                           ["peak", "FWHM", "fwhm",
+                                                                                            "min"])
+                        if mes is not None:
+                            return "photometric_aperture -> contained_energy: " + mes
+                    else:
+                        mes = sensor.photometric_aperture.contained_energy.check_selection("val", ["FWHM", "fwhm"])
+                        if mes is not None:
+                            return "photometric_aperture -> contained_energy: " + mes
