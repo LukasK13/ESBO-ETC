@@ -157,7 +157,7 @@ class Imager(ASensor):
             d_photometric_ap = 0 * u.pix
             mask.createPhotometricAperture("circle", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
         else:
-            if hasattr(self, "__contained_pixels"):
+            if self.__contained_pixels is not None:
                 d_photometric_ap = np.sqrt(self.__contained_pixels.value) * u.pix
                 mask.createPhotometricAperture("square", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
             else:
