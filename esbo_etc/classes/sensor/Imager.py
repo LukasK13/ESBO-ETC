@@ -9,7 +9,7 @@ from ..psf.Zemax import Zemax
 from ..SpectralQty import SpectralQty
 from .PixelMask import PixelMask
 import astropy.constants as const
-from logging import info
+from logging import info, warning
 
 
 class Imager(ASensor):
@@ -76,8 +76,7 @@ class Imager(ASensor):
         self.__center_offset = center_offset
         self.__shape = shape
         self.__contained_energy = contained_energy
-        if contained_pixels:
-            self.__contained_pixels = contained_pixels
+        self.__contained_pixels = contained_pixels
         self.__common_conf = common_conf
         # Calculate central wavelength
         self.__central_wl = self.__common_conf.wl_min() + (
@@ -145,8 +144,19 @@ class Imager(ASensor):
     def __calcSNR(self, signal_current: u.Quantity, background_current: u.Quantity, read_noise: u.Quantity,
                   dark_current: u.Quantity, exp_time: u.Quantity) -> u.dimensionless_unscaled:
         # Calculate the SNR using the CCD-equation
-        snr = signal_current.sum() * exp_time / np.sqrt(
-            exp_time * (signal_current.sum() + background_current.sum() + dark_current.sum()) + read_noise.sum() ** 2)
+        signal = signal_current * exp_time
+        background = background_current * exp_time
+        dark = dark_current * exp_time
+        total = signal + background + dark
+        overexposed = total > self.__well_capacity
+        if np.any(overexposed):
+            warning(str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
+        info("Collected electrons from target:     %1.2e electrons" % signal.sum().value)
+        info("Collected electrons from background: %1.2e electrons" % background.sum().value)
+        info("Electrons from dark current:         %1.2e electrons" % dark.sum().value)
+        info("Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
+        info("Total collected electrons:           %1.2e electrons" % total.sum().value)
+        snr = signal.sum() / np.sqrt(total.sum() + (read_noise ** 2).sum())
         # Return the value of the SNR, ignoring the physical units (electrons^0.5)
         return snr.value * u.dimensionless_unscaled
 
