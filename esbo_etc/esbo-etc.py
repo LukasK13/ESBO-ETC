@@ -23,9 +23,12 @@ if __name__ == "__main__":
     parent = oc_factory.fromConfigBatch(conf)
     sensor_factory = etc.SensorFactory(parent, conf.common)
     imager = sensor_factory.create(conf.instrument.sensor)
-    if hasattr(conf.common, "exposure_time"):
+    if hasattr(conf.common, "exposure_time") and hasattr(conf.common, "snr"):
+        sensitivity = imager.getSensitivity(conf.common.exposure_time(), conf.common.snr(), conf.astroscene.target.mag)
+        print("The limiting apparent magnitude is: %.2f mag." % sensitivity.value)
+    elif hasattr(conf.common, "exposure_time"):
         snr = imager.getSNR(conf.common.exposure_time())
-        print("The SNR is: %.2f" % snr)
+        print("The SNR is: %.2f." % snr.value)
     elif hasattr(conf.common, "snr"):
         exp_time = imager.getExpTime(conf.common.snr())
-        print("The necessary exposure time is: %.2f s" % exp_time.value)
+        print("The necessary exposure time is: %.2f s." % exp_time.value)

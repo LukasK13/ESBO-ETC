@@ -142,10 +142,10 @@ class Configuration(object):
         if hasattr(self.conf.common, "exposure_time"):
             mes = self.conf.common.exposure_time.check_quantity("val", u.s)
             mes is not None and error("Configuration check: common -> exposure_time: " + mes)
-        elif hasattr(self.conf.common, "snr"):
+        if hasattr(self.conf.common, "snr"):
             mes = self.conf.common.snr.check_quantity("val", u.dimensionless_unscaled)
             mes is not None and error("Configuration check: common -> snr: " + mes)
-        else:
+        if not (hasattr(self.conf.common, "exposure_time") or hasattr(self.conf.common, "snr")):
             error("Configuration check: common: Expected one of the containers 'exposure_time' or 'snr' but got none.")
 
         # Check astroscene
@@ -162,7 +162,10 @@ class Configuration(object):
                                                                                  dir(tg), 1)[0] + "'?")
         mes = getattr(tg, self.conf.astroscene.target.type).check_config(self.conf.astroscene.target)
         mes is not None and error("Configuration check: astroscene -> target: " + mes)
-
+        if hasattr(self.conf.common, "exposure_time") and hasattr(self.conf.common, "snr"):
+            if self.conf.astroscene.target.type.lower() != "blackbodytarget":
+                error("Configuration check: astroscene -> target: Sensitivity calculation only possible for " +
+                      "a target of the type 'BlackBodyTarget'.")
         mes = self.__check_optical_components(self.conf.astroscene)
         mes is not None and error("Configuration check: astroscene -> " + mes)
 

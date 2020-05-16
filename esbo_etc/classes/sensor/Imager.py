@@ -149,6 +149,34 @@ class Imager(ASensor):
         self.__calcSNR(signal_current * exp_time, background_current * exp_time, read_noise, dark_current * exp_time)
         return exp_time
 
+    @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
+    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity):
+        """
+        Calculate the sensitivity of the telescope detector combination.
+
+        Parameters
+        ----------
+        exp_time : Quantity
+            The exposure time in seconds.
+        snr : Quantity
+            The SNR for which the sensitivity time shall be calculated.
+        target_brightness : Quantity
+            The target brightness in magnitudes.
+
+        Returns
+        -------
+        sensitivity: Quantity
+            The sensitivity as limiting apparent star magnitude in mag.
+        """
+        # Calculate the electron currents
+        signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        # Fix the physical units of the SNR
+        snr = snr * u.electron ** 0.5
+        signal_current_lim = snr * (snr + np.sqrt(
+            snr ** 2 + 4 * (exp_time * (background_current.sum() + dark_current.sum()) + (read_noise ** 2).sum()))) / (
+                                         2 * exp_time)
+        return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
+
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
     def __calcSNR(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
                   dark: u.Quantity) -> u.dimensionless_unscaled:

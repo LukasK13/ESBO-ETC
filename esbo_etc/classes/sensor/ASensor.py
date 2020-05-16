@@ -39,19 +39,42 @@ class ASensor:
         pass
 
     @abstractmethod
-    def getExpTime(self, snr: float):
+    @u.quantity_input(snr=u.dimensionless_unscaled)
+    def getExpTime(self, snr: u.Quantity):
         """
         Calculate the necessary exposure time in order to achieve the given SNR.
 
         Parameters
         ----------
-        snr : float
+        snr : Quantity
             The SNR for which the necessary exposure time shall be calculated.
 
         Returns
         -------
         exp_time : Quantity
             The necessary exposure time in seconds.
+        """
+        pass
+
+    @abstractmethod
+    @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
+    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity):
+        """
+        Calculate the sensitivity of the telescope detector combination.
+
+        Parameters
+        ----------
+        exp_time : Quantity
+            The exposure time in seconds.
+        snr : Quantity
+            The SNR for which the sensitivity time shall be calculated.
+        target_brightness : Quantity
+            The target brightness in magnitudes.
+
+        Returns
+        -------
+        sensitivity: Quantity
+            The sensitivity as limiting apparent star magnitude in mag.
         """
         pass
 
