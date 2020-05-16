@@ -150,7 +150,7 @@ class Imager(ASensor):
         return exp_time
 
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
-    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity):
+    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
         """
         Calculate the sensitivity of the telescope detector combination.
 

@@ -22,7 +22,7 @@ class ASensor:
 
     @abstractmethod
     @u.quantity_input(exp_time="time")
-    def getSNR(self, exp_time: u.Quantity):
+    def getSNR(self, exp_time: u.Quantity) -> u.dimensionless_unscaled:
         """
         Calculate the signal to noise ratio (SNR) for the given exposure time.
 
@@ -33,14 +33,14 @@ class ASensor:
 
         Returns
         -------
-        snr : float
+        snr : Quantity
             The calculated SNR
         """
         pass
 
     @abstractmethod
     @u.quantity_input(snr=u.dimensionless_unscaled)
-    def getExpTime(self, snr: u.Quantity):
+    def getExpTime(self, snr: u.Quantity) -> u.s:
         """
         Calculate the necessary exposure time in order to achieve the given SNR.
 
@@ -58,7 +58,7 @@ class ASensor:
 
     @abstractmethod
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
-    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity):
+    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
         """
         Calculate the sensitivity of the telescope detector combination.
 
