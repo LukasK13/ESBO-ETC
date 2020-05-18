@@ -1,4 +1,4 @@
-import esbo_etc as etc
+import esbo_etc as eetc
 import argparse
 import logging
 import sys
@@ -17,12 +17,13 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING if args.logging is None else getattr(
         logging, args.logging.upper()), stream=sys.stdout)
 
-    conf = etc.Configuration(args.config).conf
+    conf = eetc.Configuration(args.config).conf
 
-    oc_factory = etc.classes.RadiantFactory(conf.common.wl_bins())
+    oc_factory = eetc.classes.RadiantFactory(conf.common.wl_bins())
     parent = oc_factory.fromConfigBatch(conf)
-    sensor_factory = etc.SensorFactory(parent, conf.common)
+    sensor_factory = eetc.SensorFactory(parent, conf.common)
     imager = sensor_factory.create(conf.instrument.sensor)
+
     if hasattr(conf.common, "exposure_time") and hasattr(conf.common, "snr"):
         sensitivity = imager.getSensitivity(conf.common.exposure_time(), conf.common.snr(), conf.astroscene.target.mag)
         print("The limiting apparent magnitude is: %.2f mag." % sensitivity.value)
