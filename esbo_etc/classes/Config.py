@@ -156,6 +156,11 @@ class Configuration(object):
                 mes is not None and error("Configuration check: common -> snr: " + mes)
                 self.conf.common.snr.val = readCSV(self.conf.common.snr.val, [u.dimensionless_unscaled],
                                                    format_="csv").columns[0].quantity
+            if hasattr(self.conf.common, "exposure_time") and len(self.conf.common.snr.val) != len(
+                    self.conf.common.exposure_time.val):
+                error(
+                    "Configuration check: common -> snr: Length of exposure time (%d) not matching the length of "
+                    "the SNR (%d)" % (len(self.conf.common.exposure_time.val), len(self.conf.common.snr.val)))
         if not (hasattr(self.conf.common, "exposure_time") or hasattr(self.conf.common, "snr")):
             error("Configuration check: common: Expected at least one of the containers 'exposure_time' or 'snr' but" +
                   "got none.")
@@ -220,7 +225,7 @@ class Configuration(object):
         """
         if hasattr(conf, "optical_component"):
             for component in (conf.optical_component if type(conf.optical_component) == list else
-                              [conf.optical_component]):
+            [conf.optical_component]):
                 if not hasattr(component, "type"):
                     return "optical_component: Missing required parameter 'type'."
                 if component.type not in dir(oc):
