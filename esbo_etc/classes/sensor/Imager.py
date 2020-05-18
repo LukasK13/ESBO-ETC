@@ -108,11 +108,15 @@ class Imager(ASensor):
         """
         # Calculate the electron currents
         signal_current, background_current, read_noise, dark_current = self.__exposePixels()
-        # Calculate the number of collected electrons
-        signal = signal_current * exp_time
-        background = background_current * exp_time
-        dark = dark_current * exp_time
-        return self.__calcSNR(signal, background, read_noise, dark)
+        # Calculate the SNR using the CCD-equation
+        snr = signal_current.sum() * exp_time / np.sqrt(
+            (signal_current + background_current + dark_current).sum() * exp_time + (read_noise ** 2).sum())
+        for exp_time_ in exp_time:
+            # Print information
+            self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                                dark_current * exp_time_, "t_exp=%.2f s: " % exp_time_.value)
+        # Return the value of the SNR, ignoring the physical units (electrons^0.5)
+        return snr.value * u.dimensionless_unscaled
 
     @u.quantity_input(snr=u.dimensionless_unscaled)
     def getExpTime(self, snr: u.Quantity) -> u.s:
@@ -137,16 +141,18 @@ class Imager(ASensor):
         read_noise_tot = read_noise.sum()
         dark_current_tot = dark_current.sum()
         # Fix the physical units of the SNR
-        snr = snr * u.electron**0.5
+        snr = snr * u.electron ** 0.5
 
         # Calculate the ratio of the background- and dark-current to the signal current as auxiliary variable
         current_ratio = (background_current_tot + dark_current_tot) / signal_current_tot
         # Calculate the necessary exposure time as inverse of the CCD-equation
         exp_time = snr ** 2 * (
-                    1 + current_ratio + np.sqrt((1 + current_ratio) ** 2 + 4 * read_noise_tot ** 2 / snr ** 2)) / (
-                               2 * signal_current_tot)
-        # Calculate the SNR in order to check for overexposed pixels
-        self.__calcSNR(signal_current * exp_time, background_current * exp_time, read_noise, dark_current * exp_time)
+                1 + current_ratio + np.sqrt((1 + current_ratio) ** 2 + 4 * read_noise_tot ** 2 / snr ** 2)) / (
+                           2 * signal_current_tot)
+        for snr_, exp_time_ in zip(snr, exp_time):
+            # Print information
+            self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                                dark_current * exp_time_, "SNR=%.2f: " % snr_.value)
         return exp_time
 
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
@@ -173,15 +179,18 @@ class Imager(ASensor):
         # Fix the physical units of the SNR
         snr = snr * u.electron ** 0.5
         signal_current_lim = snr * (snr + np.sqrt(
-            snr ** 2 + 4 * (exp_time * (background_current.sum() + dark_current.sum()) + (read_noise ** 2).sum()))) / (
-                                         2 * exp_time)
-        self.__calcSNR(signal_current_lim * exp_time, background_current * exp_time, read_noise,
-                       dark_current * exp_time)
+            snr ** 2 + 4 * (exp_time * (background_current.sum() + dark_current.sum()) +
+                             (read_noise ** 2).sum()))) / (2 * exp_time)
+        for snr_, exp_time_, signal_current_lim_ in zip(snr, exp_time, signal_current_lim):
+            # Print information
+            self.__printDetails(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
+                                dark_current * exp_time_,
+                                "SNR=%.2f t_exp=%.2f s: " % (snr_.value, exp_time_.value))
         return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
-    def __calcSNR(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
-                  dark: u.Quantity) -> u.dimensionless_unscaled:
+    def __printDetails(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
+                       dark: u.Quantity, prefix: str = ""):
         """
         Calculate the signal to noise ratio (SNR) of the given electron counts.
 
@@ -198,8 +207,6 @@ class Imager(ASensor):
 
         Returns
         -------
-        snr : Quantity
-            The signal to noise ration as dimensionless quantity
         """
         # Calculate the total collected electrons per pixel
         total = signal + background + dark
@@ -207,16 +214,12 @@ class Imager(ASensor):
         overexposed = total > self.__well_capacity
         if np.any(overexposed):
             # Show a warning for the overexposed pixels
-            warning(str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
-        info("Collected electrons from target:     %1.2e electrons" % signal.sum().value)
-        info("Collected electrons from background: %1.2e electrons" % background.sum().value)
-        info("Electrons from dark current:         %1.2e electrons" % dark.sum().value)
-        info("Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
-        info("Total collected electrons:           %1.2e electrons" % total.sum().value)
-        # Calculate the SNR using the CCD-equation
-        snr = signal.sum() / np.sqrt(total.sum() + (read_noise ** 2).sum())
-        # Return the value of the SNR, ignoring the physical units (electrons^0.5)
-        return snr.value * u.dimensionless_unscaled
+            warning(prefix + str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
+        info(prefix + "Collected electrons from target:     %1.2e electrons" % signal.sum().value)
+        info(prefix + "Collected electrons from background: %1.2e electrons" % background.sum().value)
+        info(prefix + "Electrons from dark current:         %1.2e electrons" % dark.sum().value)
+        info(prefix + "Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
+        info(prefix + "Total collected electrons:           %1.2e electrons" % total.sum().value)
 
     def __exposePixels(self) -> Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
         """

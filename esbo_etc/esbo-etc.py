@@ -2,6 +2,7 @@ import esbo_etc as eetc
 import argparse
 import logging
 import sys
+import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="esbo_etc/esbo-etc.py", description='Exposure time calculator for ESBO-DS')
@@ -26,10 +27,10 @@ if __name__ == "__main__":
 
     if hasattr(conf.common, "exposure_time") and hasattr(conf.common, "snr"):
         sensitivity = imager.getSensitivity(conf.common.exposure_time(), conf.common.snr(), conf.astroscene.target.mag)
-        print("The limiting apparent magnitude is: %.2f mag." % sensitivity.value)
+        print("The limiting apparent magnitude is: " + str(np.array2string(sensitivity.value, precision=2)) + " mag.")
     elif hasattr(conf.common, "exposure_time"):
         snr = imager.getSNR(conf.common.exposure_time())
-        print("The SNR is: %.2f." % snr.value)
+        print("The SNR is: " + str(np.array2string(snr.value, precision=2)) + ".")
     elif hasattr(conf.common, "snr"):
         exp_time = imager.getExpTime(conf.common.snr())
-        print("The necessary exposure time is: %.2f s." % exp_time.value)
+        print("The necessary exposure time is: " + str(np.array2string(exp_time.value, precision=2)) + " s.")
