@@ -175,6 +175,8 @@ class Imager(ASensor):
         signal_current_lim = snr * (snr + np.sqrt(
             snr ** 2 + 4 * (exp_time * (background_current.sum() + dark_current.sum()) + (read_noise ** 2).sum()))) / (
                                          2 * exp_time)
+        self.__calcSNR(signal_current_lim * exp_time, background_current * exp_time, read_noise,
+                       dark_current * exp_time)
         return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
