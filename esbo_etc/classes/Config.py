@@ -3,7 +3,7 @@ import numpy as np
 import astropy.units as u
 import os
 import logging
-from ..lib.helpers import error
+from ..lib.helpers import error, readCSV
 from .Entry import Entry
 from ..classes import target as tg
 from ..classes import optical_component as oc
@@ -141,12 +141,21 @@ class Configuration(object):
             setattr(self.conf.common, "output_path", Entry(val="."))
         if hasattr(self.conf.common, "exposure_time"):
             mes = self.conf.common.exposure_time.check_quantity("val", u.s)
-            mes is not None and error("Configuration check: common -> exposure_time: " + mes)
+            if mes is not None:
+                mes = self.conf.common.exposure_time.check_file("val")
+                mes is not None and error("Configuration check: common -> exposure_time: " + mes)
+                self.conf.common.exposure_time.val = readCSV(self.conf.common.exposure_time.val, [u.s],
+                                                             format_="csv").columns[0].quantity
         if hasattr(self.conf.common, "snr"):
             mes = self.conf.common.snr.check_quantity("val", u.dimensionless_unscaled)
-            mes is not None and error("Configuration check: common -> snr: " + mes)
+            if mes is not None:
+                mes = self.conf.common.snr.check_file("val")
+                mes is not None and error("Configuration check: common -> snr: " + mes)
+                self.conf.common.snr.val = readCSV(self.conf.common.snr.val, [u.dimensionless_unscaled],
+                                                   format_="csv").columns[0].quantity
         if not (hasattr(self.conf.common, "exposure_time") or hasattr(self.conf.common, "snr")):
-            error("Configuration check: common: Expected one of the containers 'exposure_time' or 'snr' but got none.")
+            error("Configuration check: common: Expected at least one of the containers 'exposure_time' or 'snr' but" +
+                  "got none.")
 
         # Check astroscene
         if not hasattr(self.conf, "astroscene"):
@@ -170,7 +179,7 @@ class Configuration(object):
         mes is not None and error("Configuration check: astroscene -> " + mes)
 
         # Check common_optics
-        if hasattr(self.conf, "common_optics"):
+        if hasattr(self.conf, "common_optics") and isinstance(self.conf.common_optics, Entry):
             mes = self.__check_optical_components(self.conf.common_optics)
             mes is not None and error("Configuration check: common_optics -> " + mes)
 
