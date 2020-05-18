@@ -137,7 +137,10 @@ class Configuration(object):
         if hasattr(self.conf.common, "jitter_sigma"):
             mes = self.conf.common.jitter_sigma.check_quantity("val", u.arcsec)
             mes is not None and error("Configuration check: common -> jitter_sigma: " + mes)
-        if not hasattr(self.conf.common, "output_path"):
+        if hasattr(self.conf.common, "output_path"):
+            mes = self.conf.common.output_path.check_path("val")
+            mes is not None and error("Configuration check: common -> output_path: " + mes)
+        else:
             setattr(self.conf.common, "output_path", Entry(val="."))
         if hasattr(self.conf.common, "exposure_time"):
             mes = self.conf.common.exposure_time.check_quantity("val", u.s)
