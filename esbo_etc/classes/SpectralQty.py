@@ -1,4 +1,4 @@
-from ..lib.helpers import error, isLambda
+from ..lib.helpers import error, isLambda, readCSV
 from scipy.interpolate import interp1d
 import astropy.units as u
 import math
@@ -76,23 +76,8 @@ class SpectralQty:
             The created spectral quantity.
         """
         # Read the file
-        data = ascii.read(file)
-        # Check if units are given
-        if data[data.colnames[0]].unit is None:
-            # Convert values to float
-            data[data.colnames[0]] = list(map(float, data[data.colnames[0]]))
-            data[data.colnames[1]] = list(map(float, data[data.colnames[1]]))
-            # Check if units are given in column headers
-            if all([re.search("\\[.+\\]", x) for x in data.colnames]):
-                # Extract units from headers and apply them on the columns
-                # noinspection PyArgumentList
-                units = [u.Unit(re.findall("(?<=\\[).+(?=\\])", x)[0]) for x in data.colnames]
-                data[data.colnames[0]].unit = units[0]
-                data[data.colnames[1]].unit = units[1]
-            # Use default units
-            elif wl_unit_default is not None and qty_unit_default is not None:
-                data[data.colnames[0]].unit = wl_unit_default
-                data[data.colnames[1]].unit = qty_unit_default
+        data = readCSV(file, [wl_unit_default, qty_unit_default] if wl_unit_default is not None and
+                       qty_unit_default is not None else None)
         return cls(data[data.colnames[0]].quantity, data[data.colnames[1]].quantity, fill_value=fill_value)
 
     def __str__(self, precision: int = 4) -> str:
