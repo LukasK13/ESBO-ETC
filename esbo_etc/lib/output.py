@@ -22,8 +22,11 @@ def printSNR(exp_time: u.Quantity, snr: u.Quantity):
     table.add_column("#", style="dim", width=4, justify="center")
     table.add_column("Exposure Time", justify="right")
     table.add_column("SNR", justify="right")
-    for i, exp_time_, snr_ in zip(range(len(exp_time)), exp_time.value, snr.value):
-        table.add_row(str(i), ("%1.4e " + exp_time.unit.to_string()) % exp_time_, "%1.4e" % snr_)
+    if exp_time.size > 1:
+        for i, exp_time_, snr_ in zip(range(len(exp_time)), exp_time.value, snr.value):
+            table.add_row(str(i), ("%1.4e " + exp_time.unit.to_string()) % exp_time_, "%1.4e" % snr_)
+    else:
+        table.add_row("1", ("%1.4e " + exp_time.unit.to_string()) % exp_time.value, "%1.4e" % snr.value)
     console = Console()
     console.print(table)
 
@@ -47,8 +50,11 @@ def printExposureTime(exp_time: u.Quantity, snr: u.Quantity):
     table.add_column("#", style="dim", width=4, justify="center")
     table.add_column("SNR", justify="right")
     table.add_column("Exposure Time", justify="right")
-    for i, exp_time_, snr_ in zip(range(len(exp_time)), exp_time.value, snr.value):
-        table.add_row(str(i), "%1.4e" % snr_, ("%1.4e " + exp_time.unit.to_string()) % exp_time_)
+    if exp_time.size > 1:
+        for i, exp_time_, snr_ in zip(range(len(exp_time)), exp_time.value, snr.value):
+            table.add_row(str(i), "%1.4e" % snr_, ("%1.4e " + exp_time.unit.to_string()) % exp_time_)
+    else:
+        table.add_row("1", "%1.4e" % snr.value, ("%1.4e " + exp_time.unit.to_string()) % exp_time.value)
     console = Console()
     console.print(table)
 
@@ -75,8 +81,12 @@ def printSensitivity(exp_time: u.Quantity, snr: u.Quantity, sensitivity: u.Quant
     table.add_column("Exposure Time", justify="right")
     table.add_column("SNR", justify="right")
     table.add_column("Sensitivity", justify="right")
-    for i, exp_time_, snr_, sensitivity_ in zip(range(len(exp_time)), exp_time.value, snr.value, sensitivity.value):
-        table.add_row(str(i), ("%1.4e " + exp_time.unit.to_string()) % exp_time_, "%1.4e" % snr_,
-                      ("%1.4e " + sensitivity.unit.to_string()) % sensitivity_)
+    if exp_time.size > 1:
+        for i, exp_time_, snr_, sensitivity_ in zip(range(len(exp_time)), exp_time.value, snr.value, sensitivity.value):
+            table.add_row(str(i), ("%1.4e " + exp_time.unit.to_string()) % exp_time_, "%1.4e" % snr_,
+                          ("%1.4e " + sensitivity.unit.to_string()) % sensitivity_)
+    else:
+        table.add_row("1", ("%1.4e " + exp_time.unit.to_string()) % exp_time.value, "%1.4e" % snr.value,
+                      ("%1.4e " + sensitivity.unit.to_string()) % sensitivity.value)
     console = Console()
     console.print(table)
