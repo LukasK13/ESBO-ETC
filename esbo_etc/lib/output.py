@@ -4,6 +4,20 @@ import astropy.units as u
 
 
 def printSNR(exp_time: u.Quantity, snr: u.Quantity):
+    """
+    Print the results of the SNR calculation.
+
+    Parameters
+    ----------
+    exp_time : Quantity
+        The exposure times for which the SNR was calculated.
+    snr : Quantity
+        The corresponding SNR for the exposure times.
+
+    Returns
+    -------
+
+    """
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("#", style="dim", width=4, justify="center")
     table.add_column("Exposure Time", justify="right")
@@ -15,6 +29,20 @@ def printSNR(exp_time: u.Quantity, snr: u.Quantity):
 
 
 def printExposureTime(exp_time: u.Quantity, snr: u.Quantity):
+    """
+    Print the results of the exposure time calculation.
+
+    Parameters
+    ----------
+    exp_time : Quantity
+        The corresponding exposure time for the SNRs.
+    snr : Quantity
+        The SNRs for which the exposure time was calculated.
+
+    Returns
+    -------
+
+    """
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("#", style="dim", width=4, justify="center")
     table.add_column("SNR", justify="right")
@@ -26,6 +54,22 @@ def printExposureTime(exp_time: u.Quantity, snr: u.Quantity):
 
 
 def printSensitivity(exp_time: u.Quantity, snr: u.Quantity, sensitivity: u.Quantity):
+    """
+    Print the results of the sensitivity calculation.
+
+    Parameters
+    ----------
+    exp_time : Quantity
+        The exposure times for which the sensitivity was calculated.
+    snr : Quantity
+        The SNRs for which the sensitivity was calculated.
+    sensitivity : Quantity
+        The corresponding sensitivity for the exposure times and SNRs.
+
+    Returns
+    -------
+
+    """
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("#", style="dim", width=4, justify="center")
     table.add_column("Exposure Time", justify="right")
