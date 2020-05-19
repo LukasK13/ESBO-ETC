@@ -144,17 +144,14 @@ class Imager(ASensor):
         signal_current, background_current, read_noise, dark_current = self.__exposePixels()
         # Calculate the electron currents for all pixels
         signal_current_tot = signal_current.sum()
-        background_current_tot = background_current.sum()
-        read_noise_tot = read_noise.sum()
-        dark_current_tot = dark_current.sum()
         # Fix the physical units of the SNR
         snr = snr * u.electron ** 0.5
 
         # Calculate the ratio of the background- and dark-current to the signal current as auxiliary variable
-        current_ratio = (background_current_tot + dark_current_tot) / signal_current_tot
+        current_ratio = (background_current.sum() + dark_current.sum()) / signal_current_tot
         # Calculate the necessary exposure time as inverse of the CCD-equation
         exp_time = snr ** 2 * (
-                1 + current_ratio + np.sqrt((1 + current_ratio) ** 2 + 4 * read_noise_tot ** 2 / snr ** 2)) / (
+                1 + current_ratio + np.sqrt((1 + current_ratio) ** 2 + 4 * (read_noise ** 2).sum() / snr ** 2)) / (
                            2 * signal_current_tot)
         # Print information
         if exp_time.size > 1:
