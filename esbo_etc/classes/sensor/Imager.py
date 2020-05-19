@@ -65,7 +65,7 @@ class Imager(ASensor):
         super().__init__(parent)
         if type(quantum_efficiency) == str:
             self.__quantum_efficiency = SpectralQty.fromFile(quantum_efficiency, u.nm, u.electron / u.photon)
-        elif type(quantum_efficiency) == u.Quantity:
+        else:
             self.__quantum_efficiency = quantum_efficiency
         self.__pixel_geometry = pixel_geometry
         self.__array = np.zeros((int(pixel_geometry.value[0]), int(pixel_geometry.value[1])))
@@ -361,7 +361,7 @@ class Imager(ASensor):
         # Calculate the incoming photon current of the target
         info("Calculating the signal photon current.")
         signal, size, obstruction = self._parent.calcSignal()
-        signal_photon_current = signal * np.pi * self.__common_conf.d_aperture() ** 2
+        signal_photon_current = signal * np.pi * (self.__common_conf.d_aperture() / 2) ** 2
         # Calculate the electron current of the background and thereby handling the photon energy as lambda-function
         background_current = (
                 background_photon_current / (lambda wl: (const.h * const.c / wl).to(u.W * u.s) / u.photon) *
@@ -412,7 +412,7 @@ class Imager(ASensor):
             return "Missing container 'pixel'."
         if not hasattr(sensor.pixel, "quantum_efficiency"):
             return "Missing container 'quantum_efficiency'."
-        mes = sensor.pixel.quantum_efficiency.check_float("val")
+        mes = sensor.pixel.quantum_efficiency.check_quantity("val", u.electron / u.photon)
         if mes is not None:
             mes = sensor.pixel.quantum_efficiency.check_file("val")
             if mes is not None:
