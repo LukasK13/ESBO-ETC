@@ -19,12 +19,12 @@ class Imager(ASensor):
     """
     __encircled_energy: Union[str, float, u.Quantity]
 
-    @u.quantity_input(pixel_size="length", read_noise=u.electron ** 0.5 / u.pix, center_offset=u.pix,
-                      dark_current=u.electron / u.pix / u.second, well_capacity=u.electron, pixel_geometry=u.pix)
+    @u.quantity_input(pixel_geometry=u.pixel, pixel_size="length", read_noise=u.electron ** 0.5 / u.pix,
+                      center_offset=u.pix, dark_current=u.electron / u.pix / u.second, well_capacity=u.electron)
     def __init__(self, parent: IRadiant, quantum_efficiency: Union[str, u.Quantity],
                  pixel_geometry: u.Quantity, pixel_size: u.Quantity, read_noise: u.Quantity, dark_current: u.Quantity,
                  well_capacity: u.Quantity, f_number: Union[int, float], common_conf: Entry,
-                 center_offset: u.Quantity = np.array([0, 0]) << u.nm, shape: str = None,
+                 center_offset: u.Quantity = np.array([0, 0]) << u.pix, shape: str = "circle",
                  contained_energy: Union[str, int, float] = "FWHM", contained_pixels: u.Quantity = None):
         """
         Initialize a new Image-sensor model.
@@ -36,7 +36,7 @@ class Imager(ASensor):
             The parent element of the optical component from which the electromagnetic radiation is received.
         quantum_efficiency : Union[str, u.Quantity]
             The quantum efficiency of the detector. This can be either the path to the file containing the values of
-            the spectral quantum efficiency or the overall quantum efficiency as int, float or astropy quantity.
+            the spectral quantum efficiency or the overall quantum efficiency as astropy quantity.
         pixel_geometry : u.Quantity
             The geometry of the pixel array as Quantity in pixels with two entries:
             [number of pixels in x-direction, number of pixels in y-direction]
@@ -63,7 +63,7 @@ class Imager(ASensor):
             The pixels contained within the photometric aperture.
         """
         super().__init__(parent)
-        if type(quantum_efficiency == str):
+        if type(quantum_efficiency) == str:
             self.__quantum_efficiency = SpectralQty.fromFile(quantum_efficiency, u.nm, u.electron / u.photon)
         elif type(quantum_efficiency) == u.Quantity:
             self.__quantum_efficiency = quantum_efficiency
