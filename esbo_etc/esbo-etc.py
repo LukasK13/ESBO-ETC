@@ -31,6 +31,7 @@ if __name__ == "__main__":
 
     # Print title
     f = Figlet(font='slant')
+    print("")
     print(f.renderText('ESBO-ETC'))
 
     # Set up logging
