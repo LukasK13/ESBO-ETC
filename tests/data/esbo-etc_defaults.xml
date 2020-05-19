@@ -9,7 +9,8 @@
         <psf val="Airy" osf="10" comment="PSF of the optical system. Can be Airy or a file"/>
 <!--        <psf val="data/ps2f.txt" comment="PSF of the optical system. Can be Airy or a file"/>-->
         <jitter_sigma val="1" val_unit="arcsec" comment="Sigma of the telescope jitter"/>
-        <output_path val="output" comment="Output directory to store output files"/>
+        <exposure_time val="0.1" val_unit="s" comment="The exposure time"/>
+<!--        <output_path val="output" comment="Output directory to store output files"/>-->
     </common>
 
     <astroscene>
@@ -47,6 +48,7 @@
                 <pixel_size val="6.5" val_unit="um"/>
                 <dark_current val="20" val_unit="electron / (pix * s)" comment="Detector dark current"/>
                 <sigma_read_out val="10.0" val_unit="electron(1/2) / pix" comment="Detector readout noise in e-rms"/>
+                <well_capacity val="30000" val_unit="electron" comment="Well capacity of a pixel"/>
             </pixel>
             <photometric_aperture comment="The photometric aperture used to calculate signal and noise.">
                 <shape val="square" comment="Shape of the photometric aperture. Can be square / circle"/>
