@@ -23,7 +23,7 @@ class TestImager(TestCase):
 
     def test_getSNR(self):
         snr = self.imager.getSNR(0.1 * u.s)
-        self.assertAlmostEqual(snr.value, 16.991569026382376)
+        self.assertAlmostEqual(snr.value, 5.675140880569046)
 
     def test_getExpTime(self):
         exp_time = 0.1 * u.s
@@ -36,4 +36,4 @@ class TestImager(TestCase):
         zodiac = StrayLight(target, "data/straylight/zodiacal_emission_1.csv")
         imager = Imager(zodiac, **self.imager_args)
         sensitivity = imager.getSensitivity(0.1 * u.s, 10 * u.dimensionless_unscaled, 10 * u.mag)
-        self.assertAlmostEqual(sensitivity.value, 8.749824107308404)
+        self.assertAlmostEqual(sensitivity.value, 7.244674128988499)
