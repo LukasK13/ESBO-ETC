@@ -9,6 +9,7 @@ class ASensor:
     """
     Abstract super class for sensor models
     """
+    @abstractmethod
     def __init__(self, parent: IRadiant):
         """
         Initialize a new sensor
@@ -79,6 +80,7 @@ class ASensor:
         pass
 
     @staticmethod
+    @abstractmethod
     def check_config(sensor: Entry, conf: Entry) -> Union[None, str]:
         """
         Check the configuration for this class
