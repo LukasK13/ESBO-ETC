@@ -54,7 +54,7 @@ class IPSF(ABC):
         pass
 
     @staticmethod
-    def rebin(arr: np.ndarray, factor: float):
+    def _rebin(arr: np.ndarray, factor: float):
         """
         Rebin a 2D-array by summing or repeating the elements.
 
