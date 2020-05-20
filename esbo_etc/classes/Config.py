@@ -209,7 +209,7 @@ class Configuration(object):
         mes is not None and error("Configuration check: instrument -> sensor -> " + mes)
 
     @staticmethod
-    def __check_optical_components(conf: Union[Entry, list]):
+    def __check_optical_components(conf: Union[Entry, list]) -> Union[None, str]:
         """
         Check list of optical components in the parsed configuration.
 
