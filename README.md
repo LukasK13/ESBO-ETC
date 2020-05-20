@@ -64,6 +64,7 @@ required structure see section _Reading spectral quantities from files_.
 
 ##### StrayLight
 `<optical_component type="StrayLight" emission="PathToEmissionFile"/>`
+
 This component allows to model generic noise sources like stray light or zodiacal light from a file containing the
 spectral radiance of the emission.
 * **`emission` _optional_:** The path to the file containing the spectral radiance of the emission. For details on the
@@ -173,7 +174,13 @@ Valid ranges are 0.0 - 1.0. The default is 1.
 ##### Reading spectral quantities from files
 The format of a file has to be either structured text (e.g. CSV) or astropy ECSV and will be automatically detected.
 In case of structured text, the units of the columns have to be defined in the column header within square brackets
-(e.g. "wavelength [nm]"). The file must contain two columns with units: wavelength and the spectral quantity.
+(e.g. "wavelength [nm]"). The file must contain two columns with units: wavelength and the spectral quantity:
+
+| wavelength [nm] | emission [W/(nm\*m^2\*sr)] |
+|-----------------|--------------------------|
+| 200             | 1.345e-15                |
+| 201             | 2.234e-15                |
+| ...             | ...                      |
 
 ## Running ESBO-ETC
 
