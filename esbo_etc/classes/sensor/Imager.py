@@ -68,7 +68,6 @@ class Imager(ASensor):
         else:
             self.__quantum_efficiency = quantum_efficiency
         self.__pixel_geometry = pixel_geometry
-        self.__array = np.zeros((int(pixel_geometry.value[0]), int(pixel_geometry.value[1])))
         self.__pixel_size = pixel_size
         self.__read_noise = read_noise
         self.__dark_current = dark_current
@@ -238,6 +237,29 @@ class Imager(ASensor):
         info(prefix + "Electrons from dark current:         %1.2e electrons" % dark.sum().value)
         info(prefix + "Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
         info(prefix + "Total collected electrons:           %1.2e electrons" % total.sum().value)
+        info("--------------------------------------------------------------------------------------------------------")
+
+    @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
+    def __output(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
+                 dark: u.Quantity, prefix: str = ""):
+        """
+        Write the signal and the noise in electrons to files.
+
+        Parameters
+        ----------
+        signal : Quantity
+            The collected electrons from the target in electrons.
+        background : Quantity
+            The collected electrons from the background in electrons.
+        read_noise : Quantity
+            The read noise in electrons.
+        dark : Quantity
+            The electrons from the dark current in electrons.
+
+        Returns
+        -------
+        """
+        pass
 
     def __exposePixels(self) -> Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
         """
