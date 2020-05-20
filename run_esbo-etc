@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+PYTHONPATH="${PYTHONPATH}:$(pwd)"
+export PYTHONPATH
 venv/bin/python3.7 esbo_etc/esbo-etc.py "$@"
-
