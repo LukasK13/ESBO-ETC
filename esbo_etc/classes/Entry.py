@@ -84,7 +84,7 @@ class Entry(object):
                    "' but got unit '" + attr.unit.to_string() + "'."
         return None
 
-    def check_selection(self, name, choices: list) -> Union[None, str]:
+    def check_selection(self, name: str, choices: list) -> Union[None, str]:
         """
         Check a parameter against a list of possible choices. In case of a mismatch, a recommendation will be given.
 
