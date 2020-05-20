@@ -127,7 +127,7 @@ class Configuration(object):
         mes = self.conf.common.d_aperture.check_quantity("val", u.m)
         mes is not None and error("Configuration check: common -> d_aperture: " + mes)
         if not hasattr(self.conf.common, "psf"):
-            setattr(self.conf.common, "psf", Entry(val="Airy"))
+            setattr(self.conf.common, "psf", Entry(val="Airy", osf=10))
         else:
             if self.conf.common.psf().lower() != "airy":
                 mes = self.conf.common.psf.check_file("val")
