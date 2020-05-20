@@ -72,7 +72,7 @@ class Airy(IPSF):
                 reduced_observation_angle = 1.028
                 if not np.isclose(obstruction, 0.0):
                     # Use obstructed airy disk
-                    reduced_observation_angle = newton(lambda y: self.airy(np.pi * y, np.sqrt(obstruction)) - 0.5,
+                    reduced_observation_angle = newton(lambda y: self.__airy(np.pi * y, np.sqrt(obstruction)) - 0.5,
                                                        reduced_observation_angle / 2) * 2
                     contained_energy = "fwhm"
             elif contained_energy.lower() == "min":
@@ -81,15 +81,15 @@ class Airy(IPSF):
                 contained_energy = 0.8377 * u.dimensionless_unscaled
                 if not np.isclose(obstruction, 0.0):
                     # Use obstructed airy disk
-                    reduced_observation_angle = fmin(lambda y: self.airy(np.pi * y, np.sqrt(obstruction)),
+                    reduced_observation_angle = fmin(lambda y: self.__airy(np.pi * y, np.sqrt(obstruction)),
                                                      reduced_observation_angle / 2, disp=False)[0] * 2
-                    contained_energy = self.airy_int(np.pi * reduced_observation_angle / 2,
-                                                     np.sqrt(obstruction)) * u.dimensionless_unscaled
+                    contained_energy = self.__airy_int(np.pi * reduced_observation_angle / 2,
+                                                       np.sqrt(obstruction)) * u.dimensionless_unscaled
         else:
             # Calculate the width numerically from the integral of the airy disk
             contained_energy = contained_energy / 100 * u.dimensionless_unscaled
             reduced_observation_angle = 2 * bisect(
-                lambda y: self.airy_int(np.pi * y, np.sqrt(obstruction)) - contained_energy.value, 0, 100)
+                lambda y: self.__airy_int(np.pi * y, np.sqrt(obstruction)) - contained_energy.value, 0, 100)
         if jitter_sigma is not None and (isinstance(contained_energy, u.Quantity) or isinstance(contained_energy, str)
                                          and contained_energy.lower() == "fwhm"):
             # Convert jitter to reduced observation angle in lambda / d_ap
@@ -106,7 +106,7 @@ class Airy(IPSF):
             # Calculate the corresponding x-coordinates of each grid element
             x = np.arange(1, n_points + 1) * dx
             # Calculate the psf from an airy disk for each element on the grid
-            psf = self.airy(np.pi * x, np.sqrt(obstruction))
+            psf = self.__airy(np.pi * x, np.sqrt(obstruction))
             # Calculate the integral of the undisturbed airy disk in order to scale the result of the convolution
             total = np.sum(psf * x) * dx * 2 * np.pi
             # Mirror the PSF to the negative x-domain
@@ -139,7 +139,7 @@ class Airy(IPSF):
         return reduced_observation_angle * u.dimensionless_unscaled
 
     @staticmethod
-    def airy(x: Union[float, np.ndarray], obstruction: float = None):
+    def __airy(x: Union[float, np.ndarray], obstruction: float = None) -> Union[float, np.ndarray]:
         """
         Calculate function values of the airy disk
 
@@ -177,7 +177,7 @@ class Airy(IPSF):
         return res
 
     @staticmethod
-    def airy_int(x: float, obstruction: float = None):
+    def __airy_int(x: float, obstruction: float = None) -> float:
         """
         Calculate the integral of the airy disk from 0 to x.
 
@@ -234,7 +234,7 @@ class Airy(IPSF):
         # Calculate the new PSF-center indices of the reduced mask
         psf_center_ind = [mask.psf_center_ind[0] - y_ind.min(), mask.psf_center_ind[1] - x_ind.min()]
         # Oversample the reduced mask
-        mask_red_os = self.rebin(mask_red, self.__osf).view(PixelMask)
+        mask_red_os = self._rebin(mask_red, self.__osf).view(PixelMask)
         # Calculate the new PSF-center indices of the reduced mask
         psf_center_ind = [x * self.__osf for x in psf_center_ind]
 
@@ -247,7 +247,7 @@ class Airy(IPSF):
                 0]) * reduced_observation_angle_pixel.value / self.__osf)
         dist = np.sqrt(x_mesh ** 2 + y_mesh ** 2)
         if jitter_sigma is None:
-            res = self.airy(dist * np.pi, np.sqrt(obstruction))
+            res = self.__airy(dist * np.pi, np.sqrt(obstruction))
         else:
             if self.__psf_jitter is None:
                 self.calcReducedObservationAngle("fwhm", jitter_sigma, obstruction)
@@ -257,7 +257,7 @@ class Airy(IPSF):
                                   fill_value="extrapolate")
             res = psf_interp(dist)
 
-        res = self.rebin(res, 1 / self.__osf)
+        res = self._rebin(res, 1 / self.__osf)
         res = (mask_red * res).view(np.ndarray)
         # Integrate the reduced mask and divide by the indefinite integral to get relative intensities
         res = res * (reduced_observation_angle_pixel.value / self.__osf) ** 2 / (4 / np.pi) * (1 - obstruction)
