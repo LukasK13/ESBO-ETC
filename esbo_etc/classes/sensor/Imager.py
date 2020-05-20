@@ -463,7 +463,8 @@ class Imager(ASensor):
         # Check photometric aperture
         if conf.astroscene.target.size == "point":
             if not hasattr(sensor, "photometric_aperture"):
-                return "Missing container 'photometric_aperture'."
+                setattr(sensor, "photometric_aperture", Entry(shape=Entry(val="circle"),
+                                                              contained_energy=Entry(val="FWHM")))
             if hasattr(sensor.photometric_aperture, "contained_pixels"):
                 mes = sensor.photometric_aperture.contained_pixels.check_quantity("val", u.pix)
                 if mes is not None:
