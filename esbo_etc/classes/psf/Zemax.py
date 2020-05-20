@@ -99,7 +99,7 @@ class Zemax(IPSF):
         elif type(contained_energy) in [int, float]:
             contained_energy = contained_energy / 100 * u.dimensionless_unscaled
 
-        center_point, psf, psf_osf = self.calcPSF(jitter_sigma)
+        center_point, psf, psf_osf = self.__calcPSF(jitter_sigma)
 
         # Calculate the maximum possible radius for the circle containing the photometric aperture
         r_max = max(np.sqrt(center_point[0] ** 2 + center_point[1] ** 2),
@@ -118,7 +118,7 @@ class Zemax(IPSF):
                 self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl
         return reduced_observation_angle * u.dimensionless_unscaled
 
-    def calcPSF(self, jitter_sigma: u.Quantity = None, obstruction: float = None):
+    def __calcPSF(self, jitter_sigma: u.Quantity = None):
         """
         Calculate the PSF from the Zemax-file. This includes oversampling the PSF and convolving with the
         jitter-gaussian.
@@ -126,9 +126,7 @@ class Zemax(IPSF):
         Parameters
         ----------
         jitter_sigma : Quantity
-            Sigma of the telescope's jitter in arcsec
-        obstruction : float
-            The central obstruction as ratio A_ob / A_ap
+            Sigma of the telescope's jitter in arcsec.
 
         Returns
         -------
@@ -212,7 +210,7 @@ class Zemax(IPSF):
         # Calculate the new PSF-center indices of the reduced mask
         psf_center_ind = [mask.psf_center_ind[0] - y_ind.min(), mask.psf_center_ind[1] - x_ind.min()]
         # Oversample the reduced mask
-        mask_red_os = self.rebin(mask_red, self.__osf).view(PixelMask)
+        mask_red_os = self._rebin(mask_red, self.__osf).view(PixelMask)
         # Calculate the new PSF-center indices of the reduced mask
         psf_center_ind = [x * self.__osf for x in psf_center_ind]
 
@@ -222,7 +220,7 @@ class Zemax(IPSF):
             psf = self.__psf_os
             psf_osf = self.__psf_osf
         else:
-            center_point, psf, psf_osf = self.calcPSF(jitter_sigma)
+            center_point, psf, psf_osf = self.__calcPSF(jitter_sigma)
         # Calculate the coordinates of each PSF value in microns
         x = (np.arange(psf.shape[1]) - center_point[1]) * self.__grid_delta[1].to(u.um).value / psf_osf
         y = (np.arange(psf.shape[0]) - center_point[0]) * self.__grid_delta[0].to(u.um).value / psf_osf
@@ -233,7 +231,7 @@ class Zemax(IPSF):
                          (np.arange(mask_red_os.shape[0]) - psf_center_ind[0]) * mask_red_os.pixel_size.to(u.um).value)
         # Bin the oversampled reduced mask to the original resolution and multiply with the reduced mask to select only
         # the relevant values
-        res = mask_red * self.rebin(res, 1 / self.__osf)
+        res = mask_red * self._rebin(res, 1 / self.__osf)
         # Integrate the reduced mask and divide by the indefinite integral to get relative intensities
         res = res * mask_red_os.pixel_size.to(u.um).value ** 2 / (
                     psf.sum() * (self.__grid_delta[0].to(u.um).value / psf_osf) ** 2)
