@@ -138,8 +138,10 @@ class Configuration(object):
             mes = self.conf.common.jitter_sigma.check_quantity("val", u.arcsec)
             mes is not None and error("Configuration check: common -> jitter_sigma: " + mes)
         if hasattr(self.conf.common, "output_path"):
-            mes = self.conf.common.output_path.check_path("val")
-            mes is not None and error("Configuration check: common -> output_path: " + mes)
+            mes = self.conf.common.output.check_path("path")
+            mes is not None and error("Configuration check: common -> output: " + mes)
+            mes = self.conf.common.output.check_selection("format", ["csv", "CSV", "fits", "FITS"])
+            mes is not None and error("Configuration check: common -> output: " + mes)
         else:
             setattr(self.conf.common, "output_path", Entry(val="."))
         if hasattr(self.conf.common, "exposure_time"):

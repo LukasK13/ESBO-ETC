@@ -9,9 +9,11 @@
         <psf val="Airy" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>
 <!--        <psf val="data/psf_2um.txt" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>-->
 <!--        <jitter_sigma val="10" val_unit="arcsec" comment="Sigma of the telescope jitter"/>-->
-        <output_path val="output" comment="Output directory to store output files"/>
-        <exposure_time val="0.01" val_unit="s" comment="The exposure time"/>
-        <snr val="10" val_unit="" comment="Desired signal to noise ratio"/>
+        <output path="output" format="fits" comment="Output directory to store output files"/>
+        <exposure_time val="0.1, 1.2" val_unit="s" comment="The exposure time"/>
+<!--        <snr val="10, 10, 10" val_unit="" comment="Desired signal to noise ratio"/>-->
+<!--        <snr val="data/snr.csv" comment="Desired signal to noise ratio"/>-->
+<!--        <snr val="10" val_unit="" comment="Desired signal to noise ratio"/>-->
     </common>
 
     <astroscene>
