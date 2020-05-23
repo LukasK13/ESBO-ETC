@@ -11,6 +11,8 @@ from .PixelMask import PixelMask
 import astropy.constants as const
 from logging import info, warning, debug, getLogger
 import enlighten
+import os
+import astropy.io.fits as fits
 
 
 class Imager(ASensor):
@@ -118,9 +120,13 @@ class Imager(ASensor):
             for exp_time_ in pbar(exp_time):
                 self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
                                     dark_current * exp_time_, "t_exp=%.2f s: " % exp_time_.value)
+                self.__output(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                              dark_current * exp_time_, "texp_%.2f" % exp_time_.value)
         else:
             self.__printDetails(signal_current * exp_time, background_current * exp_time, read_noise,
                                 dark_current * exp_time, "t_exp=%.2f s: " % exp_time.value)
+            self.__output(signal_current * exp_time, background_current * exp_time, read_noise,
+                          dark_current * exp_time, "texp_%.2f" % exp_time.value)
         # Return the value of the SNR, ignoring the physical units (electrons^0.5)
         return snr.value * u.dimensionless_unscaled
 
@@ -159,9 +165,13 @@ class Imager(ASensor):
             for snr_, exp_time_ in pbar(zip(snr, exp_time)):
                 self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
                                     dark_current * exp_time_, "SNR=%.2f: " % snr_.value)
+                self.__output(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                              dark_current * exp_time_, "snr_%.2f" % snr_.value)
         else:
             self.__printDetails(signal_current * exp_time, background_current * exp_time, read_noise,
                                 dark_current * exp_time, "SNR=%.2f: " % snr.value)
+            self.__output(signal_current * exp_time, background_current * exp_time, read_noise,
+                          dark_current * exp_time, "snr_%.2f" % snr.value)
         return exp_time
 
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
@@ -196,12 +206,14 @@ class Imager(ASensor):
                                                           unit='configurations'))
             for snr_, exp_time_, signal_current_lim_ in pbar(zip(snr, exp_time, signal_current_lim)):
                 self.__printDetails(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
-                                    dark_current * exp_time_,
-                                    "SNR=%.2f t_exp=%.2f s: " % (snr_.value, exp_time_.value))
+                                    dark_current * exp_time_, "SNR=%.2f t_exp=%.2f s: " % (snr_.value, exp_time_.value))
+                self.__output(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
+                              dark_current * exp_time_, "snr_%.2f_texp_%.2f" % (snr_.value, exp_time_.value))
         else:
             self.__printDetails(signal_current_lim * exp_time, background_current * exp_time, read_noise,
-                                dark_current * exp_time,
-                                "SNR=%.2f t_exp=%.2f s: " % (snr.value, exp_time.value))
+                                dark_current * exp_time, "SNR=%.2f t_exp=%.2f s: " % (snr.value, exp_time.value))
+            self.__output(signal_current_lim * exp_time, background_current * exp_time, read_noise,
+                          dark_current * exp_time, "snr_%.2f_texp_%.2f" % (snr.value, exp_time.value))
         return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
@@ -220,6 +232,8 @@ class Imager(ASensor):
             The read noise in electrons.
         dark : Quantity
             The electrons from the dark current in electrons.
+        prefix : str
+            The prefix to be used for printing
 
         Returns
         -------
@@ -241,7 +255,7 @@ class Imager(ASensor):
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
     def __output(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
-                 dark: u.Quantity, prefix: str = ""):
+                 dark: u.Quantity, name: str):
         """
         Write the signal and the noise in electrons to files.
 
@@ -255,11 +269,55 @@ class Imager(ASensor):
             The read noise in electrons.
         dark : Quantity
             The electrons from the dark current in electrons.
+        name : str
+            The name of the configuration.
 
         Returns
         -------
         """
-        pass
+        # Concatenate the paths
+        path = os.path.join(self.__common_conf.output.path, name)
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            warning("Output directory '" + path + "' already exists.")
+        # Calculate the indices of nonzero values and create a bounding rectangle
+        y, x = np.nonzero(signal)
+        y_min = min(y)
+        y_max = max(y)
+        x_min = min(x)
+        x_max = max(x)
+        # Write arrays to file
+        if self.__common_conf.output.format.lower() == "csv":
+            mes = "Range reduced to nonzero values.\nThe origin is in the top left corner, starting with 0.\n" + \
+                  "Column index range: %d - %d\nRow index range: %d - %d\n" % (y_min, y_max, x_min, x_max)
+            np.savetxt(os.path.join(path, "signal.csv"), signal[y_min:(y_max + 1), x_min:(x_max + 1)].value,
+                       delimiter=",", header="Signal in electrons\n" + mes)
+            np.savetxt(os.path.join(path, "background.csv"), background[y_min:(y_max + 1), x_min:(x_max + 1)].value,
+                       delimiter=",", header="Background in electrons\n" + mes)
+            np.savetxt(os.path.join(path, "read_noise.csv"), read_noise[y_min:(y_max + 1), x_min:(x_max + 1)].value,
+                       delimiter=",", header="Read noise in electrons\n" + mes)
+            np.savetxt(os.path.join(path, "dark_noise.csv"), dark[y_min:(y_max + 1), x_min:(x_max + 1)].value,
+                       delimiter=",", header="Dark noise in electrons\n" + mes)
+        elif self.__common_conf.output.format.lower() == "fits":
+            mes = "Range reduced to nonzero values. The origin is in the top left corner, starting with 0. " + \
+                  "Column index range: %d - %d Row index range: %d - %d " % (y_min, y_max, x_min, x_max)
+            hdu = fits.PrimaryHDU(header=fits.Header(dict(COMMENT="Simulation data created by ESBO-ETC.",
+                                                          TELESCOP="ESBO-ETC")))
+            signal_hdu = fits.ImageHDU(signal[y_min:(y_max + 1), x_min:(x_max + 1)].value, name="signal",
+                                       header=fits.Header(dict(COMMENT="Signal in electrons. " + mes,
+                                                               TELESCOP="ESBO-ETC")))
+            background_hdu = fits.ImageHDU(background[y_min:(y_max + 1), x_min:(x_max + 1)].value, name="background",
+                                           header=fits.Header(dict(COMMENT="Background in electrons. " + mes,
+                                                                   TELESCOP="ESBO-ETC")))
+            read_noise_hdu = fits.ImageHDU(read_noise[y_min:(y_max + 1), x_min:(x_max + 1)].value, name="read noise",
+                                           header=fits.Header(dict(COMMENT="Read noise in electrons. " + mes,
+                                                                   TELESCOP="ESBO-ETC")))
+            dark_hdu = fits.ImageHDU(dark[y_min:(y_max + 1), x_min:(x_max + 1)].value, name="dark noise",
+                                     header=fits.Header(dict(COMMENT="Dark noise in electrons. " + mes,
+                                                             TELESCOP="ESBO-ETC")))
+            hdul = fits.HDUList([hdu, signal_hdu, background_hdu, read_noise_hdu, dark_hdu])
+            hdul.writeto(os.path.join(path, "results.fits"), overwrite=True)
 
     def __exposePixels(self) -> Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
         """
