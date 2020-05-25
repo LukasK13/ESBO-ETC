@@ -11,14 +11,13 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser(prog="esbo_etc/esbo-etc.py", description='Exposure time calculator for ESBO-DS')
     parser.add_argument("-c", "--config", dest='config', default="esbo-etc_defaults.xml",
-                        metavar="config.xml", help="path to the configuration file")
-    parser.add_argument("-l", "--logging", dest="logging", default="WARNING", help="print debug information")
-    parser.add_argument("-o", "--output-dir", dest="output_dir", help="path to the output directory",
-                        default="output")
+                        metavar="config.xml", help="Path to the configuration file. Default is esbo-etc_defaults.xml.")
+    parser.add_argument("-l", "--logging", dest="logging", default="WARNING",
+                        help="Log level for the application. Possible levels are DEBUG, INFO, WARNING, ERROR.")
     parser.add_argument("-v", "--version", action="version", version="ESBO-ETC version 1.0.0",
-                        help="show version information")
+                        help="Show version information.")
     parser.add_argument("-m", "--manual", action="store_true", dest="manual",
-                        help="print the user manual from the readme")
+                        help="Print the user manual from the readme.")
     args, _ = parser.parse_known_args()  # fix for PyCharm python console
 
     # Print manual from README.md
