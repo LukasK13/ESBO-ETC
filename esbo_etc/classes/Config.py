@@ -126,24 +126,36 @@ class Configuration(object):
             error("Configuration check: common: Missing required container 'd_aperture'.")
         mes = self.conf.common.d_aperture.check_quantity("val", u.m)
         mes is not None and error("Configuration check: common -> d_aperture: " + mes)
-        if not hasattr(self.conf.common, "psf"):
-            setattr(self.conf.common, "psf", Entry(val="Airy", osf=10))
-        else:
-            if self.conf.common.psf().lower() != "airy":
-                mes = self.conf.common.psf.check_file("val")
+        if hasattr(self.conf.common, "psf"):
+            if hasattr(self.conf.common.psf, "val"):
+                if self.conf.common.psf().lower() != "airy":
+                    mes = self.conf.common.psf.check_file("val")
+                    mes is not None and error("Configuration check: common -> psf: " + mes)
+            else:
+                setattr(self.conf.common.psf, "val", "Airy")
+            if hasattr(self.conf.common.psf, "osf"):
+                mes = self.conf.common.psf.check_float("osf")
                 mes is not None and error("Configuration check: common -> psf: " + mes)
-            mes = self.conf.common.psf.check_float("osf")
-            mes is not None and error("Configuration check: common -> psf: " + mes)
+            else:
+                setattr(self.conf.common.psf, "osf", 10 * u.dimensionless_unscaled)
+        else:
+            setattr(self.conf.common, "psf", Entry(val="Airy", osf=10 * u.dimensionless_unscaled))
         if hasattr(self.conf.common, "jitter_sigma"):
             mes = self.conf.common.jitter_sigma.check_quantity("val", u.arcsec)
             mes is not None and error("Configuration check: common -> jitter_sigma: " + mes)
         if hasattr(self.conf.common, "output_path"):
-            mes = self.conf.common.output.check_path("path")
-            mes is not None and error("Configuration check: common -> output: " + mes)
-            mes = self.conf.common.output.check_selection("format", ["csv", "CSV", "fits", "FITS"])
-            mes is not None and error("Configuration check: common -> output: " + mes)
+            if hasattr(self.conf.common.output, "val"):
+                mes = self.conf.common.output.check_path("path")
+                mes is not None and error("Configuration check: common -> output: " + mes)
+            else:
+                setattr(self.conf.common.output, "val", ".")
+            if hasattr(self.conf.common.output, "format"):
+                mes = self.conf.common.output.check_selection("format", ["csv", "CSV", "fits", "FITS"])
+                mes is not None and error("Configuration check: common -> output: " + mes)
+            else:
+                setattr(self.conf.common.output, "format", "CSV")
         else:
-            setattr(self.conf.common, "output_path", Entry(val="."))
+            setattr(self.conf.common, "output_path", Entry(val=".", format="csv"))
         if hasattr(self.conf.common, "exposure_time"):
             mes = self.conf.common.exposure_time.check_quantity("val", u.s)
             if mes is not None:
