@@ -51,7 +51,7 @@ class Entry(object):
         if hasattr(self, "val") and type(self.val) == str and self.val.lower() in ["false", "true"]:
             self.val = (self.val.lower() == "true")
 
-    def check_quantity(self, name: str, unit: u.Unit) -> Union[None, str]:
+    def check_quantity(self, name: str, unit: u.Unit, use_default: bool = True) -> Union[None, str]:
         """
         Check a parameter as type quantity
 
@@ -71,9 +71,9 @@ class Entry(object):
             return "Parameter '" + name + "' not found."
         attr = getattr(self, name)
         if type(attr) != u.Quantity:
-            if unit == u.dimensionless_unscaled:
+            if unit == u.dimensionless_unscaled or use_default:
                 try:
-                    self.__setattr__(name, float(attr) * u.dimensionless_unscaled)
+                    self.__setattr__(name, float(attr) * unit)
                 except ValueError:
                     return "Expected parameter '" + name + "' with unit '" + unit.to_string() + \
                            "' but got no unit and cannot convert '" + attr + "' to a numeric value."
