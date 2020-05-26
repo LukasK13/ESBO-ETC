@@ -169,6 +169,31 @@ A<sub>obstructor</sub> / A<sub>beam splitter</sub>.
 Valid ranges are 0.0 - 1.0. The default is 1.
 
 #### Detectors
+`<sensor type="">`
+
+Currently, ESBO-ETC only supports detectors of the type `Imager`.
+* **`type`:** The type of the detector. Has to be one of [`Imager`].
+
+##### Imager
+```
+<sensor type="Imager">
+    <f_number val="13" val_unit=""/>
+    <pixel_geometry val="1024, 1024" val_unit="pix"/>
+    <center_offset val="0.0, 0.0" val_unit="pix"/>
+    <pixel>
+        <quantum_efficiency val="data/ccd/PCO-Edge-42-QE.txt"/>
+        <pixel_size val="6.5" val_unit="um"/>
+        <dark_current val="0.6" val_unit="electron / (pix * s)"/>
+        <sigma_read_out val="1.4" val_unit="electron(1/2) / pix"/>
+        <well_capacity val="30000" val_unit="electron"/>
+    </pixel>
+    <photometric_aperture/>
+        <shape val="circle"/>
+        <contained_energy val="80"/>
+        <contained_pixels val="100" val_unit="pix"/>
+    </photometric_aperture>
+</sensor>
+```
 
 #### Other Features
 ##### Reading spectral quantities from files
