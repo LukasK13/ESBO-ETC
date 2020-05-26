@@ -32,7 +32,7 @@ class TestImager(TestCase):
         self.assertAlmostEqual(exp_time.value, exp_time_.value)
 
     def test_getSensitivity(self):
-        exp_time = 0.1 * u.s
+        exp_time = 100 * u.s
         target = BlackBodyTarget(np.arange(200, 210) << u.nm, mag=20 * u.mag)
         zodiac = StrayLight(target, "data/straylight/zodiacal_emission_1.csv")
         imager = Imager(zodiac, **self.imager_args)

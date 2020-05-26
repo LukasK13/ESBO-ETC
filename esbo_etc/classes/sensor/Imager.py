@@ -207,13 +207,15 @@ class Imager(ASensor):
             for snr_, exp_time_, signal_current_lim_ in pbar(zip(snr, exp_time, signal_current_lim)):
                 self.__printDetails(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
                                     dark_current * exp_time_, "SNR=%.2f t_exp=%.2f s: " % (snr_.value, exp_time_.value))
-                self.__output(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
-                              dark_current * exp_time_, "snr_%.2f_texp_%.2f" % (snr_.value, exp_time_.value))
+                self.__output(signal_current * signal_current_lim_ / signal_current.sum() * exp_time_,
+                              background_current * exp_time_, read_noise, dark_current * exp_time_,
+                              "snr_%.2f_texp_%.2f" % (snr_.value, exp_time_.value))
         else:
             self.__printDetails(signal_current_lim * exp_time, background_current * exp_time, read_noise,
                                 dark_current * exp_time, "SNR=%.2f t_exp=%.2f s: " % (snr.value, exp_time.value))
-            self.__output(signal_current_lim * exp_time, background_current * exp_time, read_noise,
-                          dark_current * exp_time, "snr_%.2f_texp_%.2f" % (snr.value, exp_time.value))
+            self.__output(signal_current * signal_current_lim / signal_current.sum() * exp_time,
+                          background_current * exp_time, read_noise, dark_current * exp_time,
+                          "snr_%.2f_texp_%.2f" % (snr.value, exp_time.value))
         return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
