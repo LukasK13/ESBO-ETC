@@ -16,13 +16,13 @@ time and SNR. All computations support a batch-mode, allowing to compute multipl
 ## Full Documentation
 The full documentation is available as source [here](docs) and can be build using
 [sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html) by the command
-```
+```bash
 sphinx-build -b html
 ```
 
 for the HTML-documentation or
 
-```
+```bash
 sphinx-build -M latexpdf
 ```
 
