@@ -9,7 +9,7 @@ The minimal wavelength to consider in the computations.
     <wl_min val="3" val_unit="um"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the minimal wavelength.
     * | **val_unit:** str, *optional* = "m"
       |   The unit of the minimal wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
@@ -23,7 +23,7 @@ The maximal wavelength to consider in the computations.
     <wl_max val="5" val_unit="um"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the maximal wavelength.
     * | **val_unit:** str, *optional* = "m"
       |   The unit of the maximal wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
@@ -39,7 +39,7 @@ wl_delta
     <wl_delta val="5" val_unit="um"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the wavelength grid size.
     * | **val_unit:** str, *optional* = "m"
       |   The unit of the wavelength grid size. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
@@ -55,7 +55,7 @@ res
     <res val="1000" val_unit=""/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the spectral resolution.
     * | **val_unit:** str, *optional* = ""
       |   The unit of the spectral resolution. This has to be emtpy (dimensionless).  The default is ``dimensionless``.
@@ -72,7 +72,7 @@ The diameter of the telescope aperture.
     <d_aperture val="2.3" val_unit="m"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the telescope aperture diameter.
     * | **val_unit:** str, *optional* = "m"
       |   The unit of the telescope aperture diameter. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
@@ -110,7 +110,7 @@ jitter_sigma
     <jitter_sigma val="2" val_unit="arcsec"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the pointing jitter sigma.
     * | **val_unit:** str, *optional* = "arcsec"
       |   The unit of the pointing jitter sigma. This has to be one of [``arcsec``, ``arcmin``, ``degree``, ``radians``]. The default is ``arcsec``.
@@ -148,7 +148,7 @@ exposure_time
     <exposure_time val="data/exposure_time.csv"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** (float, str)
       |   The exposure time(s) to be used for the computations. This can be either a single value, a comma separated list of values or the path to a CSV-file containing a single column of exposure time values. For details on the required file structure see also :ref:`reading_csv`.
     * | **val_unit:** str, *optional* = "s"
       |   The unit of the exposure time. This has to be one of [``ns``, ``us``, ``ms``, ``s``, ``min``, ``h``]. If the path to a file is provided, this parameter must be omitted. The default is ``s``.
@@ -172,7 +172,7 @@ snr
     <snr val="data/snr.csv"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** (float, str)
       |   The SNR(s) to be used for the computations. This can be either a single value, a comma separated list of values or the path to a CSV-file containing a single column of SNR values. For details on the required file structure see also :ref:`reading_csv`.
     * | **val_unit:** str, *optional* = ""
       |   The unit of the exposure time. This has to be emtpy (dimensionless). If the path to a file is provided, this parameter must be omitted. The default is ``dimensionless``.

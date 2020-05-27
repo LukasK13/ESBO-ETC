@@ -48,17 +48,17 @@ Attributes:
       | The path to the file containing the spectral reflectance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **emissivity:** str, *optional*
       | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
-    * | **temp:** str, *optional*
+    * | **temp:** float, *optional*
       | The temperature of the mirror for the thermal emission.
     * | **temp_unit:** str, *optional*
       | The unit of the mirror's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstruction:** str, *optional*
+    * | **obstruction:** float, *optional*
       | The obstruction factor of the mirror as ratio of the areas A\ :sub:`obstructor` / A\ :sub:`mirror`.
-    * | **obstructor_temp:** str, *optional*
+    * | **obstructor_temp:** float, *optional*
       | The temperature of the obstructing component for the thermal emission.
     * | **obstructor_temp_unit:** str, *optional*
       | The unit of the obstructing component's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstructor_emissivity:** str, *optional*
+    * | **obstructor_emissivity:** float, *optional*
       | The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.
 
 Lens
@@ -74,17 +74,17 @@ Attributes:
       | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **emissivity:** str, *optional*
       | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
-    * | **temp:** str, *optional*
+    * | **temp:** float, *optional*
       | The temperature of the lens for the thermal emission.
     * | **temp_unit:** str, *optional*
       | The unit of the lens' temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstruction:** str, *optional*
+    * | **obstruction:** float, *optional*
       | The obstruction factor of the lens as ratio of the areas A\ :sub:`obstructor` / A\ :sub:`lens`.
-    * | **obstructor_temp:** str, *optional*
+    * | **obstructor_temp:** float, *optional*
       | The temperature of the obstructing component for the thermal emission.
     * | **obstructor_temp_unit:** str, *optional*
       | The unit of the obstructing component's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstructor_emissivity:** str, *optional*
+    * | **obstructor_emissivity:** float, *optional*
       | The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.
 
 BeamSplitter
@@ -100,17 +100,17 @@ Attributes:
       | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **emissivity:** str, *optional*
       | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
-    * | **temp:** str, *optional*
+    * | **temp:** float, *optional*
       | The temperature of the beam splitter for the thermal emission.
     * | **temp_unit:** str, *optional*
       | The unit of the beam splitter's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstruction:** str, *optional*
+    * | **obstruction:** float, *optional*
       | The obstruction factor of the beam splitter as ratio of the areas A\ :sub:`obstructor` / A\ :sub:`beam splitter`.
-    * | **obstructor_temp:** str, *optional*
+    * | **obstructor_temp:** float, *optional*
       | The temperature of the obstructing component for the thermal emission.
     * | **obstructor_temp_unit:** str, *optional*
       | The unit of the obstructing component's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstructor_emissivity:** str, *optional*
+    * | **obstructor_emissivity:** float, *optional*
       | The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.
 
 Filter
@@ -134,25 +134,25 @@ Attributes:
       | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **band:** str
       | The spectral Band of the filter. This has to be one of [``U``, ``B``, ``V``, ``R``, ``I``, ``J``, ``H``, ``K``, ``L``, ``M``, ``N``]
-    * | **start:** str
+    * | **start:** float
       | The start wavelength of the pass band of the filter.
     * | **start_unit:** str
       | The unit of the start wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
-    * | **end:** str
+    * | **end:** float
       | The end wavelength of the pass band of the filter.
     * | **end_unit:** str
       | The unit of the end wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
     * | **emissivity:** str, *optional*
       | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
-    * | **temp:** str
+    * | **temp:** float
       | The temperature of the beam splitter for the thermal emission.
     * | **temp_unit:** str, *optional*
       | The unit of the beam splitter's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstruction:** str, *optional*
+    * | **obstruction:** float, *optional*
       | The obstruction factor of the beam splitter as ratio of the areas A\ :sub:`obstructor` / A\ :sub:`filter`.
-    * | **obstructor_temp:** str, *optional*
+    * | **obstructor_temp:** float, *optional*
       | The temperature of the obstructing component for the thermal emission.
     * | **obstructor_temp_unit:** str, *optional*
       | The unit of the obstructing component's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **obstructor_emissivity:** str, *optional*
+    * | **obstructor_emissivity:** float, *optional*
       | The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.

@@ -44,7 +44,7 @@ The working focal number of the instrument.
     <f_number val="13" val_unit=""/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the working focal number of the instrument.
     * | **val_unit:** str, *optional* = ""
       |   The unit of the working focal number of the instrument. This has to be emtpy (dimensionless).
@@ -60,7 +60,7 @@ The geometry of the sensor's pixel array.
     <pixel_geometry val="1024, 1024" val_unit="pix"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The geometry of the sensor's pixel array as a comma separated list of the number of pixels per dimension (X, Y).
     * | **val_unit:** str, *optional* = "pix"
       |   The unit of the geometry of the sensor's pixel array. This has to be ``pix``.
@@ -76,7 +76,7 @@ The PSF's center offset from the arithmetical center of the detector array which
     <center_offset val="0.0, 0.0" val_unit="pix"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   PSF's center offset as a comma separated list of the offset in pixels per dimension (X, Y).
     * | **val_unit:** str, *optional* = "pix"
       |   The unit of the PSF's center offset. This has to be ``pix``.
@@ -105,8 +105,10 @@ The quantum efficiency of a detector pixel.
     <quantum_efficiency val="data/ccd/QE.txt"/>
 
 Attributes:
-    * | **val:** str
-      |   The path to the file containing the quantum efficiency values. For details on the required file structure see also :ref:`reading_csv`.
+    * | **val:** (float, str)
+      |   Either the value of the quantum efficiency or the path to the file containing the quantum efficiency values. For details on the required file structure see also :ref:`reading_csv`.
+    * | **val_unit:** str, *optional* = "electron / photon"
+      |   The unit of the edge length of a detector pixel. This has to be ``electron / photon``.
 
 pixel_size
 """"""""""
@@ -117,7 +119,7 @@ The spatial size of each detector pixel. Each pixel is assumed to be of quadrati
     <pixel_size val="6.5" val_unit="um"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the edge length of a detector pixel.
     * | **val_unit:** str, *optional* = "m"
       |   The unit of the edge length of a detector pixel. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
@@ -131,7 +133,7 @@ The dark current of a detector pixel.
     <dark_current val="0.6" val_unit="electron / (pix * s)"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the dark current of a detector pixel.
     * | **val_unit:** str, *optional* = "electron / (pix * s)"
       |   The unit of the dark current of a detector pixel. This has to be ``electron / (pix * s)``.
@@ -145,7 +147,7 @@ The read out noise of a detector pixel.
     <sigma_read_out val="1.4" val_unit="electron(1/2) / pix"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the read out noise of a detector pixel.
     * | **val_unit:** str, *optional* = "electron(1/2) / pix"
       |   The unit of the read out noise of a detector pixel. This has to be ``electron(1/2) / pix``.
@@ -159,7 +161,7 @@ The well capacity of a detector pixel.
     <well_capacity val="30000" val_unit="electron"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The value of the well capacity of a detector pixel.
     * | **val_unit:** str, *optional* = "electron"
       |   The unit of the well capacity of a detector pixel. This has to be ``electron``.
@@ -204,7 +206,7 @@ The energy to be contained within the photometric aperture. This value will used
     <contained_energy val="80"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** (float, str)
       |   The energy to be contained within the photometric aperture. This can be either the percentage of contained energy or one of [``Peak``, ``FWHM``, ``Min``].
 
 contained_pixels
@@ -218,7 +220,7 @@ The number of pixels to be contained within the photometric aperture. If this pa
     <contained_pixels val="100" val_unit="pix"/>
 
 Attributes:
-    * | **val:** str
+    * | **val:** float
       |   The number of pixels to be contained within the photometric aperture.
     * | **val_unit:** str, *optional* = "pix"
       |   The unit of the number of pixels to be contained within the photometric aperture. This has to be ``pix``.

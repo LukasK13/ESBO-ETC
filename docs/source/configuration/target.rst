@@ -23,11 +23,11 @@ Model a target as a black body of a given temperature and apparent magnitude.
     <target type="BlackBodyTarget" temp="5778" temp_unit="K" mag="10" mag_unit="mag" band="B" size="point"/>
 
 Attributes:
-    * | **temp:** str
+    * | **temp:** float
       |   The temperature of the black body.
     * | **temp_unit:** str, *optional* = "K"
       |   The unit of the black body's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **mag:** str
+    * | **mag:** float
       |   The apparent magnitude of the black body in magnitudes.
     * | **mag_unit:** str, *optional* = "mag"
       |   The unit of the black body's magnitude. This has to be ``mag``. The default is ``mag``.
