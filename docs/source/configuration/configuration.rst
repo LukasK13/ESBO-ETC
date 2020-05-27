@@ -2,10 +2,27 @@
 Building the Configuration
 **************************
 ESBO-ETC has to be configured by a XML-file. For basic information on XML and how to edit XML-files, have a look at
-`this tutorial <https://www.w3schools.com/xml/default.asp>`_. During the initialization of the program,
-the configuration is checked and possible errors reported with recommendations on how to fix the errors.
-The given attributes are the minimal attributes. This means, that additional attributes like *comment* can be added
-without breaking the configuration. This can be helpful to document tags as shown in the example below.
+`this tutorial <https://www.w3schools.com/xml/default.asp>`_.
+Each parameter of the configuration is defined by a XML-tag which is indicated by
+
+.. code-block:: xml
+
+    <tag_name/>
+
+A parameter can contain multiple attributes which are defined as key-value-pairs and some of them may be optional.
+All attribute values must be quoted as in the example below. The required types shown in the documentation refer to the unquoted value.
+Most numeric attributes require a unit which has to be defined as a second attribute with the suffix *_unit* which is also shown in the example below.
+All astropy units defined `here <https://docs.astropy.org/en/stable/units/>`_ can be used.
+
+.. code-block:: xml
+
+    <tag_name val="10" val_unit="s"/>
+
+The tree structure of the configuration file is explained below.
+
+During the initialization of the program, the configuration is checked and possible errors reported with recommendations on how to fix the errors.
+The attributes in the documentation below are the minimal attributes. This means, that additional attributes like *comment* can be added
+without breaking the configuration. This can be helpful to document tags as shown in the :ref:`example_config`.
 
 Basic Structure
 ===============
@@ -65,6 +82,8 @@ In case of structured text, the units of the columns have to be defined in the c
 +-----------------+------------------------------+
 |             ... |                          ... |
 +-----------------+------------------------------+
+
+.. _example_config:
 
 Example Configuration
 =====================
