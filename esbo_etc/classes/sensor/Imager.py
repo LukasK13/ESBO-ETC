@@ -8,8 +8,8 @@ from ..psf.Airy import Airy
 from ..psf.Zemax import Zemax
 from ..SpectralQty import SpectralQty
 from .PixelMask import PixelMask
+from ...lib.logger import logger
 import astropy.constants as const
-from logging import info, warning, debug, getLogger
 import enlighten
 import os
 import astropy.io.fits as fits
@@ -111,7 +111,7 @@ class Imager(ASensor):
         # Calculate the electron currents
         signal_current, background_current, read_noise, dark_current = self.__exposePixels()
         # Calculate the SNR using the CCD-equation
-        getLogger("root").info("Calculating the SNR...", extra={"user_waiting": True})
+        logger.info("Calculating the SNR...", extra={"spinning": True})
         snr = signal_current.sum() * exp_time / np.sqrt(
             (signal_current + background_current + dark_current).sum() * exp_time + (read_noise ** 2).sum())
         # Print information
@@ -147,6 +147,7 @@ class Imager(ASensor):
         """
         # Calculate the electron currents
         signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        logger.info("Calculating the exposure time...", extra={"spinning": True})
         # Calculate the electron currents for all pixels
         signal_current_tot = signal_current.sum()
         # Fix the physical units of the SNR
@@ -195,6 +196,7 @@ class Imager(ASensor):
         """
         # Calculate the electron currents
         signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        logger.info("Calculating the sensitivity...", extra={"spinning": True})
         # Fix the physical units of the SNR
         snr = snr * u.electron ** 0.5
         signal_current_lim = snr * (snr + np.sqrt(
@@ -246,14 +248,14 @@ class Imager(ASensor):
         overexposed = total > self.__well_capacity
         if np.any(overexposed):
             # Show a warning for the overexposed pixels
-            warning(prefix + str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
-        info("--------------------------------------------------------------------------------------------------------")
-        info(prefix + "Collected electrons from target:     %1.2e electrons" % signal.sum().value)
-        info(prefix + "Collected electrons from background: %1.2e electrons" % background.sum().value)
-        info(prefix + "Electrons from dark current:         %1.2e electrons" % dark.sum().value)
-        info(prefix + "Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
-        info(prefix + "Total collected electrons:           %1.2e electrons" % total.sum().value)
-        info("--------------------------------------------------------------------------------------------------------")
+            logger.warning(prefix + str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
+        logger.info("-------------------------------------------------------------------------------------------------")
+        logger.info(prefix + "Collected electrons from target:     %1.2e electrons" % signal.sum().value)
+        logger.info(prefix + "Collected electrons from background: %1.2e electrons" % background.sum().value)
+        logger.info(prefix + "Electrons from dark current:         %1.2e electrons" % dark.sum().value)
+        logger.info(prefix + "Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
+        logger.info(prefix + "Total collected electrons:           %1.2e electrons" % total.sum().value)
+        logger.info("-------------------------------------------------------------------------------------------------")
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
     def __output(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
@@ -282,7 +284,7 @@ class Imager(ASensor):
         try:
             os.mkdir(path)
         except FileExistsError:
-            warning("Output directory '" + path + "' already exists.")
+            logger.warning("Output directory '" + path + "' already exists.")
         # Calculate the indices of nonzero values and create a bounding rectangle
         y, x = np.nonzero(signal)
         y_min = min(y)
@@ -337,9 +339,9 @@ class Imager(ASensor):
             The electron current from the dark noise as PixelMask in electrons / s
         """
         # Calculate the total incoming electron current
-        getLogger("root").info("Calculating incoming electron current...", extra={"user_waiting": True})
+        logger.info("Calculating incoming electron current...", extra={"spinning": True})
         signal_current, size, obstruction, background_current = self.__calcIncomingElectronCurrent()
-        # getLogger("root").info("Finished calculating incoming electron current", extra={"user_waiting": False})
+        # info("Finished calculating incoming electron current", extra={"spinning": False})
         # Initialize a new PixelMask
         mask = PixelMask(self.__pixel_geometry, self.__pixel_size, self.__center_offset)
         if size.lower() == "extended":
@@ -356,8 +358,8 @@ class Imager(ASensor):
                 mask.createPhotometricAperture("square", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
             else:
                 # Calculate the diameter of the photometric aperture from the given contained energy
-                getLogger("root").info("Calculating the diameter of the photometric aperture...",
-                                       extra={"user_waiting": True})
+                logger.info("Calculating the diameter of the photometric aperture...",
+                                       extra={"spinning": True})
                 d_photometric_ap = self.__calcPhotometricAperture(obstruction)
                 # Mask the pixels to be exposed
                 mask.createPhotometricAperture(self.__shape, d_photometric_ap / 2)
@@ -370,21 +372,21 @@ class Imager(ASensor):
         if self.__contained_pixels is None and size.lower() != "extended":
             if type(self.__contained_energy) == str:
                 if self.__contained_energy.lower() == "peak":
-                    info("The radius of the photometric aperture is %.2f pixels. This equals the peak value" % (
+                    logger.info("The radius of the photometric aperture is %.2f pixels. This equals the peak value" % (
                             d_photometric_ap.value / 2))
                 elif self.__contained_energy.lower() == "fwhm":
-                    info("The radius of the photometric aperture is %.2f pixels. This equals the FWHM" % (
+                    logger.info("The radius of the photometric aperture is %.2f pixels. This equals the FWHM" % (
                             d_photometric_ap.value / 2))
                 elif self.__contained_energy.lower() == "min":
-                    info("The radius of the photometric aperture is %.2f pixels. This equals the first minimum" % (
+                    logger.info("The radius of the photometric aperture is %.2f pixels. This equals the first minimum" % (
                             d_photometric_ap.value / 2))
             else:
-                info("The radius of the photometric aperture is %.2f pixels. This equals %.0f%% encircled energy" %
+                logger.info("The radius of the photometric aperture is %.2f pixels. This equals %.0f%% encircled energy" %
                      (d_photometric_ap.value / 2, self.__contained_energy))
-        info("The photometric aperture contains " + str(np.count_nonzero(mask)) + " pixels.")
+        logger.info("The photometric aperture contains " + str(np.count_nonzero(mask)) + " pixels.")
         if size.lower() != "extended":
             # Map the PSF onto the pixel mask in order to get the relative irradiance of each pixel
-            getLogger("root").info("Mapping the PSF onto the pixel grid...", extra={"user_waiting": True})
+            logger.info("Mapping the PSF onto the pixel grid...", extra={"spinning": True})
             mask = self.__psf.mapToPixelMask(mask,
                                              getattr(getattr(self.__common_conf, "jitter_sigma", None), "val", None),
                                              obstruction)
@@ -410,7 +412,7 @@ class Imager(ASensor):
         jitter_sigma = getattr(getattr(self.__common_conf, "jitter_sigma", None), "val", None)
         reduced_observation_angle = self.__psf.calcReducedObservationAngle(self.__contained_energy, jitter_sigma,
                                                                            obstruction)
-        debug("Reduced observation angle: %.2f" % reduced_observation_angle.value)
+        logger.debug("Reduced observation angle: %.2f" % reduced_observation_angle.value)
         # Calculate angular width of PSF
         observation_angle = (reduced_observation_angle * self.__central_wl / self.__common_conf.d_aperture() *
                              180.0 / np.pi * 3600).decompose() * u.arcsec
@@ -437,11 +439,11 @@ class Imager(ASensor):
             The electron current on the detector caused by the background in electrons / (s * pix).
         """
         # Calculate the photon current of the background
-        info("Calculating the background photon current.")
+        logger.info("Calculating the background photon current.")
         background_photon_current = self._parent.calcBackground() * np.pi * (
                 self.__pixel_size.to(u.m) ** 2 / u.pix) / (4 * self.__f_number ** 2 + 1) * (1 * u.sr)
         # Calculate the incoming photon current of the target
-        info("Calculating the signal photon current.")
+        logger.info("Calculating the signal photon current.")
         signal, size, obstruction = self._parent.calcSignal()
         signal_photon_current = signal * np.pi * (self.__common_conf.d_aperture() / 2) ** 2
         # Calculate the electron current of the background and thereby handling the photon energy as lambda-function
@@ -451,10 +453,10 @@ class Imager(ASensor):
         # Calculate the electron current of the signal and thereby handling the photon energy as lambda-function
         signal_current = (signal_photon_current / (lambda wl: (const.h * const.c / wl).to(u.W * u.s) / u.photon) *
                           self.__quantum_efficiency).integrate()
-        debug("Signal current: %1.2e e-/s" % signal_current.value)
-        debug("Target size: " + size)
-        debug("Obstruction: %.2f" % obstruction)
-        debug("Background current: %1.2e e-/s" % background_current.value)
+        logger.debug("Signal current: %1.2e e-/s" % signal_current.value)
+        logger.debug("Target size: " + size)
+        logger.debug("Obstruction: %.2f" % obstruction)
+        logger.debug("Background current: %1.2e e-/s" % background_current.value)
         return signal_current, size, obstruction, background_current
 
     @staticmethod
