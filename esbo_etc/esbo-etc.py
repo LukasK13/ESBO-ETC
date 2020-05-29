@@ -38,7 +38,6 @@ if __name__ == "__main__":
     # Parse Configuration
     logger.info("Parsing configuration...", extra={"spinning": True})
     conf = eetc.Configuration(args.config).conf
-    logger.error("kjsagfsg")
 
     # Set up components
     logger.info("Setting up components...", extra={"spinning": True})
