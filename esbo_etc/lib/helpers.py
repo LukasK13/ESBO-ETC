@@ -1,32 +1,8 @@
-import logging
-import sys
-import traceback
 import numpy as np
 from astropy.io import ascii
 from astropy.table import Table
 import astropy.units as u
 import re
-
-
-def error(msg: str, exit_: bool = True):
-    """
-    Handle errors
-
-    Parameters
-    ----------
-    msg : str
-        Error message to show
-    exit_ : bool
-        Exit program
-
-    Returns
-    -------
-
-    """
-    logging.error(msg)
-    if exit_:
-        traceback.print_stack()
-        sys.exit(1)
 
 
 def isLambda(obj: object):
