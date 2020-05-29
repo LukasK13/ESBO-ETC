@@ -1,9 +1,7 @@
 import esbo_etc as eetc
 import argparse
+from esbo_etc.lib.logger import logger
 import logging
-import sys
-from logging_spinner import SpinnerHandler
-from pyspin.spin import Spin1
 from pyfiglet import Figlet
 from rich import console, markdown
 
@@ -34,17 +32,16 @@ if __name__ == "__main__":
     print(f.renderText('ESBO-ETC'))
 
     # Set up logging
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING if args.logging is None else getattr(
-        logging, args.logging.upper()), stream=sys.stdout)
-    logger = logging.getLogger('root')
-    logger.addHandler(SpinnerHandler(spin_style=Spin1))
+    logger.setLevel(logging.WARNING if args.logging is None else getattr(logging, args.logging.upper()))
+    logger.addHandler(eetc.SpinnerHandler())
 
     # Parse Configuration
-    logging.getLogger("root").info("Parsing configuration...", extra={"user_waiting": True})
+    logger.info("Parsing configuration...", extra={"spinning": True})
     conf = eetc.Configuration(args.config).conf
+    logger.error("kjsagfsg")
 
     # Set up components
-    logging.getLogger("root").info("Setting up components...", extra={"user_waiting": True})
+    logger.info("Setting up components...", extra={"spinning": True})
     oc_factory = eetc.classes.RadiantFactory(conf.common.wl_bins())
     parent = oc_factory.fromConfigBatch(conf)
     sensor_factory = eetc.SensorFactory(parent, conf.common)
@@ -60,4 +57,4 @@ if __name__ == "__main__":
     elif hasattr(conf.common, "snr"):
         exp_time = imager.getExpTime(conf.common.snr())
         eetc.printExposureTime(exp_time, conf.common.snr())
-    logging.getLogger("root").info("Finished.", extra={"user_waiting": False})
+    logger.info("Finished.", extra={"spinning": False})
