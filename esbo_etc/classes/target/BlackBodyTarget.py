@@ -2,7 +2,7 @@ from ..target.ATarget import ATarget
 from ..SpectralQty import SpectralQty
 import astropy.units as u
 from astropy.modeling.models import BlackBody
-from ...lib.helpers import error
+from ...lib.logger import logger
 from ..Entry import Entry
 from typing import Union
 
@@ -47,7 +47,7 @@ class BlackBodyTarget(ATarget):
         -------
         """
         if band.upper() not in self._band.keys():
-            error("Band has to be one of '[" + ", ".join(list(self._band.keys())) + "]'")
+            logger.error("Band has to be one of '[" + ", ".join(list(self._band.keys())) + "]'")
         # Create blackbody model with given temperature
         bb = BlackBody(temperature=temp, scale=1 * u.W / (u.m ** 2 * u.nm * u.sr))
 

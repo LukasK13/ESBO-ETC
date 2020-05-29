@@ -1,7 +1,7 @@
 from .AHotOpticalComponent import AHotOpticalComponent
 from ..SpectralQty import SpectralQty
 from ..IRadiant import IRadiant
-from ...lib.helpers import error
+from ...lib.logger import logger
 from ..Entry import Entry
 from astropy import units as u
 from typing import Union, Callable
@@ -86,7 +86,7 @@ class Filter(AHotOpticalComponent):
             The instantiated filter object.
         """
         if band not in cls._band.keys():
-            error("Band has to be one of '[" + ", ".join(list(cls._band.keys())) + "]'")
+            logger.error("Band has to be one of '[" + ", ".join(list(cls._band.keys())) + "]'")
         return cls.fromRange(parent, cls._band[band]["cwl"] - cls._band[band]["bw"] / 2,
                              cls._band[band]["cwl"] + cls._band[band]["bw"] / 2, emissivity, temp, obstruction,
                              obstructor_temp, obstructor_emissivity)

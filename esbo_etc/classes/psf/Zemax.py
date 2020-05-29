@@ -1,10 +1,10 @@
 from .IPSF import IPSF
-from ...lib.helpers import error, rasterizeCircle
+from ...lib.helpers import rasterizeCircle
 from ..sensor.PixelMask import PixelMask
+from ...lib.logger import logger
 import numpy as np
 import astropy.units as u
 import re
-from logging import warning
 from typing import Union
 from scipy.optimize import bisect
 from scipy.signal import fftconvolve
@@ -52,7 +52,7 @@ class Zemax(IPSF):
         # Parse shape of the grid and check the read PSF-array
         shape = [int(x) for x in re.findall("[0-9]+", list(filter(re.compile("Image grid size: ").match, head))[0])]
         if shape != list(self.__psf.shape):
-            warning("Not all PSF entries read.")
+            logger.warning("Not all PSF entries read.")
         # Parse and calculate the grid width
         grid_delta = [float(x.replace(",", ".")) for x in
                       re.findall("[0-9]+,*[0-9]*", list(filter(re.compile("Data area is ").match, head))[0])]
@@ -95,7 +95,7 @@ class Zemax(IPSF):
             try:
                 contained_energy = float(contained_energy) / 100.0 * u.dimensionless_unscaled
             except ValueError:
-                error("Could not convert encircled energy to float.")
+                logger.error("Could not convert encircled energy to float.")
         elif type(contained_energy) in [int, float]:
             contained_energy = contained_energy / 100 * u.dimensionless_unscaled
 

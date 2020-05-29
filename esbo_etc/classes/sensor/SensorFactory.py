@@ -2,7 +2,7 @@ from ..IRadiant import IRadiant
 from ..Entry import Entry
 from .ASensor import ASensor
 from .Imager import Imager
-from ...lib.helpers import error
+from ...lib.logger import logger
 
 
 class SensorFactory:
@@ -50,4 +50,4 @@ class SensorFactory:
                     args["contained_pixels"] = options.photometric_aperture.contained_pixels()
             return Imager(**args)
         else:
-            error("Wrong sensor type: " + options.type)
+            logger.error("Wrong sensor type: " + options.type)

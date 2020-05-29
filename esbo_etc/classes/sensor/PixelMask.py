@@ -1,6 +1,6 @@
 import astropy.units as u
-from logging import warning
-from ...lib.helpers import error, rasterizeCircle
+from ...lib.logger import logger
+from ...lib.helpers import rasterizeCircle
 import numpy as np
 
 
@@ -99,7 +99,7 @@ class PixelMask(np.ndarray):
             yc = self.psf_center_ind[0] * u.pix
         if (xc + radius).value > self.pixel_geometry[0].value - 1 or (xc - radius).value < 0 or\
                 (yc + radius).value > self.pixel_geometry[1].value - 1 or (yc - radius).value < 0:
-            warning("Some parts of the photometric aperture are outside of the array.")
+            logger.warning("Some parts of the photometric aperture are outside of the array.")
         if shape.lower() == "circle":
             # Rasterize a circle on the grid
             rasterizeCircle(self, radius.value, xc.value, yc.value)
@@ -117,4 +117,4 @@ class PixelMask(np.ndarray):
             # Mark the pixels contained in the square with 1
             self[y_up:(y_low + 1), x_left:(x_right + 1)] = 1
         else:
-            error("Unknown photometric aperture shape: '" + shape + "'.")
+            logger.error("Unknown photometric aperture shape: '" + shape + "'.")

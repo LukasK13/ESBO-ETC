@@ -2,7 +2,7 @@ from typing import Union
 import re
 import xml.etree.ElementTree as eT
 import astropy.units as u
-from ..lib.helpers import error
+from ..lib.logger import logger
 import difflib
 import os
 
@@ -45,8 +45,8 @@ class Entry(object):
                         val = val[0]
                     setattr(self, var, val)
                 except (ValueError, LookupError):
-                    error("unable to convert units in entry '" + xml.tag + "': " + getattr(self, var) + " " +
-                          getattr(self, unit), exit_=False)
+                    logger.error("unable to convert units in entry '" + xml.tag + "': " + getattr(self, var) + " " +
+                                 getattr(self, unit), exit_=False)
         # Convert boolean values
         if hasattr(self, "val") and type(self.val) == str and self.val.lower() in ["false", "true"]:
             self.val = (self.val.lower() == "true")
@@ -61,6 +61,8 @@ class Entry(object):
             The name of the parameter to be checked.
         unit : Quantity
             The default quantity to be used for conversion and equality checking.
+        use_default : bool
+            Use the given unit as default unit and try to convert strings to Quantities with this unit.
 
         Returns
         -------
@@ -109,7 +111,7 @@ class Entry(object):
             match = difflib.get_close_matches(attr, choices, 1)
             if len(match) > 0:
                 # noinspection PyTypeChecker
-                return "Value '" + attr + "' not allowed for parameter '" + name + "'. Did you mean '" +\
+                return "Value '" + attr + "' not allowed for parameter '" + name + "'. Did you mean '" + \
                        match[0] + "'?"
             else:
                 return "Value '" + attr + "' not allowed for parameter '" + name + "'."

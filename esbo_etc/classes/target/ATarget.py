@@ -3,7 +3,7 @@ from ..IRadiant import IRadiant
 from ..SpectralQty import SpectralQty
 import astropy.units as u
 import numpy as np
-from logging import info, debug
+from ...lib.logger import logger
 from typing import Tuple
 from ..Entry import Entry
 
@@ -41,9 +41,9 @@ class ATarget(IRadiant):
         background : SpectralQty
             The spectral radiance of the target's background
         """
-        info("Calculating Noise for class '" + self.__class__.__name__ + "'.")
+        logger.info("Calculating noise for class '" + self.__class__.__name__ + "'.")
         background = SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
-        debug(background)
+        logger.debug(background)
         return background
 
     def calcSignal(self) -> Tuple[SpectralQty, str, float]:
@@ -59,8 +59,8 @@ class ATarget(IRadiant):
         obstruction : float
             The obstruction factor as A_ob / A_ap.
         """
-        info("Calculating Signal for class '" + self.__class__.__name__ + "'.")
-        debug(self.__sfd)
+        logger.info("Calculating signal for class '" + self.__class__.__name__ + "'.")
+        logger.debug(self.__sfd)
         return self.__sfd, self.__size, 0.0
 
     @staticmethod

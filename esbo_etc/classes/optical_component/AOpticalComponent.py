@@ -1,11 +1,10 @@
 from ..IRadiant import IRadiant
 from ..SpectralQty import SpectralQty
-from ...lib.helpers import error
+from ...lib.logger import logger
 from abc import abstractmethod
 import astropy.units as u
 from astropy.modeling.models import BlackBody
 from typing import Union, Callable, Tuple
-from logging import info, debug
 from ..Entry import Entry
 
 
@@ -66,10 +65,10 @@ class AOpticalComponent(IRadiant):
             The obstruction factor as A_ob / A_ap.
         """
         signal, size, obstruction = self.__parent.calcSignal()
-        info("Calculating signal for class '" + self.__class__.__name__ + "'.")
+        logger.info("Calculating signal for class '" + self.__class__.__name__ + "'.")
         signal = self._propagate(signal) * (1 - self.__obstruction)
         obstruction = obstruction + self.__obstruction
-        debug(signal)
+        logger.debug(signal)
         return signal, size, obstruction
 
     def calcBackground(self) -> SpectralQty:
@@ -82,7 +81,7 @@ class AOpticalComponent(IRadiant):
             The spectral radiance of the background
         """
         parent = self.__parent.calcBackground()
-        info("Calculating background for class '" + self.__class__.__name__ + "'.")
+        logger.info("Calculating background for class '" + self.__class__.__name__ + "'.")
         parent = self._propagate(parent)
         if self.__obstructor_temp > 0 * u.K:
             bb = BlackBody(temperature=self.__obstructor_temp, scale=1. * u.W / (u.m ** 2 * u.nm * u.sr))
@@ -91,7 +90,7 @@ class AOpticalComponent(IRadiant):
         else:
             background = parent * (1. - self.__obstruction)
         background = background + self._ownNoise()
-        debug(background)
+        logger.debug(background)
         return background
 
     def _propagate(self, rad: SpectralQty) -> SpectralQty:
@@ -111,7 +110,7 @@ class AOpticalComponent(IRadiant):
         try:
             return rad * self.__transreflectivity
         except AttributeError:
-            error("Transreflectivity not given. Method propagate() needs to be implemented.")
+            logger.error("Transreflectivity not given. Method propagate() needs to be implemented.")
 
     def _ownNoise(self) -> Union[SpectralQty, Callable[[u.Quantity], u.Quantity], int, float]:
         """
@@ -125,7 +124,7 @@ class AOpticalComponent(IRadiant):
         try:
             return self.__noise
         except AttributeError:
-            error("noise not given. Method ownNoise() needs to be implemented.")
+            logger.error("noise not given. Method ownNoise() needs to be implemented.")
 
     @staticmethod
     @abstractmethod

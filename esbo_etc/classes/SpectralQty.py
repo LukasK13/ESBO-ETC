@@ -1,11 +1,9 @@
-from ..lib.helpers import error, isLambda, readCSV
+from ..lib.helpers import isLambda, readCSV
+from ..lib.logger import logger
 from scipy.interpolate import interp1d
 import astropy.units as u
 import math
 from typing import Union, Callable
-import logging
-from astropy.io import ascii
-import re
 import os
 from scipy.integrate import trapz
 
@@ -47,7 +45,7 @@ class SpectralQty:
             else:
                 self.qty = qty * u.dimensionless_unscaled
         else:
-            error("Lengths not matching")
+            logger.error("Lengths not matching")
         self._fill_value = fill_value
 
     @classmethod
@@ -166,7 +164,7 @@ class SpectralQty:
                         # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
                         return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty + other_rebinned.qty)
             else:
-                error("Units are not matching for addition.")
+                logger.error("Units are not matching for addition.")
 
     __radd__ = __add__
 
@@ -214,7 +212,7 @@ class SpectralQty:
                         # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
                         return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty - other_rebinned.qty)
             else:
-                error("Units are not matching for substraction.")
+                logger.error("Units are not matching for substraction.")
 
     def __mul__(self, other: Union[int, float, u.Quantity, "SpectralQty", Callable[[u.Quantity], u.Quantity]]) ->\
             "SpectralQty":
@@ -254,7 +252,7 @@ class SpectralQty:
                         # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
                         return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty * other_rebinned.qty)
             else:
-                error("Units are not matching for multiplication.")
+                logger.error("Units are not matching for multiplication.")
 
     __rmul__ = __mul__
 
@@ -296,7 +294,7 @@ class SpectralQty:
                         # Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity
                         return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty / other_rebinned.qty)
             else:
-                error("Units are not matching for division.")
+                logger.error("Units are not matching for division.")
 
     def rebin(self, wl: u.Quantity) -> "SpectralQty":
         """
@@ -315,11 +313,11 @@ class SpectralQty:
         """
 
         if not wl.unit.is_equivalent(self.wl.unit):
-            error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
+            logger.error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
         if min(wl) < min(self.wl) or max(wl) > max(self.wl):
             if isinstance(self._fill_value, bool):
                 if not self._fill_value:
-                    logging.warning("Extrapolation disabled, bandwidth will be reduced.")
+                    logger.warning("Extrapolation disabled, bandwidth will be reduced.")
                     # Remove new wavelengths where extrapolation would have been necessary
                     wl = [x.value for x in wl if min(self.wl) <= x <= max(self.wl)] * wl.unit
                 f = interp1d(self.wl, self.qty.value, fill_value="extrapolate")
