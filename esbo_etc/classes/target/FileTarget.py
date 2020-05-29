@@ -3,7 +3,6 @@ from ..SpectralQty import SpectralQty
 import astropy.units as u
 from ..Entry import Entry
 from typing import Union
-import os.path
 
 
 class FileTarget(ATarget):
