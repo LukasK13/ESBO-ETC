@@ -28,6 +28,7 @@ def printSNR(exp_time: u.Quantity, snr: u.Quantity):
     else:
         table.add_row("1", ("%1.4e " + exp_time.unit.to_string()) % exp_time.value, "%1.4e" % snr.value)
     console = Console()
+    console.print("")
     console.print(table)
 
 
@@ -56,6 +57,7 @@ def printExposureTime(exp_time: u.Quantity, snr: u.Quantity):
     else:
         table.add_row("1", "%1.4e" % snr.value, ("%1.4e " + exp_time.unit.to_string()) % exp_time.value)
     console = Console()
+    console.print("")
     console.print(table)
 
 
@@ -89,4 +91,5 @@ def printSensitivity(exp_time: u.Quantity, snr: u.Quantity, sensitivity: u.Quant
         table.add_row("1", ("%1.4e " + exp_time.unit.to_string()) % exp_time.value, "%1.4e" % snr.value,
                       ("%1.4e " + sensitivity.unit.to_string()) % sensitivity.value)
     console = Console()
+    console.print("")
     console.print(table)
