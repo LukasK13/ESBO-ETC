@@ -10,7 +10,6 @@ from ..SpectralQty import SpectralQty
 from .PixelMask import PixelMask
 from ...lib.logger import logger
 import astropy.constants as const
-import enlighten
 import os
 import astropy.io.fits as fits
 
@@ -115,18 +114,11 @@ class Imager(ASensor):
         snr = signal_current.sum() * exp_time / np.sqrt(
             (signal_current + background_current + dark_current).sum() * exp_time + (read_noise ** 2).sum())
         # Print information
-        if exp_time.size > 1:
-            pbar = enlighten.get_manager().counter(**dict(total=len(exp_time), desc='SNR', unit='configurations'))
-            for exp_time_ in pbar(exp_time):
-                self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
-                                    dark_current * exp_time_, "t_exp=%.2f s: " % exp_time_.value)
-                self.__output(signal_current * exp_time_, background_current * exp_time_, read_noise,
-                              dark_current * exp_time_, "texp_%.2f" % exp_time_.value)
-        else:
-            self.__printDetails(signal_current * exp_time, background_current * exp_time, read_noise,
-                                dark_current * exp_time, "t_exp=%.2f s: " % exp_time.value)
-            self.__output(signal_current * exp_time, background_current * exp_time, read_noise,
-                          dark_current * exp_time, "texp_%.2f" % exp_time.value)
+        for exp_time_ in exp_time if exp_time.size > 1 else [exp_time]:
+            self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                                dark_current * exp_time_, "t_exp=%.2f s: " % exp_time_.value)
+            self.__output(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                          dark_current * exp_time_, "texp_%.2f" % exp_time_.value)
         # Return the value of the SNR, ignoring the physical units (electrons^0.5)
         return snr.value * u.dimensionless_unscaled
 
@@ -160,19 +152,11 @@ class Imager(ASensor):
                 1 + current_ratio + np.sqrt((1 + current_ratio) ** 2 + 4 * (read_noise ** 2).sum() / snr ** 2)) / (
                            2 * signal_current_tot)
         # Print information
-        if exp_time.size > 1:
-            pbar = enlighten.get_manager().counter(**dict(total=len(exp_time), desc='Exposure Time',
-                                                          unit='configurations'))
-            for snr_, exp_time_ in pbar(zip(snr, exp_time)):
-                self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
-                                    dark_current * exp_time_, "SNR=%.2f: " % snr_.value)
-                self.__output(signal_current * exp_time_, background_current * exp_time_, read_noise,
-                              dark_current * exp_time_, "snr_%.2f" % snr_.value)
-        else:
-            self.__printDetails(signal_current * exp_time, background_current * exp_time, read_noise,
-                                dark_current * exp_time, "SNR=%.2f: " % snr.value)
-            self.__output(signal_current * exp_time, background_current * exp_time, read_noise,
-                          dark_current * exp_time, "snr_%.2f" % snr.value)
+        for snr_, exp_time_ in zip(snr, exp_time) if snr.size > 1 else zip([snr], [exp_time]):
+            self.__printDetails(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                                dark_current * exp_time_, "SNR=%.2f: " % snr_.value)
+            self.__output(signal_current * exp_time_, background_current * exp_time_, read_noise,
+                          dark_current * exp_time_, "snr_%.2f" % snr_.value)
         return exp_time
 
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
@@ -203,21 +187,13 @@ class Imager(ASensor):
             snr ** 2 + 4 * (exp_time * (background_current.sum() + dark_current.sum()) +
                             (read_noise ** 2).sum()))) / (2 * exp_time)
         # Print information
-        if exp_time.size > 1:
-            pbar = enlighten.get_manager().counter(**dict(total=len(exp_time), desc='Sensitivity',
-                                                          unit='configurations'))
-            for snr_, exp_time_, signal_current_lim_ in pbar(zip(snr, exp_time, signal_current_lim)):
-                self.__printDetails(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
-                                    dark_current * exp_time_, "SNR=%.2f t_exp=%.2f s: " % (snr_.value, exp_time_.value))
-                self.__output(signal_current * signal_current_lim_ / signal_current.sum() * exp_time_,
-                              background_current * exp_time_, read_noise, dark_current * exp_time_,
-                              "snr_%.2f_texp_%.2f" % (snr_.value, exp_time_.value))
-        else:
-            self.__printDetails(signal_current_lim * exp_time, background_current * exp_time, read_noise,
-                                dark_current * exp_time, "SNR=%.2f t_exp=%.2f s: " % (snr.value, exp_time.value))
-            self.__output(signal_current * signal_current_lim / signal_current.sum() * exp_time,
-                          background_current * exp_time, read_noise, dark_current * exp_time,
-                          "snr_%.2f_texp_%.2f" % (snr.value, exp_time.value))
+        for snr_, exp_time_, signal_current_lim_ in zip(snr, exp_time, signal_current_lim) if snr.size > 1 else zip(
+                [snr], [exp_time], [signal_current_lim]):
+            self.__printDetails(signal_current_lim_ * exp_time_, background_current * exp_time_, read_noise,
+                                dark_current * exp_time_, "SNR=%.2f t_exp=%.2f s: " % (snr_.value, exp_time_.value))
+            self.__output(signal_current * signal_current_lim_ / signal_current.sum() * exp_time_,
+                          background_current * exp_time_, read_noise, dark_current * exp_time_,
+                          "snr_%.2f_texp_%.2f" % (snr_.value, exp_time_.value))
         return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
