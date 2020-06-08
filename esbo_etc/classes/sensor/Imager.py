@@ -425,10 +425,10 @@ class Imager(ASensor):
         # Calculate the electron current of the background and thereby handling the photon energy as lambda-function
         background_current = (
                 background_photon_current / (lambda wl: (const.h * const.c / wl).to(u.W * u.s) / u.photon) *
-                self.__quantum_efficiency).integrate()
+                self.__quantum_efficiency).integrate().decompose()
         # Calculate the electron current of the signal and thereby handling the photon energy as lambda-function
         signal_current = (signal_photon_current / (lambda wl: (const.h * const.c / wl).to(u.W * u.s) / u.photon) *
-                          self.__quantum_efficiency).integrate()
+                          self.__quantum_efficiency).integrate().decompose()
         logger.debug("Signal current: %1.2e e-/s" % signal_current.value)
         logger.debug("Target size: " + size)
         logger.debug("Obstruction: %.2f" % obstruction)
