@@ -32,7 +32,7 @@ class Atmosphere(AOpticalComponent):
                                                   qty_unit_default=u.dimensionless_unscaled)
         if emission is None:
             # No emission is given, initialize the super class
-            super().__init__(parent, transmittance_sqty)
+            super().__init__(parent, transmittance_sqty, 0)
         else:
             # Read the emission
             emission_sqty = SpectralQty.fromFile(emission, wl_unit_default=u.nm,
