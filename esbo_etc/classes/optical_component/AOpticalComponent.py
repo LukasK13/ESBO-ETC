@@ -45,7 +45,7 @@ class AOpticalComponent(IRadiant):
         self.__parent = parent
         if transreflectivity:
             self.__transreflectivity = transreflectivity
-        if noise:
+        if noise is not None:
             self.__noise = noise
         self.__obstruction = obstruction
         self.__obstructor_temp = obstructor_temp
