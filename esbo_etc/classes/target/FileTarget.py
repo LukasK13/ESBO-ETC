@@ -50,9 +50,6 @@ class FileTarget(ATarget):
         mes = conf.check_file("file")
         if mes is not None:
             return mes
-        mes = conf.check_quantity("wl_bins", u.m)
-        if mes is not None:
-            return mes
         mes = conf.check_selection("size", ["point", "extended"])
         if mes is not None:
             return mes
