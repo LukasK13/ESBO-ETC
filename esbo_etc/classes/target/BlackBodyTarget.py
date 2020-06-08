@@ -20,9 +20,9 @@ class BlackBodyTarget(ATarget):
                  J=dict(wl=1250 * u.nm, sfd=3.18e-12 * u.W / (u.m ** 2 * u.nm)),
                  H=dict(wl=1650 * u.nm, sfd=1.18e-12 * u.W / (u.m ** 2 * u.nm)),
                  K=dict(wl=2200 * u.nm, sfd=4.17e-13 * u.W / (u.m ** 2 * u.nm)),
-                 L=dict(wl=3600 * u.nm, sfd=4.17e-13 * u.W / (u.m ** 2 * u.nm)),
-                 M=dict(wl=4800 * u.nm, sfd=4.17e-13 * u.W / (u.m ** 2 * u.nm)),
-                 N=dict(wl=10200 * u.nm, sfd=4.17e-13 * u.W / (u.m ** 2 * u.nm)))
+                 L=dict(wl=3600 * u.nm, sfd=6.23e-14 * u.W / (u.m ** 2 * u.nm)),
+                 M=dict(wl=4800 * u.nm, sfd=2.07e-14 * u.W / (u.m ** 2 * u.nm)),
+                 N=dict(wl=10200 * u.nm, sfd=1.23e-15 * u.W / (u.m ** 2 * u.nm)))
 
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], mag=u.mag)
     def __init__(self, wl_bins: u.Quantity, temp: u.Quantity = 5778 * u.K,
