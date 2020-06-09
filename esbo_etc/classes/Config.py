@@ -177,9 +177,8 @@ class Configuration(object):
                     "Configuration check: common -> snr: Length of exposure time (%d) not matching the length of "
                     "the SNR (%d)" % (len(self.conf.common.exposure_time.val), len(self.conf.common.snr.val)))
         if not (hasattr(self.conf.common, "exposure_time") or hasattr(self.conf.common, "snr")):
-            logger.error(
-                "Configuration check: common: Expected at least one of the containers 'exposure_time' or 'snr' but" +
-                "got none.")
+            logger.error("Configuration check: common: Expected at least one of the containers 'exposure_time' or " +
+                         "'snr' but got none.")
 
         # Check astroscene
         if not hasattr(self.conf, "astroscene"):
