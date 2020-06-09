@@ -171,11 +171,11 @@ class Configuration(object):
                 mes is not None and logger.error("Configuration check: common -> snr: " + mes)
                 self.conf.common.snr.val = readCSV(self.conf.common.snr.val, [u.dimensionless_unscaled],
                                                    format_="csv").columns[0].quantity
-            if hasattr(self.conf.common, "exposure_time") and len(self.conf.common.snr.val) != len(
-                    self.conf.common.exposure_time.val):
+            if hasattr(self.conf.common, "exposure_time") and \
+                    self.conf.common.snr.val.size != self.conf.common.exposure_time.val.size:
                 logger.error(
                     "Configuration check: common -> snr: Length of exposure time (%d) not matching the length of "
-                    "the SNR (%d)" % (len(self.conf.common.exposure_time.val), len(self.conf.common.snr.val)))
+                    "the SNR (%d)" % (self.conf.common.exposure_time.val.size, self.conf.common.snr.val.size))
         if not (hasattr(self.conf.common, "exposure_time") or hasattr(self.conf.common, "snr")):
             logger.error("Configuration check: common: Expected at least one of the containers 'exposure_time' or " +
                          "'snr' but got none.")
