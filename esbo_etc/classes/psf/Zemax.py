@@ -212,7 +212,7 @@ class Zemax(IPSF):
         # Oversample the reduced mask
         mask_red_os = self._rebin(mask_red, self.__osf).view(PixelMask)
         # Calculate the new PSF-center indices of the reduced mask
-        psf_center_ind = [x * self.__osf for x in psf_center_ind]
+        psf_center_ind = [(x + 0.5) * self.__osf - 0.5 for x in psf_center_ind]
 
         # Get PSF values or calculate them if not available
         if self.__psf_os is not None and self.__center_point_os is not None and self.__psf_osf is not None:
