@@ -16,7 +16,7 @@ class AOpticalComponent(IRadiant):
     @abstractmethod
     @u.quantity_input(obstructor_temp=[u.K, u.Celsius])
     def __init__(self, parent: IRadiant, transreflectivity: Union[SpectralQty, int, float, u.Quantity] = None,
-                 noise: Union[SpectralQty, int, float, u.Quantity] = None, obstruction: float = 0,
+                 noise: Union[SpectralQty, int, float, u.Quantity, Callable] = None, obstruction: float = 0,
                  obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
         """
         Initialize a new optical component
@@ -25,11 +25,11 @@ class AOpticalComponent(IRadiant):
         ----------
         parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received
-        transreflectivity : SpectralQty
+        transreflectivity : Union[SpectralQty, int, float, u.Quantity]
             The spectral transmission / reflectivity coefficient of the component. This coefficient is multiplied with
             the incoming radiation from the parent element in order to propagate the incoming radiation through the
             optical component.
-        noise : SpectralQty
+        noise : Union[SpectralQty, int, float, u.Quantity, Callable]
             The noise created by the optical component as spectral radiance. This noise will be added to the propagated
             incoming noise in order to calculate the overall noise.
         obstruction : float
@@ -43,7 +43,7 @@ class AOpticalComponent(IRadiant):
             Emissivity of the obstructing component.
         """
         self.__parent = parent
-        if transreflectivity:
+        if transreflectivity is not None:
             self.__transreflectivity = transreflectivity
         if noise is not None:
             self.__noise = noise
