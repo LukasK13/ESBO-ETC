@@ -65,7 +65,7 @@ class RadiantFactory:
                 if "obstruction" in attribs:
                     attribs["obstruction"] = float(attribs["obstruction"])
                 class_ = getattr(oc, options.type)
-                if options.type in ["Atmosphere", "StrayLight", "Mirror", "Lens", "BeamSplitter"]:
+                if options.type in ["Atmosphere", "StrayLight", "CosmicBackground", "Mirror", "Lens", "BeamSplitter"]:
                     return class_(**attribs)
                 elif options.type == "Filter":
                     if hasattr(options, "band"):
