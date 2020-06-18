@@ -55,7 +55,7 @@ class BlackBodyTarget(ATarget):
         # for the central wavelength of the given band
         factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * u.sr) * u.sr
         # Calculate spectral flux density for the given wavelengths and scale it for a star of the given magnitude
-        sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)
+        sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)  # / 1.195 * 1.16 #  scaling for AETC validation
 
         # Initialize super class
         super().__init__(SpectralQty(wl_bins, sfd), wl_bins, size)
