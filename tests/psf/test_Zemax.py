@@ -23,7 +23,7 @@ class TestZemax(TestCase):
         mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask.createPhotometricAperture("circle", d_ap / 2)
         mask = self.zemax.mapToPixelMask(mask)
-        self.assertAlmostEqual(mask.sum(), 0.8461957147744972)
+        self.assertAlmostEqual(float(mask.sum()), 0.8503792384734423)
 
         # Jitter
         reduced_observation_angle = self.zemax.calcReducedObservationAngle(80, 1 * u.arcsec).value
@@ -31,4 +31,4 @@ class TestZemax(TestCase):
         mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask.createPhotometricAperture("circle", d_ap / 2)
         mask = self.zemax.mapToPixelMask(mask, 1 * u.arcsec)
-        self.assertAlmostEqual(mask.sum(), 0.8241591233169423)
+        self.assertAlmostEqual(float(mask.sum()), 0.8260381847048797)

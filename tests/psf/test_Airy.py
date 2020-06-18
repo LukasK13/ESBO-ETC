@@ -41,7 +41,7 @@ class TestAiry(TestCase):
         mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask.createPhotometricAperture("circle", d_ap / 2)
         mask = self.airy.mapToPixelMask(mask)
-        self.assertAlmostEqual(mask.sum(), 0.8140235177533067)
+        self.assertAlmostEqual(float(mask.sum()), 0.8173985568945881)
 
         # Jitter, unobstructed
         reduced_observation_angle = self.airy.calcReducedObservationAngle(80, 1 * u.arcsec).value
@@ -49,7 +49,7 @@ class TestAiry(TestCase):
         mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask.createPhotometricAperture("circle", d_ap / 2)
         mask = self.airy.mapToPixelMask(mask, 1 * u.arcsec)
-        self.assertAlmostEqual(mask.sum(), 0.8097456506977345)
+        self.assertAlmostEqual(float(mask.sum()), 0.8108919935181225)
 
         # No jitter, obstructed
         reduced_observation_angle = self.airy.calcReducedObservationAngle(80, obstruction=0.04).value
@@ -57,7 +57,7 @@ class TestAiry(TestCase):
         mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask.createPhotometricAperture("circle", d_ap / 2)
         mask = self.airy.mapToPixelMask(mask, obstruction=0.04)
-        self.assertAlmostEqual(mask.sum(), 0.8088278758034545)
+        self.assertAlmostEqual(float(mask.sum()), 0.8085985979598022)
 
         # Jitter, obstructed
         reduced_observation_angle = self.airy.calcReducedObservationAngle(80, 1 * u.arcsec, 0.04).value
@@ -65,4 +65,4 @@ class TestAiry(TestCase):
         mask = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask.createPhotometricAperture("circle", d_ap / 2)
         mask = self.airy.mapToPixelMask(mask, 1 * u.arcsec, 0.04)
-        self.assertAlmostEqual(mask.sum(), 0.807989897660598)
+        self.assertAlmostEqual(float(mask.sum()), 0.808837170286202)
