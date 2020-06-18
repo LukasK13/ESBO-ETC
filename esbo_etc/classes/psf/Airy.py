@@ -236,7 +236,7 @@ class Airy(IPSF):
         # Oversample the reduced mask
         mask_red_os = self._rebin(mask_red, self.__osf).view(PixelMask)
         # Calculate the new PSF-center indices of the reduced mask
-        psf_center_ind = [x * self.__osf for x in psf_center_ind]
+        psf_center_ind = [(x + 0.5) * self.__osf - 0.5 for x in psf_center_ind]
 
         reduced_observation_angle_pixel = (mask.pixel_size / (
                 self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl).decompose()
