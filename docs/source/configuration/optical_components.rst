@@ -35,6 +35,20 @@ Attributes:
     * | **emission:** str, *optional*
       | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`.
 
+CosmicBackground
+----------------
+This component allows to model generic black body noise sources like the cosmic background.
+
+.. code-block:: xml
+
+    <optical_component type="CosmicBackground" temp="2.7" temp_unit="K"/>
+
+Attributes:
+    * | **temp:** float
+      |   The temperature of the black body.
+    * | **temp_unit:** str, *optional* = "K"
+      |   The unit of the black body's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
+
 Mirror
 ------
 Model a mirror including the mirror's thermal emission as well as possible obstruction of the mirror and the thermal emission of the obstructing component.
