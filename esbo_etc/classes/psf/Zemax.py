@@ -137,8 +137,8 @@ class Zemax(IPSF):
         psf_osf : float
             The oversampling factor of the returned PSF.
         """
-        # Calculate the psf for the PSF based on the current resolution of the PSF
-        psf_osf = np.ceil(max(self.__grid_delta) / (2 * self.__pixel_size / self.__osf)).value * 2
+        # Calculate the psf oversampling factor for the PSF based on the current resolution of the PSF
+        psf_osf = np.ceil(max(self.__grid_delta) / (self.__pixel_size / self.__osf)).value
         if psf_osf == 1.0:
             # No oversampling is necessary
             psf = self.__psf
@@ -156,8 +156,8 @@ class Zemax(IPSF):
             jitter_sigma_um = (jitter_sigma.to(u.rad) * self.__f_number * self.__d_aperture / u.rad).to(u.um)
             # Jitter is enabled. Calculate the corresponding gaussian bell and convolve it with the PSF
             if min(self.__grid_delta) / psf_osf < 6 * jitter_sigma_um:
-                # 3-sigma interval of the gaussian bell is larger than the grid width
-                # Calculate the necessary grid length for the 3-sigma interval of the gaussian bell
+                # 6-sigma interval of the gaussian bell is larger than the grid width
+                # Calculate the necessary grid length for the 6-sigma interval of the gaussian bell
                 jitter_grid_length = np.ceil(6 * jitter_sigma_um / (min(self.__grid_delta) / psf_osf)).value
                 # Make sure, the grid size is odd in order to have a defined kernel center
                 jitter_grid_length = int(jitter_grid_length if jitter_grid_length % 2 == 1 else jitter_grid_length + 1)
