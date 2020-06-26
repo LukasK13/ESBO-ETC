@@ -11,7 +11,7 @@ class FileTarget(ATarget):
     """
 
     @u.quantity_input(wl_bins="length")
-    def __init__(self, file: str, wl_bins: u.Quantity, size: str = "Point"):
+    def __init__(self, file: str, wl_bins: u.Quantity):
         """
         Initialize a new target from a file containing the spectral flux density values
 
@@ -24,13 +24,11 @@ class FileTarget(ATarget):
             will be read from the column headers or otherwise assumed to be *nm* and *W / m^2 / nm*.
         wl_bins : length-Quantity
             Wavelengths used for binning
-        size : str
-            The size of the target. Can be either point or extended.
         """
         # Create spectral quantity from file
         sfd = SpectralQty.fromFile(file, u.nm, u.W / (u.m ** 2 * u.nm))
         # Initialize the super class
-        super().__init__(sfd, wl_bins, size)
+        super().__init__(sfd, wl_bins)
 
     @staticmethod
     def check_config(conf: Entry) -> Union[None, str]:
@@ -48,8 +46,5 @@ class FileTarget(ATarget):
             The error message of the check. This will be None if the check was successful.
         """
         mes = conf.check_file("file")
-        if mes is not None:
-            return mes
-        mes = conf.check_selection("size", ["point", "extended"])
         if mes is not None:
             return mes

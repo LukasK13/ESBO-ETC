@@ -51,7 +51,7 @@ class AOpticalComponent(IRadiant):
         self.__obstructor_temp = obstructor_temp
         self.__obstructor_emissivity = obstructor_emissivity
 
-    def calcSignal(self) -> Tuple[SpectralQty, str, float]:
+    def calcSignal(self) -> Tuple[SpectralQty, float]:
         """
         Calculate the spectral flux density of the target's signal
 
@@ -59,17 +59,15 @@ class AOpticalComponent(IRadiant):
         -------
         signal : SpectralQty
             The spectral flux density of the target's signal
-        size : str
-            The size of the target.
         obstruction : float
             The obstruction factor as A_ob / A_ap.
         """
-        signal, size, obstruction = self.__parent.calcSignal()
+        signal, obstruction = self.__parent.calcSignal()
         logger.info("Calculating signal for class '" + self.__class__.__name__ + "'.")
         signal = self._propagate(signal) * (1 - self.__obstruction)
         obstruction = obstruction + self.__obstruction
         logger.debug(signal)
-        return signal, size, obstruction
+        return signal, obstruction
 
     def calcBackground(self) -> SpectralQty:
         """

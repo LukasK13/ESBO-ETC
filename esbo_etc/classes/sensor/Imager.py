@@ -420,8 +420,14 @@ class Imager(ASensor):
                 self.__pixel_size.to(u.m) ** 2 / u.pix) / (4 * self.__f_number ** 2 + 1) * (1 * u.sr)
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal photon current.")
-        signal, size, obstruction = self._parent.calcSignal()
-        signal_photon_current = signal * np.pi * (self.__common_conf.d_aperture() / 2) ** 2
+        signal, obstruction = self._parent.calcSignal()
+        size = "extended" if signal.qty.unit.is_equivalent(u.W / (u.m ** 2 * u.nm * u.sr)) else "point"
+        if size == "point":
+            signal_photon_current = signal * np.pi * (self.__common_conf.d_aperture() / 2) ** 2
+        else:
+            signal_photon_current = signal * np.pi * self.__pixel_size.to(u.m) ** 2 / (
+                    4 * self.__f_number ** 2 + 1) * (1 * u.sr)
+        print(signal_photon_current)
         # Calculate the electron current of the background and thereby handling the photon energy as lambda-function
         background_current = (
                 background_photon_current / (lambda wl: (const.h * const.c / wl).to(u.W * u.s) / u.photon) *
@@ -499,31 +505,30 @@ class Imager(ASensor):
             return "pixel -> well_capacity: " + mes
 
         # Check photometric aperture
-        if conf.astroscene.target.size == "point":
-            if not hasattr(sensor, "photometric_aperture"):
-                setattr(sensor, "photometric_aperture", Entry(shape=Entry(val="circle"),
-                                                              contained_energy=Entry(val="FWHM")))
-            if hasattr(sensor.photometric_aperture, "contained_pixels"):
-                mes = sensor.photometric_aperture.contained_pixels.check_quantity("val", u.pix)
-                if mes is not None:
-                    return "photometric_aperture -> contained_pixels: " + mes
-            else:
-                if not hasattr(sensor.photometric_aperture, "shape"):
-                    return "Missing container 'shape'."
-                mes = sensor.photometric_aperture.shape.check_selection("val", ["square", "circle"])
-                if mes is not None:
-                    return "photometric_aperture -> shape: " + mes
-                if not hasattr(sensor.photometric_aperture, "contained_energy"):
-                    return "Missing container 'contained_energy'."
-                mes = sensor.photometric_aperture.contained_energy.check_float("val")
-                if mes is not None:
-                    if conf.common.psf().lower() == "airy":
-                        mes = sensor.photometric_aperture.contained_energy.check_selection("val",
-                                                                                           ["peak", "FWHM", "fwhm",
-                                                                                            "min"])
-                        if mes is not None:
-                            return "photometric_aperture -> contained_energy: " + mes
-                    else:
-                        mes = sensor.photometric_aperture.contained_energy.check_selection("val", ["FWHM", "fwhm"])
-                        if mes is not None:
-                            return "photometric_aperture -> contained_energy: " + mes
+        if not hasattr(sensor, "photometric_aperture"):
+            setattr(sensor, "photometric_aperture", Entry(shape=Entry(val="circle"),
+                                                          contained_energy=Entry(val="FWHM")))
+        if hasattr(sensor.photometric_aperture, "contained_pixels"):
+            mes = sensor.photometric_aperture.contained_pixels.check_quantity("val", u.pix)
+            if mes is not None:
+                return "photometric_aperture -> contained_pixels: " + mes
+        else:
+            if not hasattr(sensor.photometric_aperture, "shape"):
+                return "Missing container 'shape'."
+            mes = sensor.photometric_aperture.shape.check_selection("val", ["square", "circle"])
+            if mes is not None:
+                return "photometric_aperture -> shape: " + mes
+            if not hasattr(sensor.photometric_aperture, "contained_energy"):
+                return "Missing container 'contained_energy'."
+            mes = sensor.photometric_aperture.contained_energy.check_float("val")
+            if mes is not None:
+                if conf.common.psf().lower() == "airy":
+                    mes = sensor.photometric_aperture.contained_energy.check_selection("val",
+                                                                                       ["peak", "FWHM", "fwhm",
+                                                                                        "min"])
+                    if mes is not None:
+                        return "photometric_aperture -> contained_energy: " + mes
+                else:
+                    mes = sensor.photometric_aperture.contained_energy.check_selection("val", ["FWHM", "fwhm"])
+                    if mes is not None:
+                        return "photometric_aperture -> contained_energy: " + mes

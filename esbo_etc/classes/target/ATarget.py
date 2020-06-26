@@ -15,7 +15,7 @@ class ATarget(IRadiant):
 
     @abstractmethod
     @u.quantity_input(wl_bins="length")
-    def __init__(self, sfd: SpectralQty, wl_bins: u.Quantity, size: str = "Point"):
+    def __init__(self, sfd: SpectralQty, wl_bins: u.Quantity):
         """
         Initialize a new target
 
@@ -25,12 +25,9 @@ class ATarget(IRadiant):
             The spectral flux density of the target
         wl_bins : length-Quantity
             The bins to be used for evaluating spectral quantities.
-        size : str
-            The size of the target. Can be either point or extended.
         """
         self.__sfd = sfd
         self.__wl_bins = wl_bins
-        self.__size = size
 
     def calcBackground(self) -> SpectralQty:
         """
@@ -46,7 +43,7 @@ class ATarget(IRadiant):
         logger.debug(background)
         return background
 
-    def calcSignal(self) -> Tuple[SpectralQty, str, float]:
+    def calcSignal(self) -> Tuple[SpectralQty, float]:
         """
         Calculate the spectral flux density of the target's signal
 
@@ -54,14 +51,12 @@ class ATarget(IRadiant):
         -------
         signal : SpectralQty
             The spectral flux density of the target's signal
-        size : str
-            The size of the target.
         obstruction : float
             The obstruction factor as A_ob / A_ap.
         """
         logger.info("Calculating signal for class '" + self.__class__.__name__ + "'.")
         logger.debug(self.__sfd)
-        return self.__sfd, self.__size, 0.0
+        return self.__sfd, 0.0
 
     @staticmethod
     @abstractmethod
