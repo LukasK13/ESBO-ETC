@@ -427,7 +427,6 @@ class Imager(ASensor):
         else:
             signal_photon_current = signal * np.pi * self.__pixel_size.to(u.m) ** 2 / (
                     4 * self.__f_number ** 2 + 1) * (1 * u.sr)
-        print(signal_photon_current)
         # Calculate the electron current of the background and thereby handling the photon energy as lambda-function
         background_current = (
                 background_photon_current / (lambda wl: (const.h * const.c / wl).to(u.W * u.s) / u.photon) *
