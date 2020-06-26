@@ -15,7 +15,7 @@
     </common>
 
     <astroscene>
-        <target type="BlackBodyTarget" temp="5778" temp_unit="K" mag="10" mag_unit="mag" band="V" size="point"
+        <target type="BlackBodyTarget" temp="5778" temp_unit="K" mag="10" mag_unit="mag" band="V"
                 comment="Modeling the sun as mag 10 star"/>
         <optical_component type="Atmosphere" transmittance="data/atmosphere/transmittance.csv"
                            emission="data/atmosphere/emission.csv" comment="Including the atmosphere"/>
