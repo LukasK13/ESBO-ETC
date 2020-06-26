@@ -35,7 +35,7 @@ class SpectralQty:
             The created spectral quantity.
         """
         # Check if both lengths are equal
-        if len(wl) == len(qty):
+        if wl.value.size == qty.value.size:
             # check if units are given. If not, add a dimensionless unit
             if hasattr(wl, "unit"):
                 self.wl = wl
@@ -315,7 +315,8 @@ class SpectralQty:
 
         if not wl.unit.is_equivalent(self.wl.unit):
             logger.error("Mismatching units for rebinning: " + wl.unit + ", " + self.wl.unit)
-        if min(wl) < min(self.wl) or max(wl) > max(self.wl):
+        if (wl.value.size == 1 and (wl < min(self.wl) or wl > max(self.wl))) or (
+                wl.value.size > 1 and (min(wl) < min(self.wl) or max(wl) > max(self.wl))):
             if isinstance(self._fill_value, bool):
                 if not self._fill_value:
                     logger.warning("Extrapolation disabled, bandwidth will be reduced.")
