@@ -95,10 +95,10 @@ def readCSV(file: str, units: list = None, format_: str = None) -> Table:
         for i in range(len(data.columns)):
             data[data.colnames[i]] = list(map(float, data[data.colnames[i]]))
         # Check if units are given in column headers
-        if all([re.search("\\[.+\\]", x) for x in data.colnames]):
+        if all([re.search("\\[.*\\]", x) for x in data.colnames]):
             # Extract units from headers and apply them on the columns
             # noinspection PyArgumentList
-            units_header = [u.Unit(re.findall("(?<=\\[).+(?=\\])", x)[0]) for x in data.colnames]
+            units_header = [u.Unit(re.findall("(?<=\\[).*(?=\\])", x)[0]) for x in data.colnames]
             for i in range(len(data.columns)):
                 data[data.colnames[i]].unit = units_header[i]
             if units is not None and len(units) == len(data.columns):
