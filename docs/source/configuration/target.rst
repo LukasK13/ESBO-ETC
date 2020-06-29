@@ -1,16 +1,17 @@
 Currently ESBO-ETC supports the following two different types of targets. A configuration can contain only one target
 which has to be contained in the container ``<astroscene>``. Each target consists of the basic tag
 ``<target>`` and possible other target-type specific attributes.
+Each target can be either modelled as a point source or as an infinitely extended target. In case of a point-source,
+a PSF will be used to determine the irradiance of each pixel. In case of a extended source, a uniform PSF is assumed,
+ignoring the parameters :ref:`psf`, :ref:`jitter_sigma`, and some instrument specific parameters.
 
 .. code-block:: xml
 
-    <target type="BlackBodyTarget" size="point"/>
+    <target type="BlackBodyTarget"/>
 
 Attributes:
     * | **type:** str
       |   The type of the target. Currently, only :ref:`blackbodytarget` and :ref:`filetarget` are supported.
-    * | **size:** str
-      |   The size of the target which can be either ``point`` or ``extended``. In case of a point-source, a PSF will be used to determine the irradiance of each pixel. In case of a extended source, a uniform PSF is assumed, ignoring the parameters :ref:`psf`, :ref:`jitter_sigma`, and some instrument specific parameters.
 
 .. _blackbodytarget:
 
@@ -28,9 +29,9 @@ Attributes:
     * | **temp_unit:** str, *optional* = "K"
       |   The unit of the black body's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
     * | **mag:** float
-      |   The apparent magnitude of the black body in magnitudes.
+      |   The apparent magnitude of the black body in magnitudes. In case of a magnitude per solid angle, an extended target is assumed.
     * | **mag_unit:** str, *optional* = "mag"
-      |   The unit of the black body's magnitude. This has to be ``mag``. The default is ``mag``.
+      |   The unit of the black body's magnitude. This has to be [``mag``, ``mag / arcsec**2``, ``mag / sr``]. The default is ``mag``.
     * | **band:** str
       |   The band used for fitting the black body's flux density to Vega's flux density. This has to be one of [``U``, ``B``, ``V``, ``R``, ``I``, ``J``, ``H``, ``K``, ``L``, ``M``, ``N``].
 
@@ -38,7 +39,7 @@ Attributes:
 
 FileTarget
 ----------
-Create a target from a file containing the spectral flux densities of the target.
+Create a target from a file containing the spectral flux densities or, in case of an extended source, the spectral radiance of the target.
 
 .. code-block:: xml
 
@@ -46,4 +47,4 @@ Create a target from a file containing the spectral flux densities of the target
 
 Attributes:
     * | **val:** str
-      |   The path to the file containing the spectral flux densities. For details on the required file structure see also :ref:`reading_csv`.
+      |   The path to the file containing the spectral flux densities / radiances. For details on the required file structure see also :ref:`reading_csv`.
