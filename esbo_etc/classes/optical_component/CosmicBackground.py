@@ -12,7 +12,7 @@ class CosmicBackground(AOpticalComponent):
     """
 
     @u.quantity_input(temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: IRadiant, temp: u.Quantity = 2.725 * u.K):
+    def __init__(self, parent: IRadiant, temp: u.Quantity = 2.725 * u.K, emissivity: float = 1):
         """
         Initialize a new black body point source
 
@@ -22,6 +22,8 @@ class CosmicBackground(AOpticalComponent):
             The parent element of the optical component from which the electromagnetic radiation is received
         temp : Quantity in Kelvin / Celsius
             Temperature of the black body
+        emissivity : float
+            The spectral emissivity coefficient for the optical surface.
 
         Returns
         -------
@@ -29,7 +31,7 @@ class CosmicBackground(AOpticalComponent):
         # Create black body model with given temperature
         bb = BlackBody(temperature=temp, scale=1 * u.W / (u.m ** 2 * u.nm * u.sr))
         # Initialize super class
-        super().__init__(parent, 1.0, lambda wl: bb(wl))
+        super().__init__(parent, 1.0, lambda wl: bb(wl) * emissivity)
 
     @staticmethod
     def check_config(conf: Entry) -> Union[None, str]:
@@ -49,3 +51,7 @@ class CosmicBackground(AOpticalComponent):
         mes = conf.check_quantity("temp", u.K)
         if mes is not None:
             return mes
+        if hasattr(conf, "emissivity"):
+            mes = conf.check_float("emissivity")
+            if mes is not None:
+                return mes

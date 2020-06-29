@@ -41,13 +41,15 @@ This component allows to model generic black body noise sources like the cosmic 
 
 .. code-block:: xml
 
-    <optical_component type="CosmicBackground" temp="2.7" temp_unit="K"/>
+    <optical_component type="CosmicBackground" temp="2.7" temp_unit="K" emissivity="1.0"/>
 
 Attributes:
     * | **temp:** float
-      |   The temperature of the black body.
+      | The temperature of the black body.
     * | **temp_unit:** str, *optional* = "K"
-      |   The unit of the black body's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
+      | The unit of the black body's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
+    * | **emissivity:** float, *optional*
+      | The emissivity of the cosmic background.
 
 Mirror
 ------
