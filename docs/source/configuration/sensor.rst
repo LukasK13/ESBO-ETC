@@ -224,3 +224,118 @@ Attributes:
       |   The number of pixels to be contained within the photometric aperture.
     * | **val_unit:** str, *optional* = "pix"
       |   The unit of the number of pixels to be contained within the photometric aperture. This has to be ``pix``.
+
+Heterodyne
+----------
+The heterodyne sensor type allows to model a generic heterodyne radio receiver which uses an local oscillator and an mixer to create spectral images. The heterodyne-component contains several parameters which are explained in the following. All parameters are defined according to the `Guide to GREAT <https://www.sofia.usra.edu/science/proposing-and-observing/observers-handbook-cycle-9/6-great/61-specifications#PerformanceGREAT>`_.
+
+.. code-block:: xml
+    :linenos:
+
+    <sensor type="Heterodyne">
+        <aperture_efficiency val="0.55" val_unit=""/>
+        <main_beam_efficiency val="0.67" val_unit=""/>
+        <receiver_temp val="1050" val_unit="K"/>
+        <eta_fss val="0.97" val_unit=""/>
+        <lambda_line val="157.774" val_unit="um"/>
+        <kappa val="1" val_unit=""/>
+        <n_on val="10" val_unit=""/>
+    </sensor>
+
+aperture_efficiency
+^^^^^^^^^^^^^^^^^^^
+The aperture efficiency of the instrument.
+
+.. code-block:: xml
+
+    <aperture_efficiency val="0.55" val_unit=""/>
+
+Attributes:
+    * | **val:** float
+      |   The value of the aperture efficiency of the instrument.
+    * | **val_unit:** str, *optional* = ""
+      |   The unit of the aperture efficiency of the instrument. This has to be emtpy (dimensionless).
+
+main_beam_efficiency
+^^^^^^^^^^^^^^^^^^^^
+The main beam efficiency of the instrument.
+
+.. code-block:: xml
+
+    <main_beam_efficiency val="0.67" val_unit=""/>
+
+Attributes:
+    * | **val:** float
+      |   The value of the main beam efficiency of the instrument.
+    * | **val_unit:** str, *optional* = ""
+      |   The unit of the main beam efficiency of the instrument. This has to be emtpy (dimensionless).
+
+receiver_temp
+^^^^^^^^^^^^^
+The receiver's noise temperature.
+
+.. code-block:: xml
+
+    <receiver_temp val="1050" val_unit="K"/>
+
+Attributes:
+    * | **val:** float
+      |   The receiver's noise temperature.
+    * | **val_unit:** str, *optional* = "K"
+      |   The unit of the receiver temperature. This has to be on of [``K``, ``Celsius``].
+
+eta_fss
+^^^^^^^
+The forward scattering efficiency of the detector.
+
+.. code-block:: xml
+
+    <eta_fss val="0.97" val_unit=""/>
+
+Attributes:
+    * | **val:** float
+      |   The forward scattering efficiency of the detector.
+    * | **val_unit:** str, *optional* = ""
+      |   The unit of the forward scattering efficiency of the instrument. This has to be emtpy (dimensionless).
+
+lambda_line
+^^^^^^^^^^^
+The wavelength of the observed line.
+
+.. code-block:: xml
+
+    <lambda_line val="157.774" val_unit="um"/>
+
+Attributes:
+    * | **val:** float
+      |   The wavelength of the observed line.
+    * | **val_unit:** str, *optional* = "m"
+      |   The unit of the observed line wavelength. This has to be on of [``nm``, ``um``, ``mm``, ``cm``, ``m``].
+
+kappa
+^^^^^
+The instrument's backend degradation factor.
+
+.. code-block:: xml
+
+    <kappa val="1" val_unit=""/>
+
+Attributes:
+    * | **val:** float
+      |   The instrument's backend degradation factor.
+    * | **val_unit:** str, *optional* = ""
+      |   The unit of the backend degradation factor. This has to be emtpy (dimensionless).
+
+n_on
+^^^^
+The number of on-source observations per off-source observation.
+
+.. code-block:: xml
+
+    <n_on val="10" val_unit=""/>
+
+Attributes:
+    * | **val:** float
+      |   The number of on-source observations per off-source observation.
+    * | **val_unit:** str, *optional* = ""
+      |   The unit of the number of on-source observations per off-source observation. This has to be emtpy (dimensionless).
