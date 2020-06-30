@@ -1,0 +1,59 @@
+<root>
+    <common>
+        <wl_min val="157.773" val_unit="um" comment="Shortest wavelength used for binning input spectra"/>
+        <wl_max val="157.775" val_unit="um" comment="Shortest wavelength used for binning input spectra"/>
+<!--        <wl_delta val="1" val_unit="nm" comment="Wavelength increment used for binning input spectra"/>-->
+        <res val="299792.458" val_unit=""
+                   comment="Resolving power for common spectral binning. A linear binning wavelength integral is estimated as (wl_min + wl_max)/(2*R)"/>
+        <d_aperture val="2.527" val_unit="m" comment="Diameter of the telescope aperture"/>
+        <psf val="Airy" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>
+<!--        <psf val="data/psf.txt" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>-->
+<!--        <jitter_sigma val="0.1" val_unit="arcsec" comment="Sigma of the telescope jitter"/>-->
+        <output path="output" format="csv" comment="Output directory to store output files"/>
+        <exposure_time val="1900" val_unit="s" comment="The exposure time"/>
+<!--        <snr val="10, 10, 10" val_unit="" comment="Desired signal to noise ratio"/>-->
+<!--        <snr val="data/snr.csv" comment="Desired signal to noise ratio"/>-->
+<!--        <snr val="10" val_unit="" comment="Desired signal to noise ratio"/>-->
+    </common>
+
+    <astroscene>
+<!--        <target type="LineTarget" brightness_temp="0.52" brightness_temp_unit="K"-->
+<!--                comment="Modeling the sun as mag 10 star. Size can be point or extended"/>-->
+        <target type="FileTarget" file="data/target/line.csv"/>
+        <optical_component type="Atmosphere" transmittance="data/atmosphere/transmittance_great.csv"
+                           comment="Including the atmosphere"/>
+<!--        <optical_component type="StrayLight" emission="data/atmosphere/ESBO-DS_emission.txt"-->
+<!--                   comment="Including arbitrary noise sources"/>-->
+        <optical_component type="CosmicBackground" temp="220" temp_unit="K" emissivity="0.14"
+                           comment="Thermal atmospheric emission"/>
+    </astroscene>
+
+    <common_optics>
+        <optical_component type="Mirror" reflectance="data/mirror/reflectance_great.csv" emissivity="0.08" temp="230"
+                           temp_unit="K" obstruction="0.0" comment="M1"/>
+<!--        <optical_component type="Mirror" reflectance="0.86"-->
+<!--                           emissivity="0" temp="70" temp_unit="K" obstruction="0.0" comment="M1"/>-->
+<!--        <optical_component type="Mirror" reflectance="data/mirror/Reflectance_UV-enhanced-aluminium-mirror.txt"-->
+<!--                           emissivity="0" temp="70" temp_unit="K" comment="M2"/>-->
+<!--        <optical_component type="Mirror" reflectance="data/mirror/Reflectance_UV-enhanced-aluminium-mirror.txt"-->
+<!--                           emissivity="0" temp="70" temp_unit="K" comment="M3"/>-->
+<!--        <optical_component type="Filter" band="M"-->
+<!--                           emissivity="data/filter/emissivity.csv" temp="70" temp_unit="K" comment="Filter wheel"/>-->
+<!--        <optical_component type="Filter" start="400" start_unit="nm" end="480" end_unit="nm"-->
+<!--                           emissivity="data/filter/emissivity.csv" temp="70" temp_unit="K" comment="Filter wheel"/>-->
+    </common_optics>
+
+    <instrument>
+<!--        <optical_component type="Mirror" reflectance="data/lens/Reflectance_UV-enhanced-aluminium-mirror.txt"-->
+<!--                           emissivity="0" temp="70" temp_unit="K" comment="M4"/>-->
+        <sensor type="Heterodyne">
+            <aperture_efficiency val="0.55" val_unit="" comment="Aperture efficiency"/>
+            <main_beam_efficiency val="0.67" val_unit="" comment="Main beam efficiency"/>
+            <receiver_temp val="1050" val_unit="K" comment="Noise temperature of the receiver"/>
+            <eta_fss val="0.97" val_unit="" comment="Forward scattering efficiency"/>
+            <lambda_line val="157.774" val_unit="um" comment="Line wavelength"/>
+            <kappa val="1" val_unit="" comment="Backend degradation factor"/>
+<!--            <n_on val="10" val_unit="" comment="Number of on-source observations"/>-->
+        </sensor>
+    </instrument>
+</root>
