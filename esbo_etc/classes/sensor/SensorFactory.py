@@ -2,6 +2,7 @@ from ..IRadiant import IRadiant
 from ..Entry import Entry
 from .ASensor import ASensor
 from .Imager import Imager
+from .Heterodyne import Heterodyne
 from ...lib.logger import logger
 
 
@@ -49,5 +50,14 @@ class SensorFactory:
                         options.photometric_aperture.contained_pixels, Entry):
                     args["contained_pixels"] = options.photometric_aperture.contained_pixels()
             return Imager(**args)
+        elif options.type == "Heterodyne":
+            args = dict(parent=self.__parent, aperture_efficiency=options.aperture_efficiency(),
+                        main_beam_efficiency=options.main_beam_efficiency(), receiver_temp=options.receiver_temp(),
+                        eta_fss=options.eta_fss(), lambda_line=options.lambda_line(), kappa=options.kappa(),
+                        common_conf=self.__common_conf)
+            if hasattr(options, "n_on"):
+                # noinspection PyCallingNonCallable
+                args["n_on"] = options.n_on()
+            return Heterodyne(**args)
         else:
             logger.error("Wrong sensor type: " + options.type)
