@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as eT
 import numpy as np
 import astropy.units as u
+from astropy.constants import c
 import os
 from ..lib.helpers import readCSV
 from ..lib.logger import logger
@@ -93,7 +94,11 @@ class Configuration(object):
         if hasattr(self.conf.common, "wl_delta"):
             wl_delta = self.conf.common.wl_delta()
         else:
-            wl_delta = (self.conf.common.wl_min() + self.conf.common.wl_max()) / (2 * self.conf.common.res())
+            if self.conf.common.res().unit == u.dimensionless_unscaled:
+                wl_delta = (self.conf.common.wl_min() + self.conf.common.wl_max()) / (2 * self.conf.common.res())
+            else:
+                wl_delta = (self.conf.common.wl_min() + self.conf.common.wl_max()) / 2 * (
+                        self.conf.common.res() / c).decompose()
             setattr(self.conf.common, 'wl_delta', Entry(val=wl_delta))
         setattr(self.conf.common, 'wl_bins',
                 Entry(val=np.append(np.arange(self.conf.common.wl_min().to(u.nm).value,
@@ -120,7 +125,9 @@ class Configuration(object):
             mes is not None and logger.error("Configuration check: common -> wl_delta: " + mes)
         elif hasattr(self.conf.common, "res"):
             mes = self.conf.common.res.check_quantity("val", u.dimensionless_unscaled)
-            mes is not None and logger.error("Configuration check: common -> res: " + mes)
+            if mes is not None:
+                mes = self.conf.common.res.check_quantity("val", u.m / u.s)
+                mes is not None and logger.error("Configuration check: common -> res: " + mes)
         else:
             logger.error(
                 "Configuration check: common: Expected one of the containers 'wl_delta' or 'res' but got none.")

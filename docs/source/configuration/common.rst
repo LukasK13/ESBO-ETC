@@ -58,7 +58,7 @@ Attributes:
     * | **val:** float
       |   The value of the spectral resolution.
     * | **val_unit:** str, *optional* = ""
-      |   The unit of the spectral resolution. This has to be emtpy (dimensionless).  The default is ``dimensionless``.
+      |   The unit of the spectral resolution. This has to be emtpy (dimensionless) or one of [``m/s``, ``km/s``].  The default is ``dimensionless``.
 
 .. note::
    Either :ref:`wl_delta` or :ref:`res` must be given in the configuration.
