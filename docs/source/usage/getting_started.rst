@@ -96,8 +96,9 @@ Multiple optical components are available for modelling the signal and backgroun
 components with a thermal grey body emission form a subclass of the optical components. Currently, the following optical
 components are available
 
-* An **atmosphere** component modelling the atmospheric tranmittance and emission, both read from files.
+* An **atmosphere** component modelling the atmospheric transmittance and emission, both read from files.
 * A **stray light** component for modelling generic background source like zodiacal light or earth stray light.
+* A **cosmic background** component to model thermal black body background radiation like the 2.7 K cosmic background radiation.
 * Hot optical components with thermal emission of a given temperature and emissivity:
 
     * A **mirror** component modelling the optical properties of a mirror like the mirror's reflectance.
