@@ -40,14 +40,14 @@ class Heterodyne(ASensor):
         n_on : float
             The number of on source observations.
         """
-        self.aperture_efficiency = aperture_efficiency
-        self.main_beam_efficiency = main_beam_efficiency
-        self.receiver_temp = receiver_temp
-        self.eta_fss = eta_fss
-        self.lambda_line = lambda_line
-        self.kappa = kappa
-        self.common_conf = common_conf
-        self.n_on = n_on
+        self.__aperture_efficiency = aperture_efficiency
+        self.__main_beam_efficiency = main_beam_efficiency
+        self.__receiver_temp = receiver_temp
+        self.__eta_fss = eta_fss
+        self.__lambda_line = lambda_line
+        self.__kappa = kappa
+        self.__common_conf = common_conf
+        self.__n_on = n_on
         super().__init__(parent)
 
     @u.quantity_input(exp_time="time")
@@ -67,15 +67,15 @@ class Heterodyne(ASensor):
         """
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures()
-        t_sys = 2 * (t_background + self.receiver_temp)
+        t_sys = 2 * (t_background + self.__receiver_temp)
         # Calculate the noise bandwidth
-        delta_nu = self.lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
-                    self.lambda_line / self.common_conf.wl_delta() + 1)
+        delta_nu = self.__lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
+                self.__lambda_line / self.__common_conf.wl_delta() + 1)
         # Calculate the RMS background temperature
-        if self.n_on is None:
-            t_rms = 2 * t_sys * self.kappa / np.sqrt(exp_time * delta_nu)
+        if self.__n_on is None:
+            t_rms = 2 * t_sys * self.__kappa / np.sqrt(exp_time * delta_nu)
         else:
-            t_rms = t_sys * self.kappa * np.sqrt(1 + 1 / np.sqrt(self.n_on)) / np.sqrt(exp_time * delta_nu)
+            t_rms = t_sys * self.__kappa * np.sqrt(1 + 1 / np.sqrt(self.__n_on)) / np.sqrt(exp_time * delta_nu)
         # Calculate the SNR
         snr = t_signal / t_rms
         # Print details
@@ -103,17 +103,17 @@ class Heterodyne(ASensor):
         """
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures()
-        t_sys = 2 * (t_background + self.receiver_temp)
+        t_sys = 2 * (t_background + self.__receiver_temp)
         # Calculate the noise bandwidth
-        delta_nu = self.lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
-                self.lambda_line / self.common_conf.wl_delta() + 1)
+        delta_nu = self.__lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
+                self.__lambda_line / self.__common_conf.wl_delta() + 1)
         # Calculate the RMS background temperature
         t_rms = t_signal / snr
         # Calculate the exposure time
-        if self.n_on is None:
-            exp_time = ((2 * t_sys * self.kappa / t_rms) ** 2 / delta_nu).decompose()
+        if self.__n_on is None:
+            exp_time = ((2 * t_sys * self.__kappa / t_rms) ** 2 / delta_nu).decompose()
         else:
-            exp_time = ((t_sys * self.kappa / t_rms) ** 2 * (1 + 1 / np.sqrt(self.n_on)) / delta_nu).decompose()
+            exp_time = ((t_sys * self.__kappa / t_rms) ** 2 * (1 + 1 / np.sqrt(self.__n_on)) / delta_nu).decompose()
         # Print details
         if snr.size > 1:
             for i in range(snr.size):
@@ -143,15 +143,15 @@ class Heterodyne(ASensor):
         """
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures()
-        t_sys = 2 * (t_background + self.receiver_temp)
+        t_sys = 2 * (t_background + self.__receiver_temp)
         # Calculate the noise bandwidth
-        delta_nu = self.lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
-                self.lambda_line / self.common_conf.wl_delta() + 1)
+        delta_nu = self.__lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
+                self.__lambda_line / self.__common_conf.wl_delta() + 1)
         # Calculate the RMS background temperature
-        if self.n_on is None:
-            t_rms = 2 * t_sys * self.kappa / np.sqrt(exp_time * delta_nu)
+        if self.__n_on is None:
+            t_rms = 2 * t_sys * self.__kappa / np.sqrt(exp_time * delta_nu)
         else:
-            t_rms = t_sys * self.kappa * np.sqrt(1 + 1 / np.sqrt(self.n_on)) / np.sqrt(exp_time * delta_nu)
+            t_rms = t_sys * self.__kappa * np.sqrt(1 + 1 / np.sqrt(self.__n_on)) / np.sqrt(exp_time * delta_nu)
         # Calculate the limiting signal temperature
         t_signal_lim = t_rms * snr
         # Print details
@@ -205,23 +205,23 @@ class Heterodyne(ASensor):
             The background temperature in Kelvins.
         """
         logger.info("Calculating the system temperature.")
-        t_background = (self._parent.calcBackground().rebin(self.lambda_line).qty.to(
-            u.W / (u.m ** 2 * u.Hz * u.sr), equivalencies=u.spectral_density(self.lambda_line)) *
-                        self.lambda_line ** 2 / (2 * k_B) * u.sr).decompose()
+        t_background = (self._parent.calcBackground().rebin(self.__lambda_line).qty.to(
+            u.W / (u.m ** 2 * u.Hz * u.sr), equivalencies=u.spectral_density(self.__lambda_line)) *
+                        self.__lambda_line ** 2 / (2 * k_B) * u.sr).decompose()
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal temperature.")
         signal, obstruction = self._parent.calcSignal()
         size = "extended" if signal.qty.unit.is_equivalent(u.W / (u.m ** 2 * u.nm * u.sr)) else "point"
         if size == "point":
-            signal = signal.rebin(self.lambda_line).qty.to(u.W / (u.m ** 2 * u.Hz),
-                                                           equivalencies=u.spectral_density(self.lambda_line))
-            t_signal = (signal * self.aperture_efficiency * self.common_conf.d_aperture() ** 2 *
-                        np.pi / 4 / (2 * k_B) * self.eta_fss).decompose()
+            signal = signal.rebin(self.__lambda_line).qty.to(u.W / (u.m ** 2 * u.Hz),
+                                                             equivalencies=u.spectral_density(self.__lambda_line))
+            t_signal = (signal * self.__aperture_efficiency * self.__common_conf.d_aperture() ** 2 *
+                        np.pi / 4 / (2 * k_B) * self.__eta_fss).decompose()
         else:
-            signal = signal.rebin(self.lambda_line).qty.to(u.W / (u.m ** 2 * u.Hz * u.sr),
-                                                           equivalencies=u.spectral_density(self.lambda_line))
-            t_signal = (signal * u.sr * self.main_beam_efficiency * self.lambda_line ** 2 / (
-                    2 * k_B) * self.eta_fss).decompose()
+            signal = signal.rebin(self.__lambda_line).qty.to(u.W / (u.m ** 2 * u.Hz * u.sr),
+                                                             equivalencies=u.spectral_density(self.__lambda_line))
+            t_signal = (signal * u.sr * self.__main_beam_efficiency * self.__lambda_line ** 2 / (
+                    2 * k_B) * self.__eta_fss).decompose()
         logger.debug("Signal temperature: %1.2e K" % t_signal.value)
         logger.debug("Target size: " + size)
         logger.debug("Obstruction: %.2f" % obstruction)
