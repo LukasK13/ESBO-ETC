@@ -15,6 +15,7 @@ Welcome to ESBO-ETC's documentation!
    usage/getting_started
    configuration/configuration
    developer/developer_documentation
+   api/api
 
 ..
    ******************
