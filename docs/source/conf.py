@@ -40,7 +40,7 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['configuration/target.rst', 'configuration/common.rst', 'configuration/optical_components.rst',
-                    'configuration/sensor.rst']
+                    'configuration/sensor.rst', 'developer/classes.rst']
 
 # -- Options for HTML output -------------------------------------------------
 html_show_sourcelink = False
