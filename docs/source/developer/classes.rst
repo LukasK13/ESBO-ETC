@@ -12,6 +12,7 @@ All spectral quantities used for calculations, e.g. spectral flux densities, spe
 They can be set up either by providing the two arrays wavelength bins and the corresponding spectral quantity as parameters to the constructor or by reading them from a file using the class method ``fromFile()``.
 In the latter case, the file must be readable by astropy and the units of the columns may be contained in the column header in square brackets.
 ``SpectralQty``-objects natively support mathematical operations like addition (``__add__()``), substraction (``__sub__()``), multiplication (``__mul__()``) as well as true division (``__truediv__()``) and comparison (``__eq__()``).
+These operations are defined for several other objects like ``SpectralQty``, ``int``, ``float`` as well as Lambda-functions.
 Additionally, the two methods ``rebin()`` and ``integrate()`` allow to change the spectral grid or integrate the quantity on the grid.
 
 .. _configuration:
