@@ -93,12 +93,19 @@ class Imager(ASensor):
                                common_conf.psf.osf, pixel_size)
 
     @u.quantity_input(exp_time="time")
-    def getSNR(self, exp_time: u.Quantity) -> u.dimensionless_unscaled:
+    def calcSNR(self, background: SpectralQty, signal: SpectralQty, obstruction: float,
+                exp_time: u.Quantity) -> u.dimensionless_unscaled:
         """
         Calculate the signal to background ratio (SNR) for the given exposure time using the CCD-equation.
 
         Parameters
         ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
         exp_time : time-Quantity
             The exposure time to calculate the SNR for.
 
@@ -108,7 +115,8 @@ class Imager(ASensor):
             The calculated SNR as dimensionless quantity
         """
         # Calculate the electron currents
-        signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        signal_current, background_current, read_noise, dark_current = self.__exposePixels(background, signal,
+                                                                                           obstruction)
         # Calculate the SNR using the CCD-equation
         logger.info("Calculating the SNR...", extra={"spinning": True})
         snr = signal_current.sum() * exp_time / np.sqrt(
@@ -123,12 +131,18 @@ class Imager(ASensor):
         return snr.value * u.dimensionless_unscaled
 
     @u.quantity_input(snr=u.dimensionless_unscaled)
-    def getExpTime(self, snr: u.Quantity) -> u.s:
+    def calcExpTime(self, background: SpectralQty, signal: SpectralQty, obstruction: float, snr: u.Quantity) -> u.s:
         """
         Calculate the necessary exposure time in order to achieve the given SNR.
 
         Parameters
         ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
         snr : Quantity
             The SNR for which the necessary exposure time shall be calculated as dimensionless quantity.
 
@@ -138,7 +152,8 @@ class Imager(ASensor):
             The necessary exposure time in seconds.
         """
         # Calculate the electron currents
-        signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        signal_current, background_current, read_noise, dark_current = self.__exposePixels(background, signal,
+                                                                                           obstruction)
         logger.info("Calculating the exposure time...", extra={"spinning": True})
         # Calculate the electron currents for all pixels
         signal_current_tot = signal_current.sum()
@@ -160,12 +175,19 @@ class Imager(ASensor):
         return exp_time
 
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
-    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
+    def calcSensitivity(self, background: SpectralQty, signal: SpectralQty, obstruction: float, exp_time: u.Quantity,
+                        snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
         """
         Calculate the sensitivity of the telescope detector combination.
 
         Parameters
         ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
         exp_time : Quantity
             The exposure time in seconds.
         snr : Quantity
@@ -179,7 +201,8 @@ class Imager(ASensor):
             The sensitivity as limiting apparent star magnitude in mag.
         """
         # Calculate the electron currents
-        signal_current, background_current, read_noise, dark_current = self.__exposePixels()
+        signal_current, background_current, read_noise, dark_current = self.__exposePixels(background, signal,
+                                                                                           obstruction)
         logger.info("Calculating the sensitivity...", extra={"spinning": True})
         # Fix the physical units of the SNR
         snr = snr * u.electron ** 0.5
@@ -299,9 +322,19 @@ class Imager(ASensor):
             hdul = fits.HDUList([hdu, signal_hdu, background_hdu, read_noise_hdu, dark_hdu])
             hdul.writeto(os.path.join(path, "results.fits"), overwrite=True)
 
-    def __exposePixels(self) -> Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
+    def __exposePixels(self, background: SpectralQty, signal: SpectralQty,
+                       obstruction: float) -> Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
         """
         Expose the pixels and calculate the signal and noise electron currents per pixel.
+
+        Parameters
+        ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
 
         Returns
         -------
@@ -316,7 +349,8 @@ class Imager(ASensor):
         """
         # Calculate the total incoming electron current
         logger.info("Calculating incoming electron current...", extra={"spinning": True})
-        signal_current, size, obstruction, background_current = self.__calcIncomingElectronCurrent()
+        signal_current, size, obstruction, background_current = self.__calcIncomingElectronCurrent(background, signal,
+                                                                                                   obstruction)
         # info("Finished calculating incoming electron current", extra={"spinning": False})
         # Initialize a new PixelMask
         mask = PixelMask(self.__pixel_geometry, self.__pixel_size, self.__center_offset)
@@ -335,7 +369,7 @@ class Imager(ASensor):
             else:
                 # Calculate the diameter of the photometric aperture from the given contained energy
                 logger.info("Calculating the diameter of the photometric aperture...",
-                                       extra={"spinning": True})
+                            extra={"spinning": True})
                 d_photometric_ap = self.__calcPhotometricAperture(obstruction)
                 # Mask the pixels to be exposed
                 mask.createPhotometricAperture(self.__shape, d_photometric_ap / 2)
@@ -354,11 +388,13 @@ class Imager(ASensor):
                     logger.info("The radius of the photometric aperture is %.2f pixels. This equals the FWHM" % (
                             d_photometric_ap.value / 2))
                 elif self.__contained_energy.lower() == "min":
-                    logger.info("The radius of the photometric aperture is %.2f pixels. This equals the first minimum" % (
-                            d_photometric_ap.value / 2))
+                    logger.info(
+                        "The radius of the photometric aperture is %.2f pixels. This equals the first minimum" % (
+                                d_photometric_ap.value / 2))
             else:
-                logger.info("The radius of the photometric aperture is %.2f pixels. This equals %.0f%% encircled energy" %
-                     (d_photometric_ap.value / 2, self.__contained_energy))
+                logger.info(
+                    "The radius of the photometric aperture is %.2f pixels. This equals %.0f%% encircled energy" % (
+                        d_photometric_ap.value / 2, self.__contained_energy))
         logger.info("The photometric aperture contains " + str(np.count_nonzero(mask)) + " pixels.")
         if size.lower() != "extended":
             # Map the PSF onto the pixel mask in order to get the relative irradiance of each pixel
@@ -399,9 +435,19 @@ class Imager(ASensor):
         d_photometric_ap = observation_angle / pixel_fov
         return d_photometric_ap * u.pix
 
-    def __calcIncomingElectronCurrent(self) -> Tuple[u.Quantity, str, float, u.Quantity]:
+    def __calcIncomingElectronCurrent(self, background: SpectralQty, signal: SpectralQty,
+                                      obstruction: float) -> Tuple[u.Quantity, str, float, u.Quantity]:
         """
         Calculate the detected electron current of the signal and the background.
+
+        Parameters
+        ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
 
         Returns
         -------
@@ -416,11 +462,10 @@ class Imager(ASensor):
         """
         # Calculate the photon current of the background
         logger.info("Calculating the background photon current.")
-        background_photon_current = self._parent.calcBackground() * np.pi * (
+        background_photon_current = background * np.pi * (
                 self.__pixel_size.to(u.m) ** 2 / u.pix) / (4 * self.__f_number ** 2 + 1) * (1 * u.sr)
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal photon current.")
-        signal, obstruction = self._parent.calcSignal()
         size = "extended" if signal.qty.unit.is_equivalent(u.W / (u.m ** 2 * u.nm * u.sr)) else "point"
         if size == "point":
             signal_photon_current = signal * np.pi * (self.__common_conf.d_aperture() / 2) ** 2

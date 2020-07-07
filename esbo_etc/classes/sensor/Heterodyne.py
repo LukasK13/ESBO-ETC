@@ -6,6 +6,7 @@ import numpy as np
 from astropy.constants import k_B
 from typing import Union
 from ...lib.logger import logger
+from ..SpectralQty import SpectralQty
 
 
 class Heterodyne(ASensor):
@@ -51,12 +52,19 @@ class Heterodyne(ASensor):
         super().__init__(parent)
 
     @u.quantity_input(exp_time="time")
-    def getSNR(self, exp_time: u.Quantity) -> u.dimensionless_unscaled:
+    def calcSNR(self, background: SpectralQty, signal: SpectralQty, obstruction: float,
+                exp_time: u.Quantity) -> u.dimensionless_unscaled:
         """
         Calculate the signal to background ratio (SNR) for the given exposure time using the CCD-equation.
 
         Parameters
         ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
         exp_time : time-Quantity
             The exposure time to calculate the SNR for.
 
@@ -66,7 +74,7 @@ class Heterodyne(ASensor):
             The calculated SNR as dimensionless quantity
         """
         # Calculate the signal and background temperatures
-        t_signal, t_background = self.calcTemperatures()
+        t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         t_sys = 2 * (t_background + self.__receiver_temp)
         # Calculate the noise bandwidth
         delta_nu = self.__lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
@@ -87,12 +95,18 @@ class Heterodyne(ASensor):
         return snr
 
     @u.quantity_input(snr=u.dimensionless_unscaled)
-    def getExpTime(self, snr: u.Quantity) -> u.s:
+    def calcExpTime(self, background: SpectralQty, signal: SpectralQty, obstruction: float, snr: u.Quantity) -> u.s:
         """
         Calculate the necessary exposure time in order to achieve the given SNR.
 
         Parameters
         ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
         snr : Quantity
             The SNR for which the necessary exposure time shall be calculated as dimensionless quantity.
 
@@ -102,7 +116,7 @@ class Heterodyne(ASensor):
             The necessary exposure time in seconds.
         """
         # Calculate the signal and background temperatures
-        t_signal, t_background = self.calcTemperatures()
+        t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         t_sys = 2 * (t_background + self.__receiver_temp)
         # Calculate the noise bandwidth
         delta_nu = self.__lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
@@ -123,12 +137,19 @@ class Heterodyne(ASensor):
         return exp_time
 
     @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
-    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
+    def calcSensitivity(self, background: SpectralQty, signal: SpectralQty, obstruction: float, exp_time: u.Quantity,
+                        snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
         """
         Calculate the sensitivity of the telescope detector combination.
 
         Parameters
         ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
         exp_time : Quantity
             The exposure time in seconds.
         snr : Quantity
@@ -142,7 +163,7 @@ class Heterodyne(ASensor):
             The sensitivity as limiting apparent star magnitude in mag.
         """
         # Calculate the signal and background temperatures
-        t_signal, t_background = self.calcTemperatures()
+        t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         t_sys = 2 * (t_background + self.__receiver_temp)
         # Calculate the noise bandwidth
         delta_nu = self.__lambda_line.to(u.Hz, equivalencies=u.spectral()) / (
@@ -193,9 +214,18 @@ class Heterodyne(ASensor):
         logger.info(prefix + "Antenna temperature:       %1.2e K" % t_signal.value)
         logger.info("-------------------------------------------------------------------------------------------------")
 
-    def calcTemperatures(self):
+    def calcTemperatures(self, background: SpectralQty, signal: SpectralQty, obstruction: float):
         """
         Calculate the noise temperatures of the signal and the background radiation.
+
+        Parameters
+        ----------
+        background : SpectralQty
+            The received background radiation
+        signal : SpectralQty
+            The received signal radiation
+        obstruction : float
+            The obstruction factor of the aperture as ratio A_ob / A_ap
 
         Returns
         -------
@@ -205,12 +235,11 @@ class Heterodyne(ASensor):
             The background temperature in Kelvins.
         """
         logger.info("Calculating the system temperature.")
-        t_background = (self._parent.calcBackground().rebin(self.__lambda_line).qty.to(
+        t_background = (background.rebin(self.__lambda_line).qty.to(
             u.W / (u.m ** 2 * u.Hz * u.sr), equivalencies=u.spectral_density(self.__lambda_line)) *
                         self.__lambda_line ** 2 / (2 * k_B) * u.sr).decompose()
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal temperature.")
-        signal, obstruction = self._parent.calcSignal()
         size = "extended" if signal.qty.unit.is_equivalent(u.W / (u.m ** 2 * u.nm * u.sr)) else "point"
         if size == "point":
             signal = signal.rebin(self.__lambda_line).qty.to(u.W / (u.m ** 2 * u.Hz),
