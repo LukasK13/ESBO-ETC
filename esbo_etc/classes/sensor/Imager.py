@@ -281,7 +281,7 @@ class Imager(ASensor):
         # Concatenate the paths
         path = os.path.join(self.__common_conf.output.path, name)
         try:
-            os.mkdir(path)
+            os.makedirs(path, exist_ok=True)
         except FileExistsError:
             logger.warning("Output directory '" + path + "' already exists.")
         # Calculate the indices of nonzero values and create a bounding rectangle
