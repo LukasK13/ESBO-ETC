@@ -7,7 +7,7 @@ from rich import console, markdown
 
 if __name__ == "__main__":
     # Parse arguments
-    parser = argparse.ArgumentParser(prog="esbo_etc/esbo-etc.py", description='Exposure time calculator for ESBO-DS')
+    parser = argparse.ArgumentParser(prog="esbo-etc.py", description='Exposure time calculator for ESBO-DS')
     parser.add_argument("-c", "--config", dest='config', default="esbo-etc_defaults.xml",
                         metavar="config.xml", help="Path to the configuration file. Default is esbo-etc_defaults.xml.")
     parser.add_argument("-l", "--logging", dest="logging", default="WARNING",

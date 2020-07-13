@@ -2,4 +2,4 @@
 
 PYTHONPATH="${PYTHONPATH}:$(pwd)"
 export PYTHONPATH
-venv/bin/python3 esbo_etc/esbo-etc.py "$@"
+venv/bin/python3 esbo-etc.py "$@"
