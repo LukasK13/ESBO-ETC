@@ -24,6 +24,9 @@ Python Virtual Environment
 It is advisable to create a python virtual environment for ESBO-ETC where all necessary packages will be installed.
 To create a virtual environment and install all packages, got to the project's root directory an run
 
+Linux / MacOS
+^^^^^^^^^^^^^
+
 .. code-block:: bash
     :linenos:
 
@@ -31,14 +34,39 @@ To create a virtual environment and install all packages, got to the project's r
     source venv/bin/activate
     python venv/bin/pip install -r requirements.txt
 
+Windows
+^^^^^^^
+
+It might be possible that you need to install `Microsoft Build Tools for C++ <https://visualstudio.microsoft.com/visual-cpp-build-tools/>`_ in order to compile astropy.
+
+.. code-block:: bash
+    :linenos:
+
+    conda create -n venv
+    conda activate venv
+    conda install -c anaconda pip
+    pip install -r requirements.txt
+
 Global Python installation
 --------------------------
 Instead of a virtual environment, the global python installation can be used to run ESBO-ETC. Therefore, the necessary
 packages need to be installed by running the following command from the project's root directory.
 
+Linux / MacOS
+^^^^^^^^^^^^^
+
 .. code-block:: bash
     :linenos:
 
+    pip install -r requirements.txt
+
+Windows
+^^^^^^^
+
+.. code-block:: bash
+    :linenos:
+
+    conda install -c anaconda pip
     pip install -r requirements.txt
 
 ================
@@ -59,12 +87,23 @@ The following options are available:
 Shell-Script
 ------------
 The recommended way to run ESBO-ETC is to use the provided shell-script which will add the project's root directory to
-the PATH-variable. However the shell-script only works for virtual environment installations.
+the PATH-variable. However the shell-script only works for virtual environment installations with the virtual environment named ``venv``.
+
+Linux / MacOS
+^^^^^^^^^^^^^
 
 .. code-block:: bash
     :linenos:
 
     ./run_esbo-etc [-h] [-c config.xml] [-l LOGGING] [-v] [-m]
+
+Windows
+^^^^^^^
+
+.. code-block:: bash
+    :linenos:
+
+    run_esbo-etc.bat [-h] [-c config.xml] [-l LOGGING] [-v] [-m]
 
 Python Interpreter
 ------------------
@@ -74,7 +113,7 @@ both a virtual environment as well as for the global python installation. Launch
 .. code-block:: bash
     :linenos:
 
-    python3 esbo_etc/esbo-etc.py [-h] [-c config.xml] [-l LOGGING] [-v] [-m]
+    python esbo_etc/esbo-etc.py [-h] [-c config.xml] [-l LOGGING] [-v] [-m]
 
 ==================
 Component Overview
