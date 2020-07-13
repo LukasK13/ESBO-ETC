@@ -28,14 +28,6 @@ esbo\_etc.classes.target.FileTarget module
    :undoc-members:
    :show-inheritance:
 
-esbo\_etc.classes.target.LineTarget module
-------------------------------------------
-
-.. automodule:: esbo_etc.classes.target.LineTarget
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------
