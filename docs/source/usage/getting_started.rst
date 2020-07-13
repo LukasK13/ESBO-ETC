@@ -108,6 +108,9 @@ components are available
 
 Sensor
 ------
-Currently, only the imager sensor component is available. The imager provides many parameters to adapt the components
+Currently, two sensor components are available:
+
+* The **imager** detector for generic imaging sensors like CCDs providing many parameters to adapt the component
 to the needs like the dark current, the read noise, pixel size, array size but also parameters for the photometric
 aperture like the percentage of contained energy or the shape of the photometric aperture.
+* The **heterodyne** sensor for spectroscopy using the heterodyne principle providing also multiple parameters.
