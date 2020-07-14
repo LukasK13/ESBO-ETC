@@ -66,6 +66,12 @@ class TestSpectralQty(TestCase):
         self.assertEqual(self.sqty / (lambda wl: 0.7 * u.dimensionless_unscaled),
                          SpectralQty(self.wl, self.qty / 0.7))
 
+    def test___pow__(self):
+        # Integer
+        self.assertEqual(self.sqty ** 2, SpectralQty(self.wl, self.qty ** 2))
+        # Float
+        self.assertEqual(self.sqty ** 0.5, SpectralQty(self.wl, self.qty ** 0.5))
+
     def test___sub__(self):
         # Quantity
         self.assertEqual(self.sqty - 0.1 * u.W / (u.m ** 2 * u.nm),
