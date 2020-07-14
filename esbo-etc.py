@@ -44,16 +44,16 @@ if __name__ == "__main__":
     oc_factory = eetc.classes.RadiantFactory(conf.common.wl_bins())
     parent = oc_factory.fromConfigBatch(conf)
     sensor_factory = eetc.SensorFactory(parent, conf.common)
-    imager = sensor_factory.create(conf.instrument.sensor)
+    detector = sensor_factory.create(conf.instrument.sensor)
 
     # Calculate results
     if hasattr(conf.common, "exposure_time") and hasattr(conf.common, "snr"):
-        sensitivity = imager.getSensitivity(conf.common.exposure_time(), conf.common.snr(), conf.astroscene.target.mag)
+        sensitivity = detector.getSensitivity(conf.common.exposure_time(), conf.common.snr(), conf.astroscene.target.mag)
         eetc.printSensitivity(conf.common.exposure_time(), conf.common.snr(), sensitivity)
     elif hasattr(conf.common, "exposure_time"):
-        snr = imager.getSNR(conf.common.exposure_time())
+        snr = detector.getSNR(conf.common.exposure_time())
         eetc.printSNR(conf.common.exposure_time(), snr)
     elif hasattr(conf.common, "snr"):
-        exp_time = imager.getExpTime(conf.common.snr())
+        exp_time = detector.getExpTime(conf.common.snr())
         eetc.printExposureTime(exp_time, conf.common.snr())
     logger.info("Finished.", extra={"spinning": False})
