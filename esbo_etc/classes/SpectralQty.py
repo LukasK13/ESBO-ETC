@@ -182,7 +182,7 @@ class SpectralQty:
 
         Returns
         -------
-        sum : SpectralQty
+        diff : SpectralQty
             The difference of both objects
         """
         # Subtrahend is of type int or float, use same unit
@@ -228,7 +228,7 @@ class SpectralQty:
 
         Returns
         -------
-        sum : SpectralQty
+        prod : SpectralQty
             The product of both objects
         """
         # Factor is of type int, float or Quantity, just multiply
@@ -270,7 +270,7 @@ class SpectralQty:
 
         Returns
         -------
-        sum : SpectralQty
+        quot : SpectralQty
             The quotient of both objects
         """
         # Factor is of type int, float or Quantity, just multiply
@@ -296,6 +296,24 @@ class SpectralQty:
                         return SpectralQty(other_rebinned.wl, self.rebin(other_rebinned.wl).qty / other_rebinned.qty)
             else:
                 logger.error("Units are not matching for division.")
+
+    def __pow__(self, other: Union[int, float]) -> "SpectralQty":
+        """
+        Raise to spectral quantity to the given power.
+
+        Parameters
+        ----------
+        other : Union[int, float]
+            The exponent for this object.
+
+        Returns
+        -------
+        prod : SpectralQty
+            The spectral quantity raised to the given power.
+        """
+        # Factor is of type int, float or Quantity, just multiply
+        if isinstance(other, int) or isinstance(other, float):
+            return SpectralQty(self.wl, self.qty ** other)
 
     def rebin(self, wl: u.Quantity) -> "SpectralQty":
         """
