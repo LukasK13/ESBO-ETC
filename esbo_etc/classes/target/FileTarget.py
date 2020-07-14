@@ -26,7 +26,7 @@ class FileTarget(ATarget):
             Wavelengths used for binning
         """
         # Create spectral quantity from file
-        sfd = SpectralQty.fromFile(file, u.nm, u.W / (u.m ** 2 * u.nm))
+        sfd = SpectralQty.fromFile(file, u.nm, u.W / (u.m ** 2 * u.nm)).rebin(wl_bins)
         # Initialize the super class
         super().__init__(sfd, wl_bins)
 
