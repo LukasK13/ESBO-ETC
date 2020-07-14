@@ -174,9 +174,9 @@ class Imager(ASensor):
                           dark_current * exp_time_, "snr_%.2f" % snr_.value)
         return exp_time
 
-    @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
+    # @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=[u.mag, u.mag / u.sr])
     def calcSensitivity(self, background: SpectralQty, signal: SpectralQty, obstruction: float, exp_time: u.Quantity,
-                        snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
+                        snr: u.Quantity, target_brightness: u.Quantity) -> [u.mag, u.mag / u.sr]:
         """
         Calculate the sensitivity of the telescope detector combination.
 
@@ -193,7 +193,7 @@ class Imager(ASensor):
         snr : Quantity
             The SNR for which the sensitivity time shall be calculated.
         target_brightness : Quantity
-            The target brightness in magnitudes.
+            The target brightness in mag or mag / sr.
 
         Returns
         -------
@@ -217,7 +217,7 @@ class Imager(ASensor):
             self.__output(signal_current * signal_current_lim_ / signal_current.sum() * exp_time_,
                           background_current * exp_time_, read_noise, dark_current * exp_time_,
                           "snr_%.2f_texp_%.2f" % (snr_.value, exp_time_.value))
-        return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * u.mag
+        return target_brightness - 2.5 * np.log10(signal_current_lim / signal_current.sum()) * target_brightness.unit
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
     def __printDetails(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,

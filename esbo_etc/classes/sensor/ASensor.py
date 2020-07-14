@@ -11,6 +11,7 @@ class ASensor:
     """
     Abstract super class for sensor models
     """
+
     @abstractmethod
     def __init__(self, parent: IRadiant):
         """
@@ -127,8 +128,8 @@ class ASensor:
         """
         pass
 
-    @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
-    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
+    # @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=[u.mag, u.mag / u.sr])
+    def getSensitivity(self, exp_time: u.Quantity, snr: u.Quantity, target_brightness: u.Quantity) -> [u.mag, u.mag / u.sr]:
         """
         Calculate the sensitivity of the telescope detector combination.
 
@@ -144,15 +145,15 @@ class ASensor:
         Returns
         -------
         sensitivity: Quantity
-            The sensitivity as limiting apparent star magnitude in mag.
+            The sensitivity as limiting apparent star magnitude in mag or mag / sr.
         """
         background, signal, obstruction = self.__calcIncomingRadiation()
         return self.calcSensitivity(background, signal, obstruction, exp_time, snr, target_brightness)
 
     @abstractmethod
-    @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=u.mag)
+    # @u.quantity_input(exp_time="time", snr=u.dimensionless_unscaled, target_brightness=[u.mag, u.mag / u.sr])
     def calcSensitivity(self, background: SpectralQty, signal: SpectralQty, obstruction: float, exp_time: u.Quantity,
-                        snr: u.Quantity, target_brightness: u.Quantity) -> u.mag:
+                        snr: u.Quantity, target_brightness: u.Quantity) -> [u.mag, u.mag / u.sr]:
         """
         Calculate the sensitivity of the telescope detector combination.
 
@@ -174,7 +175,7 @@ class ASensor:
         Returns
         -------
         sensitivity: Quantity
-            The sensitivity as limiting apparent star magnitude in mag.
+            The sensitivity as limiting apparent star magnitude in mag or mag / sr.
         """
         pass
 
