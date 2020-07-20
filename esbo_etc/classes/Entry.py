@@ -82,7 +82,10 @@ class Entry(object):
             else:
                 return "Expected parameter '" + name + "' with unit '" + unit.to_string() + "' but got no unit."
         if not attr.unit.is_equivalent(unit):
-            return "Expected parameter '" + name + "' with unit equivalent to '" + unit.to_string() + \
+            if unit == u.K and attr.unit == u.Celsius:
+                setattr(self, name, attr.to(u.K, equivalencies=u.temperature()))
+            else:
+                return "Expected parameter '" + name + "' with unit equivalent to '" + unit.to_string() + \
                    "' but got unit '" + attr.unit.to_string() + "'."
         return None
 
