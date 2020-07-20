@@ -10,18 +10,6 @@ Subpackages
    esbo_etc.classes
    esbo_etc.lib
 
-Submodules
-----------
-
-esbo\_etc.esbo\-etc module
---------------------------
-
-.. automodule:: esbo_etc.esbo-etc
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
 Module contents
 ---------------
 
