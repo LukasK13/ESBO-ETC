@@ -8,7 +8,10 @@ pipeline {
     stages {
         stage('Test') {
             agent {
-                label 'lunjaserv'
+                dockerfile {
+                  filename "Dockerfile"
+                  args "-u root" //needed to get around permission issues
+                }
             }
             steps {
                 // Install dependencies
