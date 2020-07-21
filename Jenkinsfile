@@ -7,8 +7,8 @@ pipeline {
     }
     environment {
         SPHINX_DIR  = 'docs'
-        BUILD_DIR   = 'docs/build'
-        SOURCE_DIR  = 'docs/source'
+        BUILD_DIR   = 'build/html'
+        SOURCE_DIR  = 'source'
         DEPLOY_HOST = 'deployer@www.example.com:/path/to/docs/'
     }
     stages {
@@ -28,13 +28,14 @@ pipeline {
                 // clear out old files
                 sh 'rm -rf ${BUILD_DIR}'
                 sh 'rm -f ${SPHINX_DIR}/sphinx-build.log'
+                sh 'ls ${WORKSPACE}'
                 sh '''
                    ${WORKSPACE}/pyenv/bin/sphinx-build \
                    -q -w ${SPHINX_DIR}/sphinx-build.log \
                    -b html \
-                   -d ${BUILD_DIR}/doctrees ${SOURCE_DIR} ${BUILD_DIR}
+                   -d ${SPHINX_DIR}/${BUILD_DIR}/doctrees ${SPHINX_DIR}/${SOURCE_DIR} ${SPHINX_DIR}/${BUILD_DIR}
                 '''
-                archiveArtifacts 'docs/build'
+                archiveArtifacts 'docs/build/html'
             }
             post {
                 failure {
