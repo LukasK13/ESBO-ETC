@@ -22,7 +22,7 @@ pipeline {
                 '''
                 sh '''
                    export PYTHONPATH=`pwd`
-                   ../pyenv/bin/python3 -m unittest discover test
+                   pyenv/bin/python3 -m unittest discover test
                 '''
             }
         }
