@@ -43,7 +43,7 @@ pipeline {
             agent any
             steps {
                 unstash 'html'
-                sh 'ls docs/build/html'
+                sh 'cp -r docs/build/html /opt/esbo-etc/'
             }
         }
 /*
