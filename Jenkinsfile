@@ -6,7 +6,26 @@ pipeline {
         SOURCE_DIR  = 'source'
     }
     stages {
-        stage('Build') {
+        stage('Test') {
+            agent {
+                label 'lunjaserv'
+            }
+            steps {
+                // Install dependencies
+                sh '''
+                   virtualenv pyenv
+                   . pyenv/bin/activate
+                   pip3 install -r requirements.txt
+                '''
+                sh '''
+                   export PYTHONPATH=`pwd`
+                   cd tests
+                   ../pyenv/bin/python3 -m unittest discover .
+                '''
+            }
+        }
+
+        stage('Build Docs') {
             agent {
                 dockerfile {
                   filename "Dockerfile"
