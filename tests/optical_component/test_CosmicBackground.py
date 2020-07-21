@@ -4,9 +4,9 @@ import numpy as np
 import astropy.units as u
 
 
-class TestBlackBodyTarget(TestCase):
+class TestCosmicBackground(TestCase):
     def setUp(self):
-        self.target = BlackBodyTarget(np.arange(100, 105) * u.um)
+        self.target = BlackBodyTarget(np.arange(100, 105) * u.um, mag=0 * u.mag)
         self.cosmic = CosmicBackground(self.target)
 
     def test_calcSignal(self):
