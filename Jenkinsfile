@@ -20,8 +20,10 @@ pipeline {
                    . pyenv/bin/activate
                    pip3 install -r requirements.txt
                 '''
-                sh 'ls -R tests/data'
-                sh 'pyenv/bin/python3 -m unittest discover tests'
+                sh '''
+                   export PYTHONPATH=`pwd`
+                   ../pyenv/bin/python3 -m unittest discover test
+                '''
             }
         }
 
