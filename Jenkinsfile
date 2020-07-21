@@ -43,7 +43,7 @@ pipeline {
             agent any
             steps {
                 unstash 'html'
-                sh 'ls'
+                sh 'ls docs/build/html'
             }
         }
 /*
