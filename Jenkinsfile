@@ -21,7 +21,10 @@ pipeline {
                    pip3 install -r requirements.txt
                 '''
                 sh '''
-                   export PYTHONPATH=`pwd`; cd tests; ../pyenv/bin/python3 -m unittest discover .
+                   export PYTHONPATH=`pwd`
+                   echo $PYTHONPATH
+                   cd tests
+                   ../pyenv/bin/python3 -m unittest discover .
                 '''
             }
         }
