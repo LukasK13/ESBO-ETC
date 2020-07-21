@@ -7,7 +7,7 @@ import numpy as np
 
 class TestFileTarget(TestCase):
     def setUp(self):
-        self.target = FileTarget("../data/target/target_demo_1.csv", np.arange(200, 210, 1) << u.nm)
+        self.target = FileTarget("tests/data/target/target_demo_1.csv", np.arange(200, 210, 1) << u.nm)
 
     def test_calcSignal(self):
         signal = SpectralQty(np.arange(200, 210, 1) << u.nm,

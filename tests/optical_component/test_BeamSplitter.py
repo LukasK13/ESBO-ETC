@@ -10,8 +10,8 @@ class TestBeamSplitter(TestCase):
     wl = np.arange(201, 205, 1) << u.nm
 
     def setUp(self):
-        self.target = FileTarget("data/target/target_demo_1.csv", self.wl)
-        self.splitter = BeamSplitter(self.target, "data/beamsplitter/beamsplitter_transmittance.csv", 0.5,
+        self.target = FileTarget("tests/data/target/target_demo_1.csv", self.wl)
+        self.splitter = BeamSplitter(self.target, "tests/data/beamsplitter/beamsplitter_transmittance.csv", 0.5,
                                      temp=300 * u.K)
 
     def test___init__(self):

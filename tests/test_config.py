@@ -5,7 +5,7 @@ import astropy.units as u
 
 class TestConfiguration(TestCase):
     def setUp(self):
-        self.config = Configuration("data/esbo-etc_defaults.xml")
+        self.config = Configuration("tests/data/esbo-etc_defaults.xml")
 
     def test_signal(self):
         self.assertTrue(isinstance(self.config.conf, Entry))

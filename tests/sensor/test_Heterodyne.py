@@ -12,14 +12,14 @@ from esbo_etc.classes.sensor.Heterodyne import Heterodyne
 
 class TestHeterodyne(TestCase):
     def setUp(self):
-        self.config = Configuration("data/esbo-etc_defaults_heterodyne.xml").conf
+        self.config = Configuration("tests/data/esbo-etc_defaults_heterodyne.xml").conf
         self.heterodyne_args = dict(aperture_efficiency=0.55, main_beam_efficiency=0.67,
                                     receiver_temp=1050 * u.K, eta_fss=0.97, lambda_line=157.774 * u.um, kappa=1.0,
                                     common_conf=self.config.common)
-        self.target = FileTarget("data/target/line.csv", self.config.common.wl_bins())
-        self.atmosphere = Atmosphere(self.target, "data/atmosphere/transmittance_great.csv")
+        self.target = FileTarget("tests/data/target/line.csv", self.config.common.wl_bins())
+        self.atmosphere = Atmosphere(self.target, "tests/data/atmosphere/transmittance_great.csv")
         self.cosmic = CosmicBackground(self.atmosphere, temp=220 * u.K, emissivity=0.14)
-        self.mirror = Mirror(self.cosmic, reflectance="data/mirror/reflectance_great.csv", emissivity=0.08,
+        self.mirror = Mirror(self.cosmic, reflectance="tests/data/mirror/reflectance_great.csv", emissivity=0.08,
                              temp=230 * u.K)
         self.heterodyne = Heterodyne(self.mirror, **self.heterodyne_args)
 
@@ -36,15 +36,15 @@ class TestHeterodyne(TestCase):
     def test_getSensitivity(self):
         exp_time = 1900 * u.s
         target = BlackBodyTarget(self.config.common.wl_bins(), mag=20 * u.mag)
-        atmosphere = Atmosphere(target, "data/atmosphere/transmittance_great.csv")
+        atmosphere = Atmosphere(target, "tests/data/atmosphere/transmittance_great.csv")
         cosmic = CosmicBackground(atmosphere, temp=220 * u.K, emissivity=0.14)
-        mirror = Mirror(cosmic, reflectance="data/mirror/reflectance_great.csv", emissivity=0.08, temp=230 * u.K)
+        mirror = Mirror(cosmic, reflectance="tests/data/mirror/reflectance_great.csv", emissivity=0.08, temp=230 * u.K)
         heterodyne = Heterodyne(mirror, **self.heterodyne_args)
         snr = heterodyne.getSNR(exp_time)
         target = BlackBodyTarget(self.config.common.wl_bins(), mag=10 * u.mag)
-        atmosphere = Atmosphere(target, "data/atmosphere/transmittance_great.csv")
+        atmosphere = Atmosphere(target, "tests/data/atmosphere/transmittance_great.csv")
         cosmic = CosmicBackground(atmosphere, temp=220 * u.K, emissivity=0.14)
-        mirror = Mirror(cosmic, reflectance="data/mirror/reflectance_great.csv", emissivity=0.08, temp=230 * u.K)
+        mirror = Mirror(cosmic, reflectance="tests/data/mirror/reflectance_great.csv", emissivity=0.08, temp=230 * u.K)
         heterodyne = Heterodyne(mirror, **self.heterodyne_args)
         sensitivity = heterodyne.getSensitivity(exp_time, snr, 10 * u.mag)
         self.assertAlmostEqual(sensitivity.value, 20)

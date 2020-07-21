@@ -144,12 +144,12 @@ class TestSpectralQty(TestCase):
         self.assertEqual(sqty_rebin, sqty_res)
 
     def test_fromFile(self):
-        sqty = SpectralQty.fromFile("data/target/target_demo_1.csv", u.nm, u.W / (u.m ** 2 * u.nm))
+        sqty = SpectralQty.fromFile("tests/data/target/target_demo_1.csv", u.nm, u.W / (u.m ** 2 * u.nm))
         res = SpectralQty(np.arange(200, 210, 1) << u.nm,
                           np.arange(1.1, 2.1, 0.1) * 1e-15 << u.W / (u.m ** 2 * u.nm))
         self.assertEqual(sqty, res)
 
-        sqty = SpectralQty.fromFile("data/target/target_demo_2.csv", u.nm, u.W / (u.m ** 2 * u.nm))
+        sqty = SpectralQty.fromFile("tests/data/target/target_demo_2.csv", u.nm, u.W / (u.m ** 2 * u.nm))
         self.assertEqual(sqty, res)
 
     def test_integrate(self):

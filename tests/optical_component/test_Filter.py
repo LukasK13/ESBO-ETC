@@ -14,8 +14,8 @@ class TestFilter(TestCase):
                                                         (u.m ** 2 * u.nm)))
 
     def test_fromFile(self):
-        target = FileTarget("data/target/target_demo_1.csv", np.arange(200, 210, 1) << u.nm)
-        filt = Filter.fromFile(target, "data/filter/filter_transmittance.csv")
+        target = FileTarget("tests/data/target/target_demo_1.csv", np.arange(200, 210, 1) << u.nm)
+        filt = Filter.fromFile(target, "tests/data/filter/filter_transmittance.csv")
         self.assertEqual(filt.calcSignal()[0],
                          SpectralQty(np.arange(200, 210, 1) << u.nm, np.array([1.10e-15, 1.20e-15, 1.30e-15, 1.40e-15,
                                                                                1.35e-15, 1.44e-15, 1.53e-15, 1.44e-15,

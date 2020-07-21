@@ -6,8 +6,8 @@ import astropy.units as u
 
 class TestStrayLight(TestCase):
     def setUp(self):
-        self.target = FileTarget("data/target/target_demo_1.csv", np.arange(200, 210) << u.nm)
-        self.zodiac = StrayLight(self.target, "data/straylight/zodiacal_emission_1.csv")
+        self.target = FileTarget("tests/data/target/target_demo_1.csv", np.arange(200, 210) << u.nm)
+        self.zodiac = StrayLight(self.target, "tests/data/straylight/zodiacal_emission_1.csv")
 
     def test_calcSignal(self):
         self.assertEqual(self.zodiac.calcSignal()[0],

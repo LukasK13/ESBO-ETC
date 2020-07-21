@@ -7,7 +7,7 @@ import numpy as np
 
 class TestZemax(TestCase):
     def setUp(self):
-        self.zemax = Zemax("data/psf_2um.txt", 13, 4 * u.um, 0.5 * u.m, 13, 6.5 * u.um)
+        self.zemax = Zemax("tests/data/psf_2um.txt", 13, 4 * u.um, 0.5 * u.m, 13, 6.5 * u.um)
 
     def test_calcReducedObservationAngle(self):
         # No jitter

@@ -10,8 +10,8 @@ class TestMirror(TestCase):
     wl = np.arange(201, 205, 1) << u.nm
 
     def setUp(self):
-        self.target = FileTarget("data/target/target_demo_1.csv", self.wl)
-        self.mirror = Mirror(self.target, "data/mirror/mirror_reflectance.csv", 0.5, temp=300 * u.K)
+        self.target = FileTarget("tests/data/target/target_demo_1.csv", self.wl)
+        self.mirror = Mirror(self.target, "tests/data/mirror/mirror_reflectance.csv", 0.5, temp=300 * u.K)
 
     def test___init__(self):
         self.assertEqual(self.mirror.calcBackground(),

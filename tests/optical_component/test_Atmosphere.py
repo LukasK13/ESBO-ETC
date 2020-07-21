@@ -6,9 +6,9 @@ import astropy.units as u
 
 class TestAtmosphere(TestCase):
     def setUp(self):
-        self.target = FileTarget("data/target/target_demo_1.csv", np.arange(200, 208) << u.nm)
-        self.atmosphere = Atmosphere(self.target, "data/atmosphere/atmosphere_transmittance_1.csv",
-                                     "data/atmosphere/atmosphere_emission_1.csv")
+        self.target = FileTarget("tests/data/target/target_demo_1.csv", np.arange(200, 208) << u.nm)
+        self.atmosphere = Atmosphere(self.target, "tests/data/atmosphere/atmosphere_transmittance_1.csv",
+                                     "tests/data/atmosphere/atmosphere_emission_1.csv")
 
     def test_calcSignal(self):
         self.assertEqual(self.atmosphere.calcSignal()[0],
