@@ -25,7 +25,7 @@ class BlackBodyTarget(ATarget):
                  N=dict(wl=10200 * u.nm, sfd=1.23e-15 * u.W / (u.m ** 2 * u.nm)))
 
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], mag=[u.mag, u.mag / u.sr])
-    def __init__(self, wl_bins: u.Quantity, temp: u.Quantity = 5778 * u.K, mag: u.Quantity = 0 * u.mag,
+    def __init__(self, wl_bins: u.Quantity, temp: u.Quantity = 5778 * u.K, mag: u.Quantity = None,
                  band: str = "V"):
         """
         Initialize a new black body point source
@@ -50,18 +50,20 @@ class BlackBodyTarget(ATarget):
         # Create blackbody model with given temperature
         bb = BlackBody(temperature=temp, scale=1 * u.W / (u.m ** 2 * u.nm * u.sr))
 
-        # Calculate the correction factor for a star of 0th magnitude using the spectral flux density
-        # for the central wavelength of the given band
-        if mag.unit.is_equivalent(u.mag / u.sr):
-            solid_angle_unit = (u.mag / mag.unit)
-            mag = mag * solid_angle_unit
-            factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * (
-                    solid_angle_unit.to(u.sr) * u.sr))
+        if mag is not None:
+            # Calculate the correction factor for a star of 0th magnitude using the spectral flux density
+            # for the central wavelength of the given band
+            if mag.unit.is_equivalent(u.mag / u.sr):
+                solid_angle_unit = (u.mag / mag.unit)
+                mag = mag * solid_angle_unit
+                factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * (
+                        solid_angle_unit.to(u.sr) * u.sr))
+            else:
+                factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * u.sr) * u.sr
+            # Calculate spectral flux density for the given wavelengths and scale it for a star of the given magnitude
+            sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)  # / 1.195 * 1.16 #  scaling for AETC validation
         else:
-            factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * u.sr) * u.sr
-        # Calculate spectral flux density for the given wavelengths and scale it for a star of the given magnitude
-        sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)  # / 1.195 * 1.16 #  scaling for AETC validation
-
+            sfd = bb(wl_bins)
         # Initialize super class
         super().__init__(SpectralQty(wl_bins, sfd), wl_bins)
 
@@ -83,11 +85,12 @@ class BlackBodyTarget(ATarget):
         mes = conf.check_quantity("temp", u.K)
         if mes is not None:
             return mes
-        mes = conf.check_quantity("mag", u.mag)
-        if mes is not None:
-            mes = conf.check_quantity("mag", u.mag / u.sr)
+        if hasattr(conf, "mag"):
+            mes = conf.check_quantity("mag", u.mag)
+            if mes is not None:
+                mes = conf.check_quantity("mag", u.mag / u.sr)
+                if mes is not None:
+                    return mes
+            mes = conf.check_selection("band", ["U", "B", "V", "R", "I", "J", "H", "K", "L", "M", "N"])
             if mes is not None:
                 return mes
-        mes = conf.check_selection("band", ["U", "B", "V", "R", "I", "J", "H", "K", "L", "M", "N"])
-        if mes is not None:
-            return mes

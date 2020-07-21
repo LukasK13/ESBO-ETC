@@ -28,8 +28,8 @@ Attributes:
       |   The temperature of the black body.
     * | **temp_unit:** str, *optional* = "K"
       |   The unit of the black body's temperature. This has to be one of [``K``, ``Celsius``]. The default is ``K``.
-    * | **mag:** float
-      |   The apparent magnitude of the black body in magnitudes. In case of a magnitude per solid angle, an extended target is assumed.
+    * | **mag:** float, *optional* = None
+      |   The apparent magnitude of the black body in magnitudes. In case of None or magnitude per solid angle, an extended target is assumed.
     * | **mag_unit:** str, *optional* = "mag"
       |   The unit of the black body's magnitude. This has to be [``mag``, ``mag / arcsec**2``, ``mag / sr``]. The default is ``mag``.
     * | **band:** str
