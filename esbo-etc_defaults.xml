@@ -24,7 +24,7 @@
         <optical_component type="CosmicBackground" temp="2.725" temp_unit="K"/>
         <optical_component type="Atmosphere" transmittance="data/atmosphere/science_case.csv"
         emission="data/atmosphere/science_case_emission.csv"/>
-<!--        <optical_component type="StrayLight" emission="data/strayLight/emission.csv"-->
+<!--        <optical_component type="StrayLight" emission="data/strayLight/emission2.csv"-->
 <!--                           comment="Including arbitrary noise sources"/>-->
     </astroscene>
 

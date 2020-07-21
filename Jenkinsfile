@@ -20,6 +20,7 @@ pipeline {
                    . pyenv/bin/activate
                    pip3 install -r requirements.txt
                 '''
+                sh 'tree tests/data'
                 sh 'pyenv/bin/python3 -m unittest discover tests'
             }
         }
