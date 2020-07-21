@@ -38,7 +38,7 @@ pipeline {
                    -d ${SPHINX_DIR}/${BUILD_DIR}/doctrees ${SPHINX_DIR}/${SOURCE_DIR} ${SPHINX_DIR}/${BUILD_DIR}
                 '''
                 */
-                archiveArtifacts 'docs/build/html'
+                archiveArtifacts 'docs/build/html/**/*.*'
             }
             post {
                 failure {
