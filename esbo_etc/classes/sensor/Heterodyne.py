@@ -314,8 +314,8 @@ class Heterodyne(ASensor):
         else:
             signal = SpectralQty(signal.wl, signal.qty.to(u.W / (u.m ** 2 * u.Hz * u.sr),
                                                           equivalencies=u.spectral_density(signal.wl)))
-            t_signal = signal * (u.sr * self.__main_beam_efficiency * self.__lambda_line ** 2 / (
-                    2 * k_B) * self.__eta_fss)
+            t_signal = signal * (self.__main_beam_efficiency * signal.wl ** 2 / (
+                    2 * k_B) * self.__eta_fss * u.sr)
             t_signal = SpectralQty(t_signal.wl, t_signal.qty.decompose())
         logger.debug("Spectral signal temperature")
         logger.debug(t_signal)

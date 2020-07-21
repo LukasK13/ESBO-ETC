@@ -28,13 +28,16 @@ pipeline {
                 // clear out old files
                 sh 'rm -rf ${BUILD_DIR}'
                 sh 'rm -f ${SPHINX_DIR}/sphinx-build.log'
-                sh 'ls ${WORKSPACE}'
+                sh 'ls'
+                sh 'pyenv/bin/sphinx-build -b html docs/source docs/build/html'
+                /*
                 sh '''
                    ${WORKSPACE}/pyenv/bin/sphinx-build \
                    -q -w ${SPHINX_DIR}/sphinx-build.log \
                    -b html \
                    -d ${SPHINX_DIR}/${BUILD_DIR}/doctrees ${SPHINX_DIR}/${SOURCE_DIR} ${SPHINX_DIR}/${BUILD_DIR}
                 '''
+                */
                 archiveArtifacts 'docs/build/html'
             }
             post {
