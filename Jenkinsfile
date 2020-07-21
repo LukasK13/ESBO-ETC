@@ -40,7 +40,9 @@ pipeline {
             }
         }
         stage('Deploy') {
-            agent any
+            agent {
+                label 'lunjaserv'
+            }
             steps {
                 unstash 'html'
                 sh 'ls docs/build/html'
