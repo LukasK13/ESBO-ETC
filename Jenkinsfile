@@ -11,19 +11,19 @@ pipeline {
             agent {
                 dockerfile {
                   filename "Dockerfile"
-                  args "-u root" //needed to get around permission issues
                 }
             }
             steps {
                 // Install dependencies
                 sh '''
-                   virtualenv pyenv
-                   . pyenv/bin/activate
+                   virtualenv venv
+                   . venv/bin/activate
                    pip3 install -r requirements.txt
                 '''
+                // run tests
                 sh '''
                    export PYTHONPATH=`pwd`
-                   pyenv/bin/python3 -m unittest discover test
+                   venv/bin/python3 -m unittest discover ${TEST_DIR}
                 '''
             }
         }
@@ -32,24 +32,25 @@ pipeline {
             agent {
                 dockerfile {
                   filename "Dockerfile"
-                  args "-u root" //needed to get around permission issues
                 }
             }
             steps {
                 // Install dependencies
                 sh '''
-                   virtualenv pyenv
-                   . pyenv/bin/activate
+                   virtualenv venv
+                   . venv/bin/activate
                    pip3 install -r requirements.txt
                 '''
                 // clear out old files
                 sh 'rm -rf ${BUILD_DIR}'
                 sh 'rm -f ${SPHINX_DIR}/sphinx-build.log'
+                // build docs
                 sh '''
-                   pyenv/bin/sphinx-build \
+                   venv/bin/sphinx-build \
                    -w ${SPHINX_DIR}/sphinx-build.log \
                    -b html ${SPHINX_DIR}/${SOURCE_DIR} ${SPHINX_DIR}/${BUILD_DIR}
                 '''
+                // stash build result
                 stash includes: 'docs/build/html/**/*.*', name: 'html'
             }
             post {
@@ -58,13 +59,16 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Deploy Docs') {
             agent {
                 label 'lunjaserv'
             }
             steps {
+                // unstash build results from previous stage
                 unstash 'html'
+                // remove old files
                 sh 'rm -rf /opt/esbo-etc/html/*'
+                // copy new files
                 sh 'cp -rf docs/build/html /opt/esbo-etc/'
             }
         }
