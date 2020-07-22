@@ -15,7 +15,8 @@ Finally, ESBO-ETC allows the computation of either the necessary exposure time f
 exposure time or, in case of a BlackBodyTarget, the sensitivity as the minimum apparent magnitude for a given exposure
 time and SNR. All computations support a batch-mode, allowing to compute multiple scenarios at once.
 
-## Full Documentation
+## Documentation
+The latest version of the documentation is hosted on the [ESBO-DS server](https://esbo-ds.irs.uni-stuttgart.de/esboetcdocs/).
 The full documentation is available as source [here](docs) and can be build using
 [sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html) by the command
 ```bash
