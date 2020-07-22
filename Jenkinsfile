@@ -1,7 +1,7 @@
 pipeline {
     agent none
     environment {
-        TEST_DIR    = 'tests'
+        TEST_DIR    = 'test'
         SPHINX_DIR  = 'docs'
         BUILD_DIR   = 'build/html'
         SOURCE_DIR  = 'source'
