@@ -12,7 +12,7 @@ Attributes:
     * | **val:** float
       |   The value of the minimal wavelength.
     * | **val_unit:** str, *optional* = "m"
-      |   The unit of the minimal wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
+      |   The unit of the minimal wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``]. The default is ``m``.
 
 wl_max
 ------
@@ -26,7 +26,7 @@ Attributes:
     * | **val:** float
       |   The value of the maximal wavelength.
     * | **val_unit:** str, *optional* = "m"
-      |   The unit of the maximal wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
+      |   The unit of the maximal wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``]. The default is ``m``.
 
 .. _wl_delta:
 
@@ -42,7 +42,7 @@ Attributes:
     * | **val:** float
       |   The value of the wavelength grid size.
     * | **val_unit:** str, *optional* = "m"
-      |   The unit of the wavelength grid size. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
+      |   The unit of the wavelength grid size. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``]. The default is ``m``.
 
 .. _res:
 

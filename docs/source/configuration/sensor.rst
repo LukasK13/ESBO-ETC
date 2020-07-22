@@ -310,7 +310,7 @@ Attributes:
     * | **val:** float
       |   The wavelength of the observed line.
     * | **val_unit:** str, *optional* = "m"
-      |   The unit of the observed line wavelength. This has to be on of [``nm``, ``um``, ``mm``, ``cm``, ``m``].
+      |   The unit of the observed line wavelength. This has to be on of [``nm``, ``um``, ``mm``, ``cm``, ``m``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``].
 
 kappa
 ^^^^^
