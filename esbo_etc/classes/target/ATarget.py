@@ -38,7 +38,7 @@ class ATarget(IRadiant):
         background : SpectralQty
             The spectral radiance of the target's background
         """
-        logger.info("Calculating noise for class '" + self.__class__.__name__ + "'.")
+        logger.info("Calculating background for class '" + self.__class__.__name__ + "'.")
         background = SpectralQty(self.__wl_bins, np.repeat(0, len(self.__wl_bins)) << u.W / (u.m**2 * u.nm * u.sr))
         logger.debug(background)
         return background
