@@ -297,10 +297,11 @@ class Heterodyne(ASensor):
         wl_bins = np.sort(np.append(self.__common_conf.wl_bins(), self.__lambda_line)).view(u.Quantity)
         signal = signal.rebin(wl_bins)
         background = background.rebin(wl_bins)
-        t_background = SpectralQty(background.wl, background.qty.to(u.W / (u.m ** 2 * u.Hz * u.sr),
+        background = SpectralQty(background.wl, background.qty.to(u.W / (u.m ** 2 * u.Hz * u.sr),
                                                                     equivalencies=u.spectral_density(
                                                                         background.wl)))
-        t_background = t_background * (t_background.wl ** 2 / (2 * k_B) * u.sr)
+        t_background = background * (
+                    self.__aperture_efficiency * background.wl ** 2 / (2 * k_B) * self.__eta_fss * u.sr)
         t_background = SpectralQty(t_background.wl, t_background.qty.decompose())
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal temperature.")
