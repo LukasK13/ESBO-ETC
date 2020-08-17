@@ -1,4 +1,4 @@
-[![Build Status](https://jenkins.lklass.de/buildStatus/icon?job=esbo_ds%2FESBO-ETC%2Fmaster)](https://jenkins.lklass.de/job/esbo_ds/job/ESBO-ETC/job/master/)
+[![Build Status](http://esbo-ds.irs.uni-stuttgart.de:8080/buildStatus/icon?job=ESBO-ETC)](http://esbo-ds.irs.uni-stuttgart.de:8080/job/ESBO-ETC/)
 
 # ESBO-ETC
 A modular exposure time calculator for the ESBO telescope.
