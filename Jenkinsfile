@@ -73,7 +73,7 @@ pipeline {
                 // remove old files
                 sh 'rm -rf /var/www/html/esboetcdocs/*'
                 // copy new files
-                sh 'cp -rf docs/build/html /var/www/html/esboetcdocs/'
+                sh 'cp -rf docs/build/html/* /var/www/html/esboetcdocs/'
             }
         }
         stage('Deploy Docs Lunjaserv') {
