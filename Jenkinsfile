@@ -12,6 +12,7 @@ pipeline {
                 dockerfile {
                   filename "Dockerfile"
                   args "--network=host"
+                  additionalBuildArgs  "--network=host"
                 }
             }
             steps {
@@ -34,6 +35,7 @@ pipeline {
                 dockerfile {
                   filename "Dockerfile"
                   args "--network=host"
+                  additionalBuildArgs  "--network=host"
                 }
             }
             steps {
