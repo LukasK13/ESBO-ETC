@@ -76,4 +76,5 @@ pipeline {
                 sh 'cp -rf docs/build/html/* /var/www/html/esboetcdocs/'
             }
         }
+    }
 }
