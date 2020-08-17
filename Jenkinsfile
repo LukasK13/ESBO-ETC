@@ -76,18 +76,4 @@ pipeline {
                 sh 'cp -rf docs/build/html/* /var/www/html/esboetcdocs/'
             }
         }
-        stage('Deploy Docs Lunjaserv') {
-            agent {
-                label 'lunjaserv'
-            }
-            steps {
-                // unstash build results from previous stage
-                unstash 'html'
-                // remove old files
-                sh 'rm -rf /opt/esbo-etc/html/*'
-                // copy new files
-                sh 'cp -rf docs/build/html /opt/esbo-etc/'
-            }
-        }
-    }
 }
