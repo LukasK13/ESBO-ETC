@@ -30,3 +30,8 @@ Extending ESBO-ETC
 ==================
 
 .. include:: extending.rst
+
+CI/CD-Pipeline
+==============
+
+.. include:: pipeline.rst
