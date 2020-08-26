@@ -3,7 +3,7 @@ In the following, the most important classes that are used by the software but n
 Spectral Quantity
 -----------------
 
-.. figure:: images/SpectralQty.pdf
+.. figure:: images/SpectralQty.png
    :alt: Class Diagram
 
    Class diagram of the Spectral Quantity.
@@ -20,7 +20,7 @@ Additionally, the two methods ``rebin()`` and ``integrate()`` allow to change th
 Configuration
 -------------
 
-.. figure:: images/Configuration.pdf
+.. figure:: images/Configuration.png
    :alt: Class Diagram
 
    Class diagram of the Configuration.
@@ -36,7 +36,7 @@ Finally, this class also computes some meta options like the array containing th
 Entry
 -----
 
-.. figure:: images/Entry.pdf
+.. figure:: images/Entry.png
    :alt: Class Diagram
 
    Class diagram of the Entry.

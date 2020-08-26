@@ -2,7 +2,7 @@ Each push to the `ESBO-ETC Repository <https://egit.irs.uni-stuttgart.de/esbo_ds
 This pipeline first executes all unittests to ensure the prober functioning of the code. Afterwards this documentation is being built and deployed to the webroot of ESBO-DS' webserver.
 All these build steps are defined within a Jenkins-file in the root of the repository. The complete CI/CD set up is shown in the following figure.
 
-.. figure:: images/ci_cd_pipeline.pdf
+.. figure:: images/ci_cd_pipeline.png
    :alt: CI/CD configuration
 
    CI/CD configuration.

@@ -1,6 +1,6 @@
 For modelling the radiation transportation, the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ was used as shown in the figure below.
 
-.. figure:: images/decorator_pattern.pdf
+.. figure:: images/decorator_pattern.png
    :alt: Decorator Pattern
    :width: 100%
 
@@ -11,7 +11,7 @@ This target may be encapsulated by multiple optical components which manipulate 
 The outermost part of the radiation transportation pipeline is formed by some kind of sensor component, detecting the radiation.
 The quality of the detected signal can then be determined by calculating the signal to noise ration (SNR).
 
-.. figure:: images/class_diagram.pdf
+.. figure:: images/class_diagram.png
    :alt: Class Diagram
 
    Class diagram of the software architecture.
@@ -19,7 +19,7 @@ The quality of the detected signal can then be determined by calculating the sig
 Radiant Interface
 -----------------
 
-.. figure:: images/IRadiant.pdf
+.. figure:: images/IRadiant.png
    :alt: Interface IRadiant
 
    Class diagram of the interface IRadiant.
@@ -34,7 +34,7 @@ classes to focus on the initialization and calculation of their own properties, 
 Target
 ^^^^^^
 
-.. figure:: images/Target.pdf
+.. figure:: images/Target.png
    :alt: Target Classes
 
    Class diagram of the target classes.
@@ -47,7 +47,7 @@ All subclasses therefore only set up a ``SpectralQty``-object containing the emi
 Optical Component
 ^^^^^^^^^^^^^^^^^
 
-.. figure:: images/OpticalComponent.pdf
+.. figure:: images/OpticalComponent.png
    :alt: Optical component classes
 
    Class diagram of the optical components.
@@ -64,7 +64,7 @@ According to the restrictions above, subclasses of ``AOpticalComponent`` can be 
 Hot Optical Component
 """""""""""""""""""""
 
-.. figure:: images/HotOpticalComponent.pdf
+.. figure:: images/HotOpticalComponent.png
    :alt: Hot optical component classes
 
    Class diagram of the hot optical components.
@@ -76,7 +76,7 @@ Like ``AOpticalComponent``, the class ``AHotOpticalComponent`` provides the abst
 Sensor
 ------
 
-.. figure:: images/Sensor.pdf
+.. figure:: images/Sensor.png
    :alt: Sensor classes
 
    Class diagram of the sensor components.
@@ -90,7 +90,7 @@ Additionally, ``ASensor`` defines the abstract method ``checkConfig()`` to allow
 PSF
 ---
 
-.. figure:: images/PSF.pdf
+.. figure:: images/PSF.png
    :alt: PSF classes
 
    Class diagram of the PSF classes.
@@ -108,7 +108,7 @@ The following two factory methods are responsible for transforming the parsed co
 Radiant Factory
 ^^^^^^^^^^^^^^^
 
-.. figure:: images/RadiantFactory.pdf
+.. figure:: images/RadiantFactory.png
    :alt: RadiantFactory class
 
    Class diagram of the radiant factory.
@@ -120,7 +120,7 @@ The method ``fromConfigBatch`` allows to set up a batch of objects starting with
 Sensor Factory
 ^^^^^^^^^^^^^^
 
-.. figure:: images/SensorFactory.pdf
+.. figure:: images/SensorFactory.png
    :alt: SensorFactory class
 
    Class diagram of the sensor factory.
