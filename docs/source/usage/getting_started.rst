@@ -77,11 +77,11 @@ same options which can be shown using the parameter ``-h`` or ``--help``.
 
 The following options are available:
 
-:-h, -\\-help: Show the help.
-:-c, -\\-config: Specify the path to the configuration file. Default is esbo-etc_defaults.xml.
-:-l, -\\-logging: Specify the log level for the application. Possible levels are DEBUG, INFO, WARNING, ERROR.
-:-v, -\\-version: Print version information.
-:-m, -\\-manual: Print the manual.
+:-h, -\-help: Show the help.
+:-c, -\-config: Specify the path to the configuration file. Default is esbo-etc_defaults.xml.
+:-l, -\-logging: Specify the log level for the application. Possible levels are DEBUG, INFO, WARNING, ERROR.
+:-v, -\-version: Print version information.
+:-m, -\-manual: Print the manual.
 
 
 Shell-Script
