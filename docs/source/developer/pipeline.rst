@@ -20,13 +20,11 @@ Pipeline
 The pipeline is divided into three steps:
 
 1. **Test:** A docker image containing a complete python installation and a virtual environment is built using the Dockerfile in the root of the repo.
-Afterwards all required python modules (see ``requirements.txt``) are being installed in the container and the unittests defined in ``tests`` executed.
-If all tests pass, the pipeline continues with stage 2.
-
+   Afterwards all required python modules (see ``requirements.txt``) are being installed in the container and the unittests defined in ``tests`` executed.
+   If all tests pass, the pipeline continues with stage 2.
 2. **Build Docs:** The documentation is being build using the previous docker image.
-After all required python modules have been installed, the build process using sphinx is started.
-The results of the build process (all website files) are archived (stashed) for the next stage of the pipeline as shown in the image above.
-
+   After all required python modules have been installed, the build process using sphinx is started.
+   The results of the build process (all website files) are archived (stashed) for the next stage of the pipeline as shown in the image above.
 3. **Deploy Docs:** The last stage of the pipeline is run locally on the ESBO-DS VM.
-The build results from the previous stage are unarchived and copied to the webroot of the webserver.
+   The build results from the previous stage are unarchived and copied to the webroot of the webserver.
 
