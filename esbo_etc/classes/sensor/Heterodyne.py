@@ -301,7 +301,7 @@ class Heterodyne(ASensor):
                                                                     equivalencies=u.spectral_density(
                                                                         background.wl)))
         t_background = background * (
-                    self.__aperture_efficiency * background.wl ** 2 / (2 * k_B) * self.__eta_fss * u.sr)
+                    self.__main_beam_efficiency * background.wl ** 2 / (2 * k_B) * self.__eta_fss * u.sr)
         t_background = SpectralQty(t_background.wl, t_background.qty.decompose())
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal temperature.")
