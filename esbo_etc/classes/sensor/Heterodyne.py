@@ -121,7 +121,7 @@ class Heterodyne(ASensor):
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         line_ind = np.where(t_signal.wl == self.__lambda_line)[0][0]
-        t_sys = 2 * (t_background + self.__receiver_temp)
+        t_sys = 2 * (t_background + self.__receiver_temp + t_signal)
         # Calculate the noise bandwidth
         delta_nu = t_signal.wl.to(u.Hz, equivalencies=u.spectral()) / (t_signal.wl / self.__common_conf.wl_delta() + 1)
         exp_time = []
@@ -172,7 +172,7 @@ class Heterodyne(ASensor):
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         line_ind = np.where(t_signal.wl == self.__lambda_line)[0][0]
-        t_sys = 2 * (t_background + self.__receiver_temp)
+        t_sys = 2 * (t_background + self.__receiver_temp + t_signal)
         # Calculate the noise bandwidth
         delta_nu = t_signal.wl.to(u.Hz, equivalencies=u.spectral()) / (t_signal.wl / self.__common_conf.wl_delta() + 1)
         sensitivity = []
