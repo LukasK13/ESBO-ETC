@@ -115,9 +115,11 @@ Attributes:
     * | **val_unit:** str, *optional* = "arcsec"
       |   The unit of the pointing jitter sigma. This has to be one of [``arcsec``, ``arcmin``, ``degree``, ``radians``]. The default is ``arcsec``.
 
+.. _output_dir:
+
 output
 ------
-*optional* -- Output settings for the results of the computation.
+*optional* -- Output settings for the results of the computation (see also :ref:`output`).
 
 .. code-block:: xml
 
