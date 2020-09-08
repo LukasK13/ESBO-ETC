@@ -28,7 +28,7 @@ The Imager sensor type allows to model a generic imaging sensor which uses a pix
             <sigma_read_out val="1.4" val_unit="electron(1/2) / pix"/>
             <well_capacity val="30000" val_unit="electron"/>
         </pixel>
-        <photometric_aperture/>
+        <photometric_aperture>
             <shape val="circle"/>
             <contained_energy val="80"/>
             <contained_pixels val="100" val_unit="pix"/>

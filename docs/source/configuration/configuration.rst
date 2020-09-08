@@ -104,7 +104,7 @@ Example Configuration
         </common>
 
         <astroscene>
-            <target type="BlackBodyTarget" temp="5778" temp_unit="K" mag="10" mag_unit="mag" band="B" size="point"
+            <target type="BlackBodyTarget" temp="5778" temp_unit="K" mag="10" mag_unit="mag" band="B"
                     comment="Modeling the sun as mag 10 star. Size can be point or extended"/>
             <optical_component type="Atmosphere" transmittance="data/atmosphere/ESBO-DS_transmittance.txt"
                                emission="data/atmosphere/ESBO-DS_emission.txt" comment="Including the atmosphere"/>
