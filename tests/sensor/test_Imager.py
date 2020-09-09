@@ -23,7 +23,7 @@ class TestImager(TestCase):
 
     def test_getSNR(self):
         snr = self.imager.getSNR(0.1 * u.s)
-        self.assertAlmostEqual(snr.value, 5.694075373738752)
+        self.assertAlmostEqual(snr.value, 7.112939048582188)
 
     def test_getExpTime(self):
         exp_time = 0.1 * u.s
