@@ -19,7 +19,7 @@
                 comment="Modeling the sun as mag 10 star"/>
         <optical_component type="Atmosphere" transmittance="tests/data/atmosphere/transmittance.csv"
                            emission="tests/data/atmosphere/emission.csv" comment="Including the atmosphere"/>
-        <optical_component type="StrayLight" emission="./tests/data/strayLight/emission.csv"
+        <optical_component type="StrayLight" emission="tests/data/strayLight/emission.csv"
                            comment="Including arbitrary noise sources"/>
     </astroscene>
 

@@ -140,6 +140,7 @@ class Entry(object):
         """
         if not hasattr(self, name):
             return "Parameter '" + name + "' not found."
+        print(os.getcwd())
         if not os.path.isfile(getattr(self, name)):
             return "File '" + getattr(self, name) + "' does not exist."
 
