@@ -25,6 +25,9 @@ pipeline {
                 // run tests
                 sh '''
                    export PYTHONPATH=`pwd`
+                   ls
+                   ls tests
+                   ls tests/data
                    venv/bin/python3 -m unittest discover ${TEST_DIR}
                 '''
             }
