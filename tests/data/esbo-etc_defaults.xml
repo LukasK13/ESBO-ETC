@@ -1,13 +1,13 @@
 <root>
     <common>
-        <wl_min val="3" val_unit="um" comment="Shortest wavelength used for binning input spectra"/>
-        <wl_max val="5" val_unit="um" comment="Shortest wavelength used for binning input spectra"/>
+        <wl_min val="0.4" val_unit="um" comment="Shortest wavelength used for binning input spectra"/>
+        <wl_max val="0.5" val_unit="um" comment="Shortest wavelength used for binning input spectra"/>
         <wl_delta val="1" val_unit="nm" comment="Wavelength increment used for binning input spectra"/>
 <!--        <res val="1000" val_unit=""-->
 <!--                   comment="Resolving power for common spectral binning. A linear binning wavelength integral is estimated as wl_min/R"/>-->
         <d_aperture val="0.5" val_unit="m" comment="Diameter of the telescope aperture"/>
         <psf val="Airy" osf="10" comment="PSF of the optical system. Can be Airy or a file"/>
-<!--        <psf val="data/ps2f.txt" comment="PSF of the optical system. Can be Airy or a file"/>-->
+<!--        <psf val="tests/data/ps2f.txt" comment="PSF of the optical system. Can be Airy or a file"/>-->
         <jitter_sigma val="1" val_unit="arcsec" comment="Sigma of the telescope jitter"/>
         <output path="output" format="fits" comment="Output directory to store output files"/>
         <exposure_time val="0.1" val_unit="s" comment="The exposure time"/>
@@ -17,29 +17,29 @@
     <astroscene>
         <target type="BlackBodyTarget" temp="5778" temp_unit="K" mag="10" mag_unit="mag" band="V"
                 comment="Modeling the sun as mag 10 star"/>
-        <optical_component type="Atmosphere" transmittance="data/atmosphere/transmittance.csv"
-                           emission="data/atmosphere/emission.csv" comment="Including the atmosphere"/>
-        <optical_component type="StrayLight" emission="data/strayLight/emission.csv"
+        <optical_component type="Atmosphere" transmittance="tests/data/atmosphere/transmittance.csv"
+                           emission="tests/data/atmosphere/emission.csv" comment="Including the atmosphere"/>
+        <optical_component type="StrayLight" emission="tests/data/strayLight/emission.csv"
                            comment="Including arbitrary noise sources"/>
     </astroscene>
 
     <common_optics>
-        <optical_component type="Mirror" reflectance="data/mirror/reflectance.csv"
-                           emissivity="data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M1"
+        <optical_component type="Mirror" reflectance="tests/data/mirror/reflectance.csv"
+                           emissivity="tests/data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M1"
                            obstruction="0.1" obstructor_temp="70" obstructor_temp_unit="K"/>
-        <optical_component type="Mirror" reflectance="data/mirror/reflectance.csv"
-                           emissivity="data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M2"/>
-        <optical_component type="Mirror" reflectance="data/mirror/reflectance.csv"
-                           emissivity="data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M3"/>
+        <optical_component type="Mirror" reflectance="tests/data/mirror/reflectance.csv"
+                           emissivity="tests/data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M2"/>
+        <optical_component type="Mirror" reflectance="tests/data/mirror/reflectance.csv"
+                           emissivity="tests/data/mirror/emissivity.csv" temp="70" temp_unit="K" comment="M3"/>
 <!--        <optical_component type="Filter" band="B"-->
-<!--                           emissivity="data/filter/emissivity.csv" val="70" val_unit="K" comment="Filter wheel"/>-->
+<!--                           emissivity="tests/data/filter/emissivity.csv" val="70" val_unit="K" comment="Filter wheel"/>-->
         <optical_component type="Filter" start="400" start_unit="nm" end="480" end_unit="nm"
-                           emissivity="data/filter/emissivity.csv" temp="70" temp_unit="K" comment="Filter wheel"/>
+                           emissivity="tests/data/filter/emissivity.csv" temp="70" temp_unit="K" comment="Filter wheel"/>
     </common_optics>
 
     <instrument>
-        <optical_component type="Lens" transmittance="data/lens/transmittance.csv"
-                           emissivity="data/lens/emissivity.csv" temp="70" temp_unit="K" comment="M4"/>
+        <optical_component type="Lens" transmittance="tests/data/lens/transmittance.csv"
+                           emissivity="tests/data/lens/emissivity.csv" temp="70" temp_unit="K" comment="M4"/>
         <sensor type="Imager">
             <f_number val="13" val_unit="" comment="The working f/#"/>
             <pixel_geometry val="1024, 1024" val_unit="pix" comment="Pixel geometry"/>
