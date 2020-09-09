@@ -29,7 +29,6 @@ class Imager(ASensor):
                  contained_energy: Union[str, int, float] = "FWHM", aperture_size: u.Quantity = None):
         """
         Initialize a new Image-sensor model.
-        Initialize a new Image-sensor model.
 
         Parameters
         ----------
