@@ -50,6 +50,7 @@ pipeline {
                 sh 'rm -f ${SPHINX_DIR}/sphinx-build.log'
                 // build docs
                 sh '''
+                   venv/bin/sphinx-apidoc -f -o docs/source/api esbo_etc
                    venv/bin/sphinx-build \
                    -w ${SPHINX_DIR}/sphinx-build.log \
                    -b html ${SPHINX_DIR}/${SOURCE_DIR} ${SPHINX_DIR}/${BUILD_DIR}
