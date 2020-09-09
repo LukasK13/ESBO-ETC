@@ -16,6 +16,11 @@ Project Structure
 
 .. include:: project_structure.rst
 
+ESBO-ETC Python module
+======================
+
+.. include:: scripting.rst
+
 Software Architecture
 =====================
 
