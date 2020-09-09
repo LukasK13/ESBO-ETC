@@ -19,8 +19,8 @@
     <astroscene>
 <!--        <target type="LineTarget" brightness_temp="0.52" brightness_temp_unit="K"-->
 <!--                comment="Modeling the sun as mag 10 star. Size can be point or extended"/>-->
-        <target type="FileTarget" file="data/target/line.csv"/>
-        <optical_component type="Atmosphere" transmittance="data/atmosphere/transmittance_great.csv"
+        <target type="FileTarget" file="tests/data/target/line.csv"/>
+        <optical_component type="Atmosphere" transmittance="tests/data/atmosphere/transmittance_great.csv"
                            comment="Including the atmosphere"/>
 <!--        <optical_component type="StrayLight" emission="data/atmosphere/ESBO-DS_emission.txt"-->
 <!--                   comment="Including arbitrary noise sources"/>-->
@@ -29,7 +29,7 @@
     </astroscene>
 
     <common_optics>
-        <optical_component type="Mirror" reflectance="data/mirror/reflectance_great.csv" emissivity="0.08" temp="230"
+        <optical_component type="Mirror" reflectance="tests/data/mirror/reflectance_great.csv" emissivity="0.08" temp="230"
                            temp_unit="K" obstruction="0.0" comment="M1"/>
 <!--        <optical_component type="Mirror" reflectance="0.86"-->
 <!--                           emissivity="0" temp="70" temp_unit="K" obstruction="0.0" comment="M1"/>-->
