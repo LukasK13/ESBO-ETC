@@ -46,9 +46,9 @@ class SensorFactory:
                 if hasattr(options.photometric_aperture, "contained_energy") and isinstance(
                         options.photometric_aperture.contained_energy, Entry):
                     args["contained_energy"] = options.photometric_aperture.contained_energy()
-                if hasattr(options.photometric_aperture, "contained_pixels") and isinstance(
-                        options.photometric_aperture.contained_pixels, Entry):
-                    args["contained_pixels"] = options.photometric_aperture.contained_pixels()
+                if hasattr(options.photometric_aperture, "aperture_size") and isinstance(
+                        options.photometric_aperture.aperture_size, Entry):
+                    args["aperture_size"] = options.photometric_aperture.aperture_size()
             return Imager(**args)
         elif options.type == "Heterodyne":
             args = dict(parent=self.__parent, aperture_efficiency=options.aperture_efficiency(),

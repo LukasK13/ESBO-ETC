@@ -16,7 +16,7 @@ class TestImager(TestCase):
                                 pixel_size=6.5 * u.um, read_noise=1.4 * u.electron ** 0.5 / u.pix,
                                 dark_current=0.6 * u.electron / u.pix / u.second, well_capacity=30000 * u.electron,
                                 f_number=13, common_conf=self.config.common, center_offset=np.array([0, 0]) << u.pix,
-                                shape="circle", contained_energy="FWHM", contained_pixels=None)
+                                shape="circle", contained_energy="FWHM", aperture_size=None)
         self.target = FileTarget("tests/data/target/target_demo_1.csv", np.arange(200, 210) << u.nm)
         self.zodiac = StrayLight(self.target, "tests/data/straylight/zodiacal_emission_1.csv")
         self.imager = Imager(self.zodiac, **self.imager_args)

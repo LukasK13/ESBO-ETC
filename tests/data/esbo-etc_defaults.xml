@@ -54,7 +54,7 @@
             <photometric_aperture comment="The photometric aperture used to calculate signal and noise.">
                 <shape val="square" comment="Shape of the photometric aperture. Can be square / circle"/>
                 <contained_energy val="min" comment="Contained energy for calculating the SNR. Can be Peak, FWHM, Min or the percentage of encircled energy."/>
-<!--                <contained_pixels val="20" val_unit="pix" comment="Number of contained pixels."/>-->
+<!--                <aperture_size val="20" val_unit="pix" comment="Number of contained pixels."/>-->
             </photometric_aperture>
         </sensor>
     </instrument>

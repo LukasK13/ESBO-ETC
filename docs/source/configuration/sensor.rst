@@ -31,7 +31,7 @@ The Imager sensor type allows to model a generic imaging sensor which uses a pix
         <photometric_aperture>
             <shape val="circle"/>
             <contained_energy val="80"/>
-            <contained_pixels val="100" val_unit="pix"/>
+            <aperture_size val="100" val_unit="pix"/>
         </photometric_aperture>
     </sensor>
 
@@ -178,7 +178,7 @@ The photometric_aperture-container contains parameters for the photometric apert
     <photometric_aperture/>
         <shape val="circle"/>
         <contained_energy val="80"/>
-        <contained_pixels val="100" val_unit="pix"/>
+        <aperture_size val="100" val_unit="pix"/>
     </photometric_aperture>
 
 shape
@@ -209,21 +209,21 @@ Attributes:
     * | **val:** (float, str)
       |   The energy to be contained within the photometric aperture. This can be either the percentage of contained energy or one of [``Peak``, ``FWHM``, ``Min``].
 
-contained_pixels
+aperture_size
 """"""""""""""""
 *optional*
 
-The number of pixels to be contained within the photometric aperture. If this parameter is given, the :ref:`contained_energy` parameter will be ignored. The square root of this value will be used as the radius of the photometric aperture.
+The radius respectively the edge length of the photometric aperture in pixels. If this parameter is given, the :ref:`contained_energy` parameter will be ignored.
 
 .. code-block:: xml
 
-    <contained_pixels val="100" val_unit="pix"/>
+    <aperture_size val="100" val_unit="pix"/>
 
 Attributes:
     * | **val:** float
-      |   The number of pixels to be contained within the photometric aperture.
+      |   The radius respectively the edge length of the photometric aperture.
     * | **val_unit:** str, *optional* = "pix"
-      |   The unit of the number of pixels to be contained within the photometric aperture. This has to be ``pix``.
+      |   The unit of the radius respectively the edge length of the photometric aperture. This has to be ``pix``.
 
 Heterodyne
 ----------

@@ -26,7 +26,7 @@ class Imager(ASensor):
                  pixel_geometry: u.Quantity, pixel_size: u.Quantity, read_noise: u.Quantity, dark_current: u.Quantity,
                  well_capacity: u.Quantity, f_number: Union[int, float], common_conf: Entry,
                  center_offset: u.Quantity = np.array([0, 0]) << u.pix, shape: str = "circle",
-                 contained_energy: Union[str, int, float] = "FWHM", contained_pixels: u.Quantity = None):
+                 contained_energy: Union[str, int, float] = "FWHM", aperture_size: u.Quantity = None):
         """
         Initialize a new Image-sensor model.
         Initialize a new Image-sensor model.
@@ -60,8 +60,8 @@ class Imager(ASensor):
             The shape of the photometric aperture. Can be either square or circle
         contained_energy : Union[str, int, float]
             The energy contained within the photometric aperture.
-        contained_pixels : u.Quantity
-            The pixels contained within the photometric aperture.
+        aperture_size : u.Quantity
+            The radius respectively the edge length of the photometric aperture.
         """
         super().__init__(parent)
         if type(quantum_efficiency) == str:
@@ -77,7 +77,7 @@ class Imager(ASensor):
         self.__center_offset = center_offset
         self.__shape = shape
         self.__contained_energy = contained_energy
-        self.__contained_pixels = contained_pixels
+        self.__aperture_size = aperture_size
         self.__common_conf = common_conf
         # Calculate central wavelength
         self.__central_wl = self.__common_conf.wl_min() + (
@@ -361,9 +361,9 @@ class Imager(ASensor):
             mask.createPhotometricAperture("circle", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
         else:
             # Target is a point source
-            if self.__contained_pixels is not None:
+            if self.__aperture_size is not None:
                 # Calculate the diameter of the photometric aperture as square root of the contained pixels
-                d_photometric_ap = np.sqrt(self.__contained_pixels.value) * u.pix
+                d_photometric_ap = np.sqrt(self.__aperture_size.value) * u.pix
                 # Mask the pixels to be exposed
                 mask.createPhotometricAperture("square", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
             else:
@@ -379,7 +379,7 @@ class Imager(ASensor):
         read_noise = mask * self.__read_noise * u.pix
         # Calculate the dark current PixelMask
         dark_current = mask * self.__dark_current * u.pix
-        if self.__contained_pixels is None and size.lower() != "extended":
+        if self.__aperture_size is None and size.lower() != "extended":
             if type(self.__contained_energy) == str:
                 if self.__contained_energy.lower() == "peak":
                     logger.info("The radius of the photometric aperture is %.2f pixels. This equals the peak value" % (
@@ -552,10 +552,10 @@ class Imager(ASensor):
         if not hasattr(sensor, "photometric_aperture"):
             setattr(sensor, "photometric_aperture", Entry(shape=Entry(val="circle"),
                                                           contained_energy=Entry(val="FWHM")))
-        if hasattr(sensor.photometric_aperture, "contained_pixels"):
-            mes = sensor.photometric_aperture.contained_pixels.check_quantity("val", u.pix)
+        if hasattr(sensor.photometric_aperture, "aperture_size"):
+            mes = sensor.photometric_aperture.aperture_size.check_quantity("val", u.pix)
             if mes is not None:
-                return "photometric_aperture -> contained_pixels: " + mes
+                return "photometric_aperture -> aperture_size: " + mes
         else:
             if not hasattr(sensor.photometric_aperture, "shape"):
                 return "Missing container 'shape'."
