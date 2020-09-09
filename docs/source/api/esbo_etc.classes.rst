@@ -63,6 +63,14 @@ esbo\_etc.classes.SpinnerHandler module
    :undoc-members:
    :show-inheritance:
 
+esbo\_etc.classes.esbo\_etc module
+----------------------------------
+
+.. automodule:: esbo_etc.classes.esbo_etc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
