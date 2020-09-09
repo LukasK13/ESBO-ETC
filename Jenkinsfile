@@ -24,6 +24,7 @@ pipeline {
                 '''
                 // run tests
                 sh '''
+                   ls tests/data/strayLight
                    export PYTHONPATH=`pwd`
                    venv/bin/python3 -m unittest discover ${TEST_DIR}
                 '''
