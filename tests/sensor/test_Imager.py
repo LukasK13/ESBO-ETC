@@ -13,7 +13,7 @@ class TestImager(TestCase):
         self.config = Configuration("tests/data/esbo-etc_defaults.xml").conf
         self.imager_args = dict(quantum_efficiency=0.9 * u.electron / u.photon,
                                 pixel_geometry=np.array([1024, 1024]) << u.pix,
-                                pixel_size=6.5 * u.um, read_noise=1.4 * u.electron ** 0.5 / u.pix,
+                                pixel_size=6.5 * u.um, sigma_read_out=1.4 * u.electron ** 0.5 / u.pix,
                                 dark_current=0.6 * u.electron / u.pix / u.second, well_capacity=30000 * u.electron,
                                 f_number=13, common_conf=self.config.common, center_offset=np.array([0, 0]) << u.pix,
                                 shape="circle", contained_energy="FWHM", aperture_size=None)

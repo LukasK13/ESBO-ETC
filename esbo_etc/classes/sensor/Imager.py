@@ -20,10 +20,10 @@ class Imager(ASensor):
     """
     __encircled_energy: Union[str, float, u.Quantity]
 
-    @u.quantity_input(pixel_geometry=u.pixel, pixel_size="length", read_noise=u.electron ** 0.5 / u.pix,
+    @u.quantity_input(pixel_geometry=u.pixel, pixel_size="length", sigma_read_out=u.electron ** 0.5 / u.pix,
                       center_offset=u.pix, dark_current=u.electron / u.pix / u.second, well_capacity=u.electron)
     def __init__(self, parent: IRadiant, quantum_efficiency: Union[str, u.Quantity],
-                 pixel_geometry: u.Quantity, pixel_size: u.Quantity, read_noise: u.Quantity, dark_current: u.Quantity,
+                 pixel_geometry: u.Quantity, pixel_size: u.Quantity, sigma_read_out: u.Quantity, dark_current: u.Quantity,
                  well_capacity: u.Quantity, f_number: Union[int, float], common_conf: Entry,
                  center_offset: u.Quantity = np.array([0, 0]) << u.pix, shape: str = "circle",
                  contained_energy: Union[str, int, float] = "FWHM", aperture_size: u.Quantity = None):
@@ -42,7 +42,7 @@ class Imager(ASensor):
             [number of pixels in x-direction, number of pixels in y-direction]
         pixel_size : length-Quantity
             The edge length of a pixel (assumed to be square).
-        read_noise : Quantity
+        sigma_read_out : Quantity
             The RMS-read noise per detector pixel in electrons^0.5 / pixel.
         dark_current : Quantity
             The dark current of a detector pixel in electrons / (pixels * s).
@@ -69,7 +69,7 @@ class Imager(ASensor):
             self.__quantum_efficiency = quantum_efficiency
         self.__pixel_geometry = pixel_geometry
         self.__pixel_size = pixel_size
-        self.__read_noise = read_noise
+        self.__sigma_read_out = sigma_read_out
         self.__dark_current = dark_current
         self.__well_capacity = well_capacity
         self.__f_number = f_number
@@ -375,7 +375,7 @@ class Imager(ASensor):
         # Calculate the background current PixelMask
         background_current = mask * background_current * u.pix
         # Calculate the read noise PixelMask
-        read_noise = mask * self.__read_noise * u.pix
+        read_noise = mask * self.__sigma_read_out * u.pix
         # Calculate the dark current PixelMask
         dark_current = mask * self.__dark_current * u.pix
         if self.__aperture_size is None and size.lower() != "extended":
