@@ -68,6 +68,14 @@ esbo\_etc.classes.optical\_component.Mirror module
    :undoc-members:
    :show-inheritance:
 
+esbo\_etc.classes.optical\_component.OpticalComponentFactory module
+-------------------------------------------------------------------
+
+.. automodule:: esbo_etc.classes.optical_component.OpticalComponentFactory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 esbo\_etc.classes.optical\_component.StrayLight module
 ------------------------------------------------------
 

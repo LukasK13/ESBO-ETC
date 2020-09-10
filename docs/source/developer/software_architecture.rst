@@ -70,7 +70,7 @@ Hot Optical Component
    Class diagram of the hot optical components.
 
 The abstract class ``AHotOpticalComponent`` extends the abstract superclass ``AOpticalComponent`` by implementing the method ``ownNoise()`` assuming grey body radiation in order to model optical components with a thermal background contribution.
-This has the consequence, that every subclass of ``AHotOpticalComponent`` must implement the method ``propagate()``, which handles to propagation of the signal and backgroudn radiation through the component.
+This has the consequence, that every subclass of ``AHotOpticalComponent`` must implement the method ``propagate()``, which handles to propagation of the signal and background radiation through the component.
 Like ``AOpticalComponent``, the class ``AHotOpticalComponent`` provides the abstract method ``checkConfig()`` for checking the configuration file.
 
 Sensor
@@ -103,27 +103,17 @@ Factories
 ---------
 
 In order to instantiate the corresponding objects from the configuration file, the `factory method pattern <https://en.wikipedia.org/wiki/Factory_method_pattern>`_ was used.
-The following two factory methods are responsible for transforming the parsed configuration into the cascaded radiation transportation pipeline.
+The following factory methods are responsible for transforming the parsed configuration into the cascaded radiation transportation pipeline.
 
-Radiant Factory
-^^^^^^^^^^^^^^^
+.. figure:: images/Factory.png
+   :alt: Factory classes
 
-.. figure:: images/RadiantFactory.png
-   :alt: RadiantFactory class
+   Class diagram of the factories.
 
-   Class diagram of the radiant factory.
+The abstract superclass ``AFactory`` provides the abstract method ``create()`` to create any target, optical component and detector object.
+Additionally, the method ``collectOptions()`` allows to collect all options from the parsed configuration as dictionary for the constructor call of the corresponding class.
 
-The class ``RadiantFactory`` is responsible for the instantiation of all targets and optical components.
-Therefore the method ``create()`` analyzes the parsed configuration and assembles the necessary parameters for the following instantiation of the object.
-The method ``fromConfigBatch`` allows to set up a batch of objects starting with a target and continuing with possibly multiple optical components.
-
-Sensor Factory
-^^^^^^^^^^^^^^
-
-.. figure:: images/SensorFactory.png
-   :alt: SensorFactory class
-
-   Class diagram of the sensor factory.
-
-The class ``SensorFactory`` allows to instantiate a sensor object from the parsed configuration.
-In detail, the method ``create()`` is responsible for assembling all parameters and setting up the object.
+The class ``TargetFactory`` is responsible for the instantiation of all subclasses of ``ATarget``.
+In contrast, the class ``OpticalComponentFactory`` handles the creation of all subclasses of ``AOpticalComponent``.
+It provides the method ``fromConfigBatch`` to set up a batch of optical components.
+Finally, the class ``SensorFactory`` is responsible for the instantiation of all subclasses of ``ASensor``.

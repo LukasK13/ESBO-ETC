@@ -15,6 +15,22 @@ Subpackages
 Submodules
 ----------
 
+esbo\_etc.classes.AFactory module
+---------------------------------
+
+.. automodule:: esbo_etc.classes.AFactory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+esbo\_etc.classes.ARadiantFactory module
+----------------------------------------
+
+.. automodule:: esbo_etc.classes.ARadiantFactory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 esbo\_etc.classes.Config module
 -------------------------------
 
@@ -35,14 +51,6 @@ esbo\_etc.classes.IRadiant module
 ---------------------------------
 
 .. automodule:: esbo_etc.classes.IRadiant
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-esbo\_etc.classes.RadiantFactory module
----------------------------------------
-
-.. automodule:: esbo_etc.classes.RadiantFactory
    :members:
    :undoc-members:
    :show-inheritance:

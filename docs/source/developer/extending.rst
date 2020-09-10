@@ -14,7 +14,7 @@ The class must provide a constructor which accepts all attributes of the configu
 Additionally, the class must implement the method ``checkConfig()`` in order to check the configuration.
 In case of an configuration error, the method must return the corresponding error message.
 
-Optionally, the factory method ``create()`` of the class ``RadiantFactory`` has to be modified, if the constructor of the new component requires more parameters than the configuration tag attributes.
+Optionally, the factory method ``create()`` of the class ``TargetFactory`` has to be modified, if the constructor of the new component requires more parameters than the configuration tag attributes.
 
 
 Adding Optical Components
@@ -33,7 +33,7 @@ In case of an configuration error, the method must return the corresponding erro
 The method ``propagate()`` is used to model the propagation of incoming radiation through the optical component.
 Therefore, this method receives as parameter the incoming radiation as ``SpectralQty``-object and must return the manipulated radiation as ``SpectralQty``-object.
 
-The optional second task consists of modifying the factory method ``create()`` of the class ``RadiantFactory`` in order to properly initialize the new optical component from the configuration.
+The optional second task consists of modifying the factory method ``create()`` of the class ``OpticalComponentFactory`` in order to properly initialize the new optical component from the configuration.
 This is only necessary if the new optical component needs additional parameters besides the attributes of the corresponding configuration tag of if the new component provides multiple constructors (see class ``Filter``).
 
 Adding Detector Components

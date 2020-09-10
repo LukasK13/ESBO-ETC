@@ -28,6 +28,14 @@ esbo\_etc.classes.target.FileTarget module
    :undoc-members:
    :show-inheritance:
 
+esbo\_etc.classes.target.TargetFactory module
+---------------------------------------------
+
+.. automodule:: esbo_etc.classes.target.TargetFactory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
