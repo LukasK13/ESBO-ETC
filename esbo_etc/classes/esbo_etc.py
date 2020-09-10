@@ -47,10 +47,14 @@ class esbo_etc:
 
         # Set up components
         logger.info("Setting up components...", extra={"spinning": True})
-        oc_factory = eetc.classes.RadiantFactory(self.conf.common.wl_bins())
-        parent = oc_factory.fromConfigBatch(self.conf)
-        sensor_factory = eetc.SensorFactory(parent, self.conf.common)
-        detector = sensor_factory.create(self.conf.instrument.sensor)
+        target_factory = eetc.TargetFactory(self.conf.common)
+        oc_factory = eetc.OpticalComponentFactory(self.conf.common)
+        sensor_factory = eetc.SensorFactory(self.conf.common)
+
+        parent = target_factory.create(self.conf.astroscene.target)
+        parent = oc_factory.fromConfigBatch(self.conf, parent)
+
+        detector = sensor_factory.create(self.conf.instrument.sensor, parent)
 
         # Calculate results
         res = None

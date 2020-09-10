@@ -7,3 +7,4 @@ from .Lens import *
 from .BeamSplitter import *
 from .Mirror import *
 from .CosmicBackground import *
+from .OpticalComponentFactory import *

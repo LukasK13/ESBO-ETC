@@ -1,3 +1,4 @@
+from ..AFactory import AFactory
 from ..IRadiant import IRadiant
 from ..Entry import Entry
 from .ASensor import ASensor
@@ -6,36 +7,41 @@ from .Heterodyne import Heterodyne
 from ...lib.logger import logger
 
 
-class SensorFactory:
+class SensorFactory(AFactory):
     """
     A Factory creating objects of the type ASensor
     """
-    def __init__(self, parent: IRadiant, common_conf: Entry):
+
+    def __init__(self, common_conf: Entry):
         """
         Instantiate a new factory object
-        """
-        self.__common_conf = common_conf
-        self.__parent = parent
 
-    def create(self, options: Entry) -> ASensor:
+        Parameters
+        ----------
+        common_conf : Entry
+            The common configuration of the configuration file
         """
-        Create a new object of the type ASensor
+        super().__init__(common_conf)
+
+    def create(self, options: Entry, parent: IRadiant = None):
+        """
+        Create a new sensor object
 
         Parameters
         ----------
         options : Entry
             The options to be used as parameters for the instantiation of the new object.
+        parent : IRadiant
+            The parent element of the object.
         Returns
         -------
         obj : ASensor
             The created sensor object
         """
+        opts = self.collectOptions(options)
+
         if options.type == "Imager":
-            args = dict(parent=self.__parent, quantum_efficiency=options.pixel.quantum_efficiency(),
-                        pixel_geometry=options.pixel_geometry(), pixel_size=options.pixel.pixel_size(),
-                        read_noise=options.pixel.sigma_read_out(), dark_current=options.pixel.dark_current(),
-                        well_capacity=options.pixel.well_capacity(), f_number=options.f_number(),
-                        common_conf=self.__common_conf)
+            args = dict(parent=parent, **opts, common_conf=self._common_conf)
             if hasattr(options, "center_offset"):
                 # noinspection PyCallingNonCallable
                 args["center_offset"] = options.center_offset()
@@ -51,10 +57,7 @@ class SensorFactory:
                     args["aperture_size"] = options.photometric_aperture.aperture_size()
             return Imager(**args)
         elif options.type == "Heterodyne":
-            args = dict(parent=self.__parent, aperture_efficiency=options.aperture_efficiency(),
-                        main_beam_efficiency=options.main_beam_efficiency(), receiver_temp=options.receiver_temp(),
-                        eta_fss=options.eta_fss(), lambda_line=options.lambda_line(), kappa=options.kappa(),
-                        common_conf=self.__common_conf)
+            args = dict(parent=parent, **opts, common_conf=self._common_conf)
             if hasattr(options, "n_on"):
                 # noinspection PyCallingNonCallable
                 args["n_on"] = options.n_on()
