@@ -2,6 +2,7 @@ import astropy.units as u
 from ..ARadiantFactory import ARadiantFactory
 from ..Entry import Entry
 from ..IRadiant import IRadiant
+from .ATarget import ATarget
 from ...classes import target as tg
 from ...lib.logger import logger
 
@@ -22,7 +23,7 @@ class TargetFactory(ARadiantFactory):
         """
         super().__init__(common_conf)
 
-    def create(self, options: Entry, parent: IRadiant = None) -> IRadiant:
+    def create(self, options: Entry, parent: IRadiant = None) -> ATarget:
         """
         Create a new object of the type IRadiant
 
@@ -34,8 +35,8 @@ class TargetFactory(ARadiantFactory):
             The optional parent element of the object (necessary for subclasses of AOpticalComponent).
         Returns
         -------
-        obj : IRadiant
-            The created object
+        obj : ATarget
+            The created target object
         """
         opts = self.collectOptions(options)
         if parent is None:

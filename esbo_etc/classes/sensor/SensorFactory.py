@@ -23,7 +23,7 @@ class SensorFactory(AFactory):
         """
         super().__init__(common_conf)
 
-    def create(self, options: Entry, parent: IRadiant = None):
+    def create(self, options: Entry, parent: IRadiant = None) -> ASensor:
         """
         Create a new sensor object
 

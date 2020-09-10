@@ -1,6 +1,7 @@
 from ..ARadiantFactory import ARadiantFactory
 from ..Entry import Entry
 from ..IRadiant import IRadiant
+from .AOpticalComponent import AOpticalComponent
 from ...classes import optical_component as oc
 from ...lib.logger import logger
 
@@ -21,7 +22,7 @@ class OpticalComponentFactory(ARadiantFactory):
         """
         super().__init__(common_conf)
 
-    def create(self, options: Entry, parent: IRadiant = None) -> IRadiant:
+    def create(self, options: Entry, parent: IRadiant = None) -> AOpticalComponent:
         """
         Create a new object of the type IRadiant
 
@@ -33,8 +34,8 @@ class OpticalComponentFactory(ARadiantFactory):
             The optional parent element of the object (necessary for subclasses of AOpticalComponent).
         Returns
         -------
-        obj : IRadiant
-            The created object
+        obj : AOpticalComponent
+            The created optical component
         """
         opts = self.collectOptions(options)
         if parent is not None:
@@ -57,7 +58,7 @@ class OpticalComponentFactory(ARadiantFactory):
         else:
             logger.error("No parent given for optical component.")
 
-    def fromConfigBatch(self, conf: Entry, parent: IRadiant) -> IRadiant:
+    def fromConfigBatch(self, conf: Entry, parent: IRadiant) -> AOpticalComponent:
         """
         Initialize a decorated target from a configuration.
 
@@ -70,7 +71,7 @@ class OpticalComponentFactory(ARadiantFactory):
 
         Returns
         -------
-        parent : IRadiant
+        parent : AOpticalComponent
             The decorated parent object.
         """
         if hasattr(conf.astroscene, "optical_component"):
