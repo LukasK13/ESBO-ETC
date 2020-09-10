@@ -1,11 +1,11 @@
-from ..RadiantFactory import RadiantFactory
+from ..ARadiantFactory import ARadiantFactory
 from ..Entry import Entry
 from ..IRadiant import IRadiant
 from ...classes import optical_component as oc
 from ...lib.logger import logger
 
 
-class OpticalComponentFactory(RadiantFactory):
+class OpticalComponentFactory(ARadiantFactory):
     """
     A Factory creating objects of the type IRadiant
     """

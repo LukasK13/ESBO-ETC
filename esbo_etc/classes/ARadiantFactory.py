@@ -4,7 +4,7 @@ from .IRadiant import IRadiant
 from abc import abstractmethod
 
 
-class RadiantFactory(AFactory):
+class ARadiantFactory(AFactory):
     """
     A Factory creating objects of the type IRadiant
     """

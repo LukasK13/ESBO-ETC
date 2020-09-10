@@ -1,12 +1,12 @@
 import astropy.units as u
-from ..RadiantFactory import RadiantFactory
+from ..ARadiantFactory import ARadiantFactory
 from ..Entry import Entry
 from ..IRadiant import IRadiant
 from ...classes import target as tg
 from ...lib.logger import logger
 
 
-class TargetFactory(RadiantFactory):
+class TargetFactory(ARadiantFactory):
     """
     A Factory creating objects of the type IRadiant
     """
