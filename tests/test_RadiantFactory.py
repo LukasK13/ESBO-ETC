@@ -25,7 +25,8 @@ class TestRadiantFactory(TestCase):
                              "tests/data/mirror/emissivity.csv", 70 * u.K)
         parent_2 = oc.Mirror(parent_2, "tests/data/mirror/reflectance.csv",
                              "tests/data/mirror/emissivity.csv", 70 * u.K)
-        parent_2 = oc.Filter.fromRange(parent_2, 400 * u.nm, 480 * u.nm, "tests/data/filter/emissivity.csv", 70 * u.K)
+        parent_2 = oc.Filter(parent=parent_2, start=400 * u.nm, end=480 * u.nm,
+                             emissivity="tests/data/filter/emissivity.csv", temp=70 * u.K)
         parent_2 = oc.Lens(parent_2, "tests/data/lens/transmittance.csv", "tests/data/lens/emissivity.csv", 70 * u.K)
 
         self.assertEqual(parent.calcSignal()[0], parent_2.calcSignal()[0])

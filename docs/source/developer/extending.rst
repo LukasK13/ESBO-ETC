@@ -34,7 +34,7 @@ The method ``propagate()`` is used to model the propagation of incoming radiatio
 Therefore, this method receives as parameter the incoming radiation as ``SpectralQty``-object and must return the manipulated radiation as ``SpectralQty``-object.
 
 The optional second task consists of modifying the factory method ``create()`` of the class ``OpticalComponentFactory`` in order to properly initialize the new optical component from the configuration.
-This is only necessary if the new optical component needs additional parameters besides the attributes of the corresponding configuration tag of if the new component provides multiple constructors (see class ``Filter``).
+This is only necessary if the new optical component needs additional parameters besides the attributes of the corresponding configuration tag.
 
 Adding Detector Components
 --------------------------
@@ -46,5 +46,4 @@ Thereby, the new class must implement the three methods ``calcSNR()``, ``calcExp
 All three methods obtain the incoming background and signal radiation as well as the obstruction factor as parameters apart from some specific parameters and must return the corresponding calculated value.
 Additionally, all three methods must be able to calculate multiple SNRs, exposure times or sensitivities at once if an array of specific parameters is provided.
 
-Besides the implementation of the detector, the factory method ``create()`` of the class ``SensorFactory`` must be modified.
-In detail, a new if-branch must be added which assembles all necessary parameters for the constructor of the new component and calls the constructor.
+Besides the implementation of the detector, the factory method ``create()`` of the class ``SensorFactory`` can be modified.

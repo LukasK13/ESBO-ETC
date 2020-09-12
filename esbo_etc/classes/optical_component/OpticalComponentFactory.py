@@ -37,26 +37,16 @@ class OpticalComponentFactory(ARadiantFactory):
         obj : AOpticalComponent
             The created optical component
         """
-        opts = self.collectOptions(options)
         if parent is not None:
-            # New component is of type Optical Component
+            opts = self.collectOptions(options)
             opts["parent"] = parent
-            class_ = getattr(oc, options.type)
-            if options.type in ["Atmosphere", "StrayLight", "CosmicBackground", "Mirror", "Lens", "BeamSplitter"]:
+            if hasattr(oc, options.type):
+                class_ = getattr(oc, options.type)
                 return class_(**opts)
-            elif options.type == "Filter":
-                if hasattr(options, "band"):
-                    return oc.Filter.fromBand(**opts)
-                elif hasattr(options, "transmittance"):
-                    return oc.Filter.fromFile(**opts)
-                elif hasattr(options, "start") and hasattr(options, "end"):
-                    return oc.Filter.fromRange(**opts)
-                else:
-                    logger.error("Wrong parameters for filter.")
             else:
                 logger.error("Unknown optical component type: '" + options.type + "'")
         else:
-            logger.error("No parent given for optical component.")
+            logger.error("Parent object is required for optical component.")
 
     def fromConfigBatch(self, conf: Entry, parent: IRadiant) -> AOpticalComponent:
         """

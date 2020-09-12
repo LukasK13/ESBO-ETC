@@ -2,8 +2,7 @@ from ..AFactory import AFactory
 from ..IRadiant import IRadiant
 from ..Entry import Entry
 from .ASensor import ASensor
-from .Imager import Imager
-from .Heterodyne import Heterodyne
+from ...classes import sensor as sensor
 from ...lib.logger import logger
 
 
@@ -38,29 +37,13 @@ class SensorFactory(AFactory):
         obj : ASensor
             The created sensor object
         """
-        opts = self.collectOptions(options)
-
-        if options.type == "Imager":
+        if parent is not None:
+            opts = self.collectOptions(options)
             args = dict(parent=parent, **opts, common_conf=self._common_conf)
-            if hasattr(options, "center_offset"):
-                # noinspection PyCallingNonCallable
-                args["center_offset"] = options.center_offset()
-            if hasattr(options, "photometric_aperture"):
-                if hasattr(options.photometric_aperture, "shape") and isinstance(
-                        options.photometric_aperture.shape, Entry):
-                    args["shape"] = options.photometric_aperture.shape()
-                if hasattr(options.photometric_aperture, "contained_energy") and isinstance(
-                        options.photometric_aperture.contained_energy, Entry):
-                    args["contained_energy"] = options.photometric_aperture.contained_energy()
-                if hasattr(options.photometric_aperture, "aperture_size") and isinstance(
-                        options.photometric_aperture.aperture_size, Entry):
-                    args["aperture_size"] = options.photometric_aperture.aperture_size()
-            return Imager(**args)
-        elif options.type == "Heterodyne":
-            args = dict(parent=parent, **opts, common_conf=self._common_conf)
-            if hasattr(options, "n_on"):
-                # noinspection PyCallingNonCallable
-                args["n_on"] = options.n_on()
-            return Heterodyne(**args)
+            if hasattr(sensor, options.type):
+                class_ = getattr(sensor, options.type)
+                return class_(**args)
+            else:
+                logger.error("Unknown sensor type: '" + options.type + "'")
         else:
-            logger.error("Wrong sensor type: " + options.type)
+            logger.error("Parent object is required for sensor.")

@@ -1,4 +1,3 @@
-import astropy.units as u
 from ..ARadiantFactory import ARadiantFactory
 from ..Entry import Entry
 from ..IRadiant import IRadiant
@@ -38,18 +37,13 @@ class TargetFactory(ARadiantFactory):
         obj : ATarget
             The created target object
         """
-        opts = self.collectOptions(options)
+
         if parent is None:
-            # New component is of type target
+            opts = self.collectOptions(options)
             opts["wl_bins"] = self._common_conf.wl_bins.val
-            if options.type == "BlackBodyTarget":
-                # Black Body Target
-                if "mag" in opts and type(opts["mag"]) == str:
-                    opts["mag"] = float(opts["mag"]) * u.mag
-                return tg.BlackBodyTarget(**opts)
-            elif options.type == "FileTarget":
-                # File Target
-                return getattr(tg, options.type)(**opts)
+            if hasattr(tg, options.type):
+                class_ = getattr(tg, options.type)
+                return class_(**opts)
             else:
                 logger.error("Unknown target type: '" + options.type + "'")
         else:

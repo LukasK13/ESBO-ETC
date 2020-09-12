@@ -4,7 +4,7 @@ from ..IRadiant import IRadiant
 from ...lib.logger import logger
 from ..Entry import Entry
 from astropy import units as u
-from typing import Union, Callable
+from typing import Union
 import numpy as np
 
 
@@ -21,10 +21,7 @@ class Filter(AHotOpticalComponent):
                  L=dict(cwl=3600 * u.nm, bw=1200 * u.nm), M=dict(cwl=4800 * u.nm, bw=800 * u.nm),
                  N=dict(cwl=10200 * u.nm, bw=2500 * u.nm))
 
-    @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: IRadiant, transmittance: Union[SpectralQty, Callable[[u.Quantity], u.Quantity]],
-                 emissivity: Union[str, float] = 1, temp: u.Quantity = 0 * u.K, obstruction: float = 0,
-                 obstructor_temp: u.Quantity = 0 * u.K, obstructor_emissivity: float = 1):
+    def __init__(self, **kwargs):
         """
         Instantiate a new filter model
 
@@ -32,8 +29,15 @@ class Filter(AHotOpticalComponent):
         ----------
         parent : IRadiant
             The parent element of the optical component from which the electromagnetic radiation is received.
-        transmittance : Union[SpectralQty, Callable]
-            The spectral transmittance coefficients of the filter.
+        transmittance : str
+            Path to the file containing the spectral transmittance-coefficients of the filter element.
+            The format of the file will be guessed by `astropy.io.ascii.read()`.
+        band : str
+            The spectral band of the filter. Can be one of [U, B, V, R, I, J, H, K].
+        start : length-quantity
+            Start wavelength of the pass-band
+        end : length-quantity
+            End wavelength of the pass-band
         emissivity : Union[str, float]
             The spectral emissivity coefficient for the optical surface.
         temp: Quantity in Kelvin / Celsius
@@ -48,14 +52,22 @@ class Filter(AHotOpticalComponent):
         obstructor_emissivity : float
             Emissivity of the obstructing component.
         """
-        super().__init__(parent, emissivity, temp, obstruction, obstructor_temp, obstructor_emissivity)
-        self._transmittance = transmittance
+        args = dict()
+        if "band" in kwargs:
+            args = self._fromBand(**kwargs)
+        elif "transmittance" in kwargs:
+            args = self._fromFile(**kwargs)
+        elif "start" in kwargs and "end" in kwargs:
+            args = self._fromRange(**kwargs)
+        else:
+            logger.error("Wrong parameters for filter.")
+        self._transmittance = args.pop("transmittance")
+        super().__init__(**args)
 
-    @classmethod
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromBand(cls, parent: IRadiant, band: str, emissivity: Union[str, float] = 1, temp: u.Quantity = 0 * u.K,
-                 obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
-                 obstructor_emissivity: float = 1) -> "Filter":
+    def _fromBand(self, parent: IRadiant, band: str, emissivity: Union[str, float] = 1, temp: u.Quantity = 0 * u.K,
+                  obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
+                  obstructor_emissivity: float = 1) -> dict:
         """
         Instantiate a new filter model from a spectral band. The filter will be modelled as bandpass filter of
         infinite order and therefore similar to a hat-function.
@@ -82,20 +94,19 @@ class Filter(AHotOpticalComponent):
 
         Returns
         -------
-        filter : Filter
-            The instantiated filter object.
+        args : dict
+            The arguments for the class instantiation.
         """
-        if band not in cls._band.keys():
-            logger.error("Band has to be one of '[" + ", ".join(list(cls._band.keys())) + "]'")
-        return cls.fromRange(parent, cls._band[band]["cwl"] - cls._band[band]["bw"] / 2,
-                             cls._band[band]["cwl"] + cls._band[band]["bw"] / 2, emissivity, temp, obstruction,
-                             obstructor_temp, obstructor_emissivity)
+        if band not in self._band.keys():
+            logger.error("Band has to be one of '[" + ", ".join(list(self._band.keys())) + "]'")
+        return self._fromRange(parent, self._band[band]["cwl"] - self._band[band]["bw"] / 2,
+                               self._band[band]["cwl"] + self._band[band]["bw"] / 2, emissivity, temp, obstruction,
+                               obstructor_temp, obstructor_emissivity)
 
-    @classmethod
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromFile(cls, parent: IRadiant, transmittance: str, emissivity: Union[str, float] = 1,
-                 temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
-                 obstructor_emissivity: float = 1) -> "Filter":
+    def _fromFile(self, parent: IRadiant, transmittance: str, emissivity: Union[str, float] = 1,
+                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
+                  obstructor_emissivity: float = 1) -> dict:
         """
         Instantiate a new filter model from a file containing the spectral transmittance coefficients.
 
@@ -122,17 +133,17 @@ class Filter(AHotOpticalComponent):
 
         Returns
         -------
-        filter : Filter
-            The instantiated filter object.
+        args : dict
+            The arguments for the class instantiation.
         """
-        return cls(parent, SpectralQty.fromFile(transmittance, u.nm, u.dimensionless_unscaled), emissivity, temp,
-                   obstruction, obstructor_temp, obstructor_emissivity)
+        return {"parent": parent, "transmittance": SpectralQty.fromFile(transmittance, u.nm, u.dimensionless_unscaled),
+                "emissivity": emissivity, "temp": temp, "obstruction": obstruction, "obstructor_temp": obstructor_temp,
+                "obstructor_emissivity": obstructor_emissivity}
 
-    @classmethod
     # @u.quantity_input(start="length", end="length", temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def fromRange(cls, parent: IRadiant, start: u.Quantity, end: u.Quantity, emissivity: Union[str, float] = 1,
-                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
-                  obstructor_emissivity: float = 1) -> "Filter":
+    def _fromRange(self, parent: IRadiant, start: u.Quantity, end: u.Quantity, emissivity: Union[str, float] = 1,
+                   temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
+                   obstructor_emissivity: float = 1) -> dict:
         """
         Instantiate a new filter model from a spectral range. The filter will be modelled as bandpass filter of
         infinite order and therefore similar to a hat-function.
@@ -161,11 +172,12 @@ class Filter(AHotOpticalComponent):
 
         Returns
         -------
-        filter : Filter
-            The instantiated filter object.
+        args : dict
+            The arguments for the class instantiation.
         """
-        return cls(parent, cls.__filter_factory(start, end), emissivity, temp,
-                   obstruction, obstructor_temp, obstructor_emissivity)
+        return {"parent": parent, "transmittance": self.__filter_factory(start, end),
+                "emissivity": emissivity, "temp": temp, "obstruction": obstruction, "obstructor_temp": obstructor_temp,
+                "obstructor_emissivity": obstructor_emissivity}
 
     def _propagate(self, sqty: SpectralQty) -> SpectralQty:
         """
@@ -201,8 +213,8 @@ class Filter(AHotOpticalComponent):
         lambda : Callable[[u.Quantity], u.Quantity]
             The filter function
         """
-        return lambda wl: np.logical_and(np.greater_equal(wl, start), np.greater_equal(end, wl)).astype(int) *\
-            u.dimensionless_unscaled
+        return lambda wl: np.logical_and(np.greater_equal(wl, start), np.greater_equal(end, wl)).astype(
+            int) * u.dimensionless_unscaled
 
     @staticmethod
     def check_config(conf: Entry) -> Union[None, str]:
