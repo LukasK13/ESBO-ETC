@@ -112,8 +112,9 @@ class Airy(IPSF):
             # Mirror the PSF to the negative x-domain
             psf = np.concatenate((np.flip(psf), np.array([1]), psf))
             # Calculate a gaussian kernel
-            kernel = 1 / (2 * np.pi * jitter_sigma ** 2) * np.exp(
-                - np.concatenate((np.flip(x), np.array([0]), x)) ** 2 / (2 * jitter_sigma ** 2))
+            kernel = 1 / (2 * np.pi * jitter_sigma ** 2) * np.exp(- x ** 2 / (2 * jitter_sigma ** 2))
+            # Mirror the kernel to the negative x-domain
+            kernel = np.concatenate((np.flip(kernel), np.array([1 / (2 * np.pi * jitter_sigma ** 2)]), kernel))
             # Normalize the kernel
             kernel = kernel / np.sum(kernel)
             # Convolve the PSF with gaussian kernel
