@@ -2,7 +2,6 @@ from ..lib.helpers import isLambda, readCSV
 from ..lib.logger import logger
 from scipy.interpolate import interp1d
 import astropy.units as u
-import math
 from typing import Union, Callable
 import os
 from scipy.integrate import trapz
