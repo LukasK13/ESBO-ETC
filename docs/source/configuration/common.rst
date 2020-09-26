@@ -50,6 +50,7 @@ res
 ---
 *optional* -- The spectral resolution to be used for the computations.
 
+
 .. code-block:: xml
 
     <res val="1000" val_unit=""/>
@@ -62,6 +63,8 @@ Attributes:
 
 .. note::
    Either :ref:`wl_delta` or :ref:`res` must be given in the configuration.
+   This parameters controls the accuracy of the integration of spectral quantities which is necessary for example for the imaging detector.
+   Therefore, the user has to balance between computational effort and precision.
 
 d_aperture
 ----------
