@@ -50,9 +50,9 @@ def rasterizeCircle(grid: np.ndarray, radius: float, xc: float, yc: float):
     r2 = radius ** 2  # square of the radius
 
     # Create meshgrid for the x and y range of the circle
-    dx, dy = np.meshgrid(range(- radius_pix if xc_pix - radius_pix >= 0 else - xc_pix,
+    dx, dy = np.meshgrid(range(- radius_pix if xc_pix >= radius_pix else - xc_pix,
                                radius_pix + 1 if grid.shape[1] > (xc_pix + radius_pix + 1) else grid.shape[1] - xc_pix),
-                         range(- radius_pix if yc_pix - radius_pix >= 0 else - yc_pix,
+                         range(- radius_pix if yc_pix >= radius_pix else - yc_pix,
                                radius_pix + 1 if grid.shape[0] > (yc_pix + radius_pix + 1) else grid.shape[0] - yc_pix))
     dx2 = (dx + x_shift) ** 2  # Square of the x-component of the current pixels radius
     dx_side2 = (dx + x_shift + ((dx < 0) - 0.5)) ** 2  # Square of the x-component of the neighbouring pixels radius
