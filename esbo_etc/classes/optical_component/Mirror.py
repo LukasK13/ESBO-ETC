@@ -11,7 +11,7 @@ class Mirror(AHotOpticalComponent):
     A class to model the optical characteristics of a mirror.
     """
     @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def __init__(self, parent: IRadiant, reflectance: str, emissivity: Union[str, float] = 1,
+    def __init__(self, parent: IRadiant, reflectance: str, emissivity: Union[str, float] = None,
                  temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                  obstructor_emissivity: float = 1):
         """
@@ -37,7 +37,12 @@ class Mirror(AHotOpticalComponent):
         obstructor_emissivity : float
             Emissivity of the obstructing component.
         """
-        self._reflectance = SpectralQty.fromFile(reflectance, u.nm, u.dimensionless_unscaled)
+        try:
+            self._reflectance = float(reflectance) * u.dimensionless_unscaled
+        except ValueError:
+            self._reflectance = SpectralQty.fromFile(reflectance, u.nm, u.dimensionless_unscaled)
+        if emissivity is None:
+            emissivity = -1 * self._reflectance + 1.0
         super().__init__(parent, emissivity, temp, obstruction, obstructor_temp, obstructor_emissivity)
 
     def _propagate(self, rad: SpectralQty) -> SpectralQty:
@@ -73,7 +78,9 @@ class Mirror(AHotOpticalComponent):
         """
         mes = conf.check_file("reflectance")
         if mes is not None:
-            return mes
+            mes = conf.check_float("reflectance")
+            if mes is not None:
+                return mes
         if hasattr(conf, "emissivity"):
             mes = conf.check_file("emissivity")
             if mes is not None:

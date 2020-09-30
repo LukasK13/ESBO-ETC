@@ -104,7 +104,7 @@ class Filter(AHotOpticalComponent):
                                obstructor_temp, obstructor_emissivity)
 
     # @u.quantity_input(temp=[u.Kelvin, u.Celsius], obstructor_temp=[u.Kelvin, u.Celsius])
-    def _fromFile(self, parent: IRadiant, transmittance: str, emissivity: Union[str, float] = 1,
+    def _fromFile(self, parent: IRadiant, transmittance: str, emissivity: Union[str, float] = None,
                   temp: u.Quantity = 0 * u.K, obstruction: float = 0, obstructor_temp: u.Quantity = 0 * u.K,
                   obstructor_emissivity: float = 1) -> dict:
         """
@@ -136,7 +136,13 @@ class Filter(AHotOpticalComponent):
         args : dict
             The arguments for the class instantiation.
         """
-        return {"parent": parent, "transmittance": SpectralQty.fromFile(transmittance, u.nm, u.dimensionless_unscaled),
+        try:
+            _transmittance = float(transmittance) * u.dimensionless_unscaled
+        except ValueError:
+            _transmittance = SpectralQty.fromFile(transmittance, u.nm, u.dimensionless_unscaled)
+        if emissivity is None:
+            emissivity = -1 * _transmittance + 1.0
+        return {"parent": parent, "transmittance": _transmittance,
                 "emissivity": emissivity, "temp": temp, "obstruction": obstruction, "obstructor_temp": obstructor_temp,
                 "obstructor_emissivity": obstructor_emissivity}
 
@@ -235,6 +241,8 @@ class Filter(AHotOpticalComponent):
             mes = conf.check_selection("band", ["U", "B", "V", "R", "I", "J", "H", "K", "L", "M", "N"])
         elif hasattr(conf, "transmittance"):
             mes = conf.check_file("transmittance")
+            if mes is not None:
+                mes = conf.check_float("transmittance")
         elif hasattr(conf, "start") and hasattr(conf, "end"):
             mes = conf.check_quantity("start", u.m)
             if mes is not None:
