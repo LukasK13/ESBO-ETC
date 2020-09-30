@@ -17,11 +17,20 @@ This component models the behaviour of an atmosphere which has a spectral transm
 
     <optical_component type="Atmosphere" transmittance="PathToTransmittanceFile" emission="PathToEmissionFile"/>
 
+.. code-block:: xml
+
+    <optical_component type="Atmosphere" transmittance="PathToATRANFile" temp="200" temp_unit="K"/>
+
+
 Attributes:
     * | **transmittance:** str
-      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`. If the output of ATRAN is given, the emission parameter is not available. Instead the parameter temp is used for the atmospheric emission.
     * | **emission:** str, *optional*
       | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`.
+    * | **temp:** str, *optional*
+      | The atmospheric temperature used for black body emission using the complement of the ATRAN tranmittance.
+    * | **temp_unit:** str, *optional* = "K"
+      | Unit of the atmospheric temperature used for black body emission using the complement of the ATRAN tranmittance.
 
 StrayLight
 ----------
