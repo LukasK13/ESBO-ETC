@@ -81,7 +81,7 @@ class Entry(object):
                            "' but got no unit and cannot convert '" + attr + "' to a numeric value."
             else:
                 return "Expected parameter '" + name + "' with unit '" + unit.to_string() + "' but got no unit."
-        if not attr.unit.is_equivalent(unit):
+        elif not attr.unit.is_equivalent(unit):
             if unit == u.K and attr.unit == u.Celsius:
                 setattr(self, name, attr.to(unit, equivalencies=u.temperature()))
                 setattr(self, name + '_unit', unit.to_string())
