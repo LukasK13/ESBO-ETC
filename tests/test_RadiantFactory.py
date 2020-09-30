@@ -16,8 +16,8 @@ class TestRadiantFactory(TestCase):
         parent = oc_factory.fromConfigBatch(conf, parent)
 
         parent_2 = BlackBodyTarget(conf.common.wl_bins(), 5778 * u.K, 10 * u.mag, "V")
-        parent_2 = oc.Atmosphere(parent_2, "tests/data/atmosphere/transmittance.csv",
-                                 "tests/data/atmosphere/emission.csv")
+        parent_2 = oc.Atmosphere(parent=parent_2, transmittance="tests/data/atmosphere/transmittance.csv",
+                                 emission="tests/data/atmosphere/emission.csv")
         parent_2 = oc.StrayLight(parent_2, "tests/data/straylight/emission.csv")
         parent_2 = oc.Mirror(parent_2, "tests/data/mirror/reflectance.csv",
                              "tests/data/mirror/emissivity.csv", 70 * u.K, obstruction=0.1, obstructor_temp=70 * u.K)
