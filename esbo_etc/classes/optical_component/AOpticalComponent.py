@@ -6,6 +6,7 @@ import astropy.units as u
 from astropy.modeling.models import BlackBody
 from typing import Union, Callable, Tuple
 from ..Entry import Entry
+import os
 
 
 class AOpticalComponent(IRadiant):
@@ -66,7 +67,7 @@ class AOpticalComponent(IRadiant):
         logger.info("Calculating signal for class '" + self.__class__.__name__ + "'.")
         signal = self._propagate(signal) * (1 - self.__obstruction)
         obstruction = obstruction + self.__obstruction
-        logger.debug(signal)
+        logger.debug(os.linesep + str(signal))
         return signal, obstruction
 
     def calcBackground(self) -> SpectralQty:
@@ -88,7 +89,7 @@ class AOpticalComponent(IRadiant):
         else:
             background = parent * (1. - self.__obstruction)
         background = background + self._ownNoise()
-        logger.debug(background)
+        logger.debug(os.linesep + str(background))
         return background
 
     def _propagate(self, rad: SpectralQty) -> SpectralQty:
