@@ -95,26 +95,27 @@ class Airy(IPSF):
             # Convert jitter to reduced observation angle in lambda / d_ap
             jitter_sigma = jitter_sigma.to(u.rad).value * self.__d_aperture / self.__wl.to(u.m)
             # Calculate necessary grid length to accommodate the psf and 3-sigma of the gaussian
-            grid_width = (reduced_observation_angle / 2 + 3 * jitter_sigma)
+            grid_width = (reduced_observation_angle / 2 + 3 * jitter_sigma.value)
             # Calculate the reduced observation angle of a single detector pixel
             reduced_observation_angle_pixel = (self.__pixel_size / (
                     self.__f_number * self.__d_aperture) * self.__d_aperture / self.__wl).decompose()
             # Calculate the width of each grid element
             dx = reduced_observation_angle_pixel.value / self.__osf
             # Calculate the necessary number of points on the grid
-            n_points = np.ceil(grid_width / dx).value
+            n_points = np.ceil(grid_width / dx)
             # Calculate the corresponding x-coordinates of each grid element
             x = np.arange(1, n_points + 1) * dx
             # Calculate the psf from an airy disk for each element on the grid
             psf = self.__airy(np.pi * x, np.sqrt(obstruction))
             # Calculate the integral of the undisturbed airy disk in order to scale the result of the convolution
+            # This corresponds to an integration in polar coordinates: I(r)*r dr dphi
             total = np.sum(psf * x) * dx * 2 * np.pi
             # Mirror the PSF to the negative x-domain
             psf = np.concatenate((np.flip(psf), np.array([1]), psf))
             # Calculate a gaussian kernel
-            kernel = 1 / (2 * np.pi * jitter_sigma ** 2) * np.exp(- x ** 2 / (2 * jitter_sigma ** 2))
+            kernel = 1 / (2 * np.pi * jitter_sigma.value ** 2) * np.exp(- x ** 2 / (2 * jitter_sigma.value ** 2))
             # Mirror the kernel to the negative x-domain
-            kernel = np.concatenate((np.flip(kernel), np.array([1 / (2 * np.pi * jitter_sigma ** 2)]), kernel))
+            kernel = np.concatenate((np.flip(kernel), np.array([1 / (2 * np.pi * jitter_sigma.value ** 2)]), kernel))
             # Normalize the kernel
             kernel = kernel / np.sum(kernel)
             # Convolve the PSF with gaussian kernel
@@ -122,6 +123,7 @@ class Airy(IPSF):
             # Reduce the PSF to the positive x-domain
             psf = psf[int((psf.shape[0] - 1) / 2):]
             # Scale the integral of the disturbed PSF equal to the undisturbed PSF
+            # This corresponds to an integration in polar coordinates: I(r)*r dr dphi
             psf = psf / (np.sum(psf * np.arange(psf.shape[0]) * dx) * dx * 2 * np.pi) * total
 
             self.__psf_jitter = psf
@@ -130,12 +132,13 @@ class Airy(IPSF):
                                             self.__osf * 2
             else:
                 # Calculate the rolling integral of the PSF
+                # This corresponds to an integration in polar coordinates: I(r)*r dr dphi
                 psf_int = np.cumsum(psf * np.arange(psf.shape[0]) * dx) * dx * 2 * np.pi
-                # Scale the integral of the disturbed PSF equal to the undisturbed PSF
-                psf_int = psf_int / (4 / np.pi) * (1 - obstruction)
+                # Calculate the percentage of encircled energy by dividing by the infinite integral of the undisturbed
+                # airy disk
+                psf_int = psf_int / (4 / np.pi * 1 / (1 - obstruction))
                 # Calculate the reduced observation angle
-                reduced_observation_angle = np.argmax(
-                    psf_int > contained_energy) * reduced_observation_angle_pixel.value / self.__osf * 2
+                reduced_observation_angle = np.argmax(psf_int > contained_energy) * dx * 2
 
         return reduced_observation_angle * u.dimensionless_unscaled
 
