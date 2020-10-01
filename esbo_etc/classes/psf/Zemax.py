@@ -176,8 +176,7 @@ class Zemax(IPSF):
                 # Normalize kernel
                 kernel = kernel / np.sum(kernel)
                 # Convolve PSF with gaussian kernel
-                psf = fftconvolve(np.pad(psf, int((jitter_grid_length - 1) / 2), mode="constant", constant_values=0),
-                                  kernel, mode="same")
+                psf = fftconvolve(psf, kernel, mode="full")
                 # Calculate new center point
                 center_point = [x + int((jitter_grid_length - 1) / 2) for x in center_point]
         # Save the values as object attribute

@@ -119,7 +119,7 @@ class Airy(IPSF):
             # Normalize the kernel
             kernel = kernel / np.sum(kernel)
             # Convolve the PSF with gaussian kernel
-            psf = fftconvolve(np.pad(psf, int(n_points), mode="constant", constant_values=0), kernel, mode="same")
+            psf = fftconvolve(psf, kernel, mode="full")
             # Reduce the PSF to the positive x-domain
             psf = psf[int((psf.shape[0] - 1) / 2):]
             # Scale the integral of the disturbed PSF equal to the undisturbed PSF
