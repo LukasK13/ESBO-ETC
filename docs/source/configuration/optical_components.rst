@@ -69,10 +69,10 @@ Model a mirror including the mirror's thermal emission as well as possible obstr
     <optical_component type="Mirror" reflectance="PathToReflectance" emissivity="PathToEmissivity" temp="70" temp_unit="K" obstruction="0.2" obstructor_temp="70" obstructor_temp_unit="K" obstructor_emissivity="0.9"/>
 
 Attributes:
-    * | **reflectance:** str
-      | The path to the file containing the spectral reflectance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+    * | **reflectance:** [str, float]
+      | Either a floating point value for the reflectance or a path to the file containing the spectral reflectance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **emissivity:** str, *optional*
-      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
+      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`. If not given, 1 - reflectance is used.
     * | **temp:** float, *optional*
       | The temperature of the mirror for the thermal emission.
     * | **temp_unit:** str, *optional*
@@ -95,10 +95,10 @@ Model a lens including the lens' thermal emission as well as possible obstructio
     <optical_component type="Lens" transmittance="PathToTransmittance" emissivity="PathToEmissivity" temp="70" temp_unit="K" obstruction="0.2" obstructor_temp="70" obstructor_temp_unit="K" obstructor_emissivity="0.9"/>
 
 Attributes:
-    * | **transmittance:** str
-      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+    * | **transmittance:** [str, float]
+      | Either a floating point value for the transmittance or a path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **emissivity:** str, *optional*
-      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
+      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`. If not given, 1 - transmittance is used.
     * | **temp:** float, *optional*
       | The temperature of the lens for the thermal emission.
     * | **temp_unit:** str, *optional*
@@ -121,10 +121,10 @@ Model a beam splitter including the beam splitter's thermal emission as well as 
     <optical_component type="BeamSplitter" transmittance="PathToTransmittance" emissivity="PathToEmissivity" temp="70" temp_unit="K" obstruction="0.2" obstructor_temp="70" obstructor_temp_unit="K" obstructor_emissivity="0.9"/>
 
 Attributes:
-    * | **transmittance:** str
-      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+    * | **transmittance:** [str, float]
+      | Either a floating point value for the transmittance or a path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **emissivity:** str, *optional*
-      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
+      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`. If not given, 1 - transmittance is used.
     * | **temp:** float, *optional*
       | The temperature of the beam splitter for the thermal emission.
     * | **temp_unit:** str, *optional*
@@ -155,8 +155,8 @@ Model a beam splitter including the beam splitter's thermal emission as well as 
     <optical_component type="Filter" start="400" start_unit="nm" end="480" end_unit="nm" emissivity="PathToEmissivity" temp="70" temp_unit="K" obstruction="0.2" obstructor_temp="70" obstructor_temp_unit="K" obstructor_emissivity="0.9"/>
 
 Attributes:
-    * | **transmittance:** str
-      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+    * | **transmittance:** [str, float]
+      | Either a floating point value for the transmittance or a path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **band:** str
       | The spectral Band of the filter. This has to be one of [``U``, ``B``, ``V``, ``R``, ``I``, ``J``, ``H``, ``K``, ``L``, ``M``, ``N``]
     * | **start:** float
@@ -168,7 +168,7 @@ Attributes:
     * | **end_unit:** str
       | The unit of the end wavelength. This has to be one of [``m``, ``cm``, ``mm``, ``um``, ``nm``, ``pm``]. The default is ``m``.
     * | **emissivity:** str, *optional*
-      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`.
+      | The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also :ref:`reading_csv`. If not given, 1 - transmittance is used.
     * | **temp:** float
       | The temperature of the beam splitter for the thermal emission.
     * | **temp_unit:** str, *optional*
