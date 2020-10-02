@@ -22,17 +22,20 @@ class Atmosphere(AOpticalComponent):
         ----------
         parent : IRadiant
             The parent element of the atmosphere from which the electromagnetic radiation is received.
-            This element is usually of type Target or StrayLight.
         transmittance : str
             Path to the file containing the spectral transmittance-coefficients of the atmosphere.
             The format of the file will be guessed by `astropy.io.ascii.read()`.
+        atran : str
+            Path to the ATRAN output file containing the spectral transmittance-coefficients of the atmosphere.
         emission : str
             Path to the file containing the spectral radiance of the atmosphere.
             The format of the file will be guessed by `astropy.io.ascii.read()`.
+        temp : u.Quantity
+            The atmospheric temperature for the atmosphere's black body radiation.
         """
 
         args = dict()
-        if "temp" in kwargs:
+        if "atran" in kwargs:
             args = self._fromATRAN(**kwargs)
         elif "transmittance" in kwargs:
             args = self._fromFiles(**kwargs)
@@ -48,13 +51,17 @@ class Atmosphere(AOpticalComponent):
         ----------
         parent : IRadiant
             The parent element of the atmosphere from which the electromagnetic radiation is received.
-            This element is usually of type Target or StrayLight.
         transmittance : str
             Path to the file containing the spectral transmittance-coefficients of the atmosphere.
             The format of the file will be guessed by `astropy.io.ascii.read()`.
         emission : str
             Path to the file containing the spectral radiance of the atmosphere.
             The format of the file will be guessed by `astropy.io.ascii.read()`.
+
+        Returns
+        -------
+        args : dict
+            The arguments for the class instantiation.
         """
         # Read the transmittance
         transmittance = SpectralQty.fromFile(transmittance, wl_unit_default=u.nm,
@@ -66,20 +73,39 @@ class Atmosphere(AOpticalComponent):
                                             qty_unit_default=u.W / (u.m ** 2 * u.nm * u.sr))
         return {"parent": parent, "transmittance": transmittance, "emission": emission}
 
-    def _fromATRAN(self, parent: IRadiant, transmittance: str, temp: u.Quantity):
-        transmittance = "data_sofia/atmospheric_transmittance.dat"
+    def _fromATRAN(self, parent: IRadiant, atran: str, temp: u.Quantity = None):
+        """
+        Initialize a new atmosphere model from an ATRAN output file
+
+        Parameters
+        ----------
+        parent : IRadiant
+            The parent element of the atmosphere from which the electromagnetic radiation is received.
+        atran : str
+            Path to the ATRAN output file containing the spectral transmittance-coefficients of the atmosphere.
+        temp : u.Quantity
+            The atmospheric temperature for the atmosphere's black body radiation.
+
+        Returns
+        -------
+        args : dict
+            The arguments for the class instantiation.
+        """
         # Read the file
-        data = ascii.read(transmittance, format=None)
+        data = ascii.read(atran, format=None)
         # Set units
         data["col2"].unit = u.um
         data["col3"].unit = u.dimensionless_unscaled
         # Create spectral quantity
         transmittance = SpectralQty(data["col2"].quantity, data["col3"].quantity)
 
-        # Create black body
-        bb = self.__gb_factory(temp)
-        # Calculate emission
-        emission = SpectralQty(transmittance.wl, bb(transmittance.wl)) * transmittance
+        if temp is not None:
+            # Create black body
+            bb = self.__gb_factory(temp)
+            # Calculate emission
+            emission = SpectralQty(transmittance.wl, bb(transmittance.wl)) * transmittance
+        else:
+            emission = 0
         return {"parent": parent, "transmittance": transmittance, "emission": emission}
 
     @staticmethod
@@ -97,13 +123,23 @@ class Atmosphere(AOpticalComponent):
         mes : Union[None, str]
             The error message of the check. This will be None if the check was successful.
         """
-        mes = conf.check_file("transmittance")
-        if mes is not None:
-            return mes
-        if hasattr(conf, "emission"):
-            mes = conf.check_file("emission")
+        if hasattr(conf, "transmittance"):
+            mes = conf.check_file("transmittance")
             if mes is not None:
                 return mes
+            if hasattr(conf, "emission"):
+                mes = conf.check_file("emission")
+                if mes is not None:
+                    return mes
+        else:
+            mes = conf.check_file("atran")
+            if mes is not None:
+                return mes
+            if hasattr(conf, "temp"):
+                mes = conf.check_quantity("temp", u.K)
+                if mes is not None:
+                    return mes
+
 
     @staticmethod
     @u.quantity_input(temp=[u.Kelvin, u.Celsius])

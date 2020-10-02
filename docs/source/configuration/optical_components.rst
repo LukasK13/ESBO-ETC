@@ -24,11 +24,13 @@ This component models the behaviour of an atmosphere which has a spectral transm
 
 Attributes:
     * | **transmittance:** str
-      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`. If the output of ATRAN is given, the emission parameter is not available. Instead the parameter temp is used for the atmospheric emission.
+      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+    * | **atran:** str
+      | Path to a file containing the output of ATRAN. In this case, the parameter emission is not available. Instead the parameter temp is used for the atmospheric emission.
     * | **emission:** str, *optional*
-      | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`.
-    * | **temp:** str, *optional*
-      | The atmospheric temperature used for black body emission using the complement of the ATRAN tranmittance.
+      | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`. This option is only available, if the parameter transmittance is given.
+    * | **temp:** float, *optional*
+      | The atmospheric temperature used for black body emission (only available for an ATRAN input).
     * | **temp_unit:** str, *optional* = "K"
       | Unit of the atmospheric temperature used for black body emission using the complement of the ATRAN tranmittance.
 
