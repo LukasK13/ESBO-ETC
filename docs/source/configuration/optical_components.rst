@@ -12,6 +12,8 @@ Attributes:
 Atmosphere
 ----------
 This component models the behaviour of an atmosphere which has a spectral transmittance and a spectral emission.
+It is possible to read the transmittance of the atmosphere from a CSV file, from an output file of ATRAN or call the webversion of ATRAN to compute the transmission profile.
+The atmospheric emission can bei either read from a CSV file or computed as a grey body radiator of a given temperature and emissivity = 1 - transmission.
 
 .. code-block:: xml
 
@@ -21,18 +23,52 @@ This component models the behaviour of an atmosphere which has a spectral transm
 
     <optical_component type="Atmosphere" transmittance="PathToATRANFile" temp="200" temp_unit="K"/>
 
+.. code-block:: xml
+
+    <optical_component type="Atmosphere" altitude="41000" altitude_unit="ft" wl_min="16" wl_min_unit="um"
+                       wl_max="24" wl_max_unit="um" latitude="39" latitude_unit="degree" water_vapor="0"
+                       water_vapor_unit="um" n_layers="2" zenith_angle="0" zenith_angle_unit="degree" resolution="0"
+                       temp="240" temp_unit="K"/>
 
 Attributes:
     * | **transmittance:** str
       | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
     * | **atran:** str
-      | Path to a file containing the output of ATRAN. In this case, the parameter emission is not available. Instead the parameter temp is used for the atmospheric emission.
+      | Path to a file containing the output of ATRAN.
+    * | **altitude:** float
+      | The observatory altitude for the call to ATRAN.
+    * | **altitude_unit:** str, *optional* = "ft"
+      | The unit of the observatory altitude for the call to ATRAN.
+    * | **wl_min:** float
+      | The minimum wavelength for the call to ATRAN.
+    * | **wl_min_unit:** str, *optional* = "um"
+      | The unit of the minimum wavelength for the call to ATRAN.
+    * | **wl_max:** float
+      | The maximum wavelength for the call to ATRAN.
+    * | **wl_max_unit:** str, *optional* = "um"
+      | The unit of the maximum wavelength for the call to ATRAN.
+    * | **latitude:** float, *optional*
+      | The observatory latitude for the call to ATRAN.
+    * | **latitude_unit:** str, *optional* = "degree"
+      | The unit of the observatory latitude for the call to ATRAN.
+    * | **water_vapor:** float, *optional*
+      | The water vapor overburden for the call to ATRAN.
+    * | **water_vapor_unit:** str, *optional* = "um"
+      | The unit of the water vapor overburden for the call to ATRAN.
+    * | **n_layers:** float, *optional*
+      | The number of atmospheric layers for the call to ATRAN.
+    * | **zenith_angle:** float, *optional*
+      | The zenith angle for the call to ATRAN.
+    * | **zenith_angle_unit:** str, *optional* = "degree"
+      | The unit of the zenith angle for the call to ATRAN (0 is towards the zenith).
+    * | **resolution:** float, *optional*
+      | The resolution for smoothing for the call to ATRAN (0 for no smoothing).
     * | **emission:** str, *optional*
-      | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`. This option is only available, if the parameter transmittance is given.
+      | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`.
     * | **temp:** float, *optional*
-      | The atmospheric temperature used for black body emission (only available for an ATRAN input).
+      | The atmospheric temperature used for grey body emission.
     * | **temp_unit:** str, *optional* = "K"
-      | Unit of the atmospheric temperature used for black body emission using the complement of the ATRAN tranmittance.
+      | Unit of the atmospheric temperature used for black body emission using the complement of the transmittance.
 
 StrayLight
 ----------
