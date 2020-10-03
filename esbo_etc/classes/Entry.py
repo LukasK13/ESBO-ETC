@@ -37,6 +37,8 @@ class Entry(object):
         attribs = list(xml.attrib.keys())
         units = list(filter(re.compile(".*_unit$").match, attribs))
         for unit in units:
+            # enable imperial units
+            u.imperial.enable()
             var = unit.replace("_unit", "")
             if hasattr(self, var):
                 try:
