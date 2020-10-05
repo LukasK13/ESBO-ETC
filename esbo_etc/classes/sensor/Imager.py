@@ -368,8 +368,8 @@ class Imager(ASensor):
                 logger.info("Calculating the diameter of the photometric aperture...",
                             extra={"spinning": True})
                 d_photometric_ap = self.__calcPhotometricAperture(obstruction)
-                # Mask the pixels to be exposed
-                mask.createPhotometricAperture(self.__shape, d_photometric_ap / 2)
+            # Mask the pixels to be exposed
+            mask.createPhotometricAperture(self.__shape, d_photometric_ap / 2)
         # Calculate the background current PixelMask
         background_current = mask * background_current * u.pix
         # Calculate the read noise PixelMask
