@@ -361,10 +361,8 @@ class Imager(ASensor):
         else:
             # Target is a point source
             if self.__aperture_size is not None:
-                # Calculate the diameter of the photometric aperture as square root of the contained pixels
-                d_photometric_ap = np.sqrt(self.__aperture_size.value) * u.pix
-                # Mask the pixels to be exposed
-                mask.createPhotometricAperture("square", d_photometric_ap / 2, np.array([0, 0]) << u.pix)
+                # Us ethe aperture size as diameter
+                d_photometric_ap = self.__aperture_size
             else:
                 # Calculate the diameter of the photometric aperture from the given contained energy
                 logger.info("Calculating the diameter of the photometric aperture...",
