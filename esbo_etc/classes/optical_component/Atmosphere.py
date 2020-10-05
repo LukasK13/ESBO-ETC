@@ -77,6 +77,8 @@ class Atmosphere(AOpticalComponent):
         elif "emission" in kwargs:
             args["emission"] = SpectralQty.fromFile(kwargs["emission"], wl_unit_default=u.nm,
                                                     qty_unit_default=u.W / (u.m ** 2 * u.nm * u.sr))
+        else:
+            args["emission"] = 0
         super().__init__(parent=args["parent"], transreflectivity=args["transmittance"], noise=args["emission"])
 
     def _fromFiles(self, parent: IRadiant, transmittance: str):
