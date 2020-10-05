@@ -227,7 +227,7 @@ Attributes:
 
 Heterodyne
 ----------
-The heterodyne sensor type allows to model a generic heterodyne radio receiver which uses an local oscillator and an mixer to create spectral images. The heterodyne-component contains several parameters which are explained in the following. All parameters are defined according to the `Guide to GREAT <https://www.sofia.usra.edu/science/proposing-and-observing/observers-handbook-cycle-9/6-great/61-specifications#PerformanceGREAT>`_.
+The heterodyne sensor type allows to model a generic DSB heterodyne radio receiver which uses an local oscillator and an mixer to create spectral images. The heterodyne-component contains several parameters which are explained in the following. All parameters are defined according to the `Guide to GREAT <https://www.sofia.usra.edu/science/proposing-and-observing/observers-handbook-cycle-9/6-great/61-specifications#PerformanceGREAT>`_.
 
 .. code-block:: xml
     :linenos:
@@ -238,6 +238,7 @@ The heterodyne sensor type allows to model a generic heterodyne radio receiver w
         <receiver_temp val="1050" val_unit="K"/>
         <eta_fss val="0.97" val_unit=""/>
         <lambda_line val="157.774" val_unit="um"/>
+        <lambda_local_oscillator val="158" val_unit="um"/>
         <kappa val="1" val_unit=""/>
         <n_on val="10" val_unit=""/>
     </sensor>
@@ -300,7 +301,7 @@ Attributes:
 
 lambda_line
 ^^^^^^^^^^^
-The wavelength of the observed line.
+The wavelength or frequency of the observed line.
 
 .. code-block:: xml
 
@@ -311,6 +312,21 @@ Attributes:
       |   The wavelength of the observed line.
     * | **val_unit:** str, *optional* = "m"
       |   The unit of the observed line wavelength. This has to be on of [``nm``, ``um``, ``mm``, ``cm``, ``m``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``].
+
+lambda_local_oscillator
+^^^^^^^^^^^
+The wavelength or frequency of the local oscillator. This parameter is optional. If no value is given, the noise temperature of the signal band is doubled.
+
+.. code-block:: xml
+
+    <lambda_local_oscillator val="158" val_unit="um"/>
+
+Attributes:
+    * | **val:** float
+      |   The wavelength of the local oscillator.
+    * | **val_unit:** str, *optional* = "m"
+      |   The unit of the local oscillator wavelength. This has to be on of [``nm``, ``um``, ``mm``, ``cm``, ``m``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``].
+
 
 kappa
 ^^^^^

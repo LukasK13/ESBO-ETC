@@ -18,7 +18,7 @@ class Heterodyne(ASensor):
 
     def __init__(self, parent: IRadiant, aperture_efficiency: float, main_beam_efficiency: float,
                  receiver_temp: u.Quantity, eta_fss: float, lambda_line: u.Quantity, kappa: float, common_conf: Entry,
-                 n_on: float = None):
+                 n_on: float = None, lambda_local_oscillator: u.Quantity = None):
         """
         Initialize a new heterodyne detector
 
@@ -48,6 +48,7 @@ class Heterodyne(ASensor):
         self.__receiver_temp = receiver_temp
         self.__eta_fss = eta_fss
         self.__lambda_line = lambda_line
+        self.__lambda_local_oscillator = lambda_local_oscillator
         self.__kappa = kappa
         self.__common_conf = common_conf
         self.__n_on = n_on
@@ -78,7 +79,7 @@ class Heterodyne(ASensor):
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         line_ind = np.where(t_signal.wl == self.__lambda_line)[0][0]
-        t_sys = 2 * (t_background + self.__receiver_temp + t_signal)
+        t_sys = t_background + 2 * self.__receiver_temp + t_signal
         # Calculate the noise bandwidth
         delta_nu = t_signal.wl.to(u.Hz, equivalencies=u.spectral()) / (t_signal.wl / self.__common_conf.wl_delta() + 1)
         snr = []
@@ -121,7 +122,7 @@ class Heterodyne(ASensor):
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         line_ind = np.where(t_signal.wl == self.__lambda_line)[0][0]
-        t_sys = 2 * (t_background + self.__receiver_temp + t_signal)
+        t_sys = t_background + 2 * self.__receiver_temp + t_signal
         # Calculate the noise bandwidth
         delta_nu = t_signal.wl.to(u.Hz, equivalencies=u.spectral()) / (t_signal.wl / self.__common_conf.wl_delta() + 1)
         exp_time = []
@@ -172,7 +173,7 @@ class Heterodyne(ASensor):
         # Calculate the signal and background temperatures
         t_signal, t_background = self.calcTemperatures(background, signal, obstruction)
         line_ind = np.where(t_signal.wl == self.__lambda_line)[0][0]
-        t_sys = 2 * (t_background + self.__receiver_temp + t_signal)
+        t_sys = t_background + 2 * self.__receiver_temp + t_signal
         # Calculate the noise bandwidth
         delta_nu = t_signal.wl.to(u.Hz, equivalencies=u.spectral()) / (t_signal.wl / self.__common_conf.wl_delta() + 1)
         sensitivity = []
@@ -318,6 +319,14 @@ class Heterodyne(ASensor):
             t_signal = signal * (self.__main_beam_efficiency * signal.wl ** 2 / (
                     2 * k_B) * self.__eta_fss * u.sr)
             t_signal = SpectralQty(t_signal.wl, t_signal.qty.decompose())
+
+        if self.__lambda_local_oscillator is None:
+            t_signal = t_signal * 2
+            t_background = t_background * 2
+        else:
+            t_signal = t_signal + t_signal.rebin(2 * self.__lambda_local_oscillator - t_signal.wl)
+            t_background = t_background + t_background.rebin(2 * self.__lambda_local_oscillator - t_background.wl)
+
         logger.debug("Spectral signal temperature")
         logger.debug(t_signal)
         logger.debug("Target size: " + size)
@@ -368,6 +377,10 @@ class Heterodyne(ASensor):
         mes = sensor.lambda_line.check_quantity("val", u.nm)
         if mes is not None:
             return "lambda_line: " + mes
+        if hasattr(sensor, "lambda_local_oscillator"):
+            mes = sensor.lambda_local_oscillator.check_quantity("val", u.nm)
+            if mes is not None:
+                return "lambda_local_oscillator: " + mes
         if not hasattr(sensor, "kappa"):
             return "Missing container 'kappa'."
         mes = sensor.kappa.check_float("val")
