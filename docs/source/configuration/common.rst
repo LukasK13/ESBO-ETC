@@ -49,6 +49,7 @@ Attributes:
 res
 ---
 *optional* -- The spectral resolution to be used for the computations.
+The central wavelength as defined by the average of the parameters `wl_min` and `wl_max` will be used to compute the wavelength grid size.
 
 
 .. code-block:: xml
