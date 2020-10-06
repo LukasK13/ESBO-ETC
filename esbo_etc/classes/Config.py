@@ -97,8 +97,8 @@ class Configuration(object):
             if self.conf.common.res().unit == u.dimensionless_unscaled:
                 wl_delta = (self.conf.common.wl_min() + self.conf.common.wl_max()) / (2 * self.conf.common.res())
             else:
-                wl_delta = (self.conf.common.wl_min() + self.conf.common.wl_max()) / 2 * (
-                        self.conf.common.res() / c).decompose()
+                wl_delta = (self.conf.common.wl_min() + self.conf.common.wl_max()) / (
+                            2 * c / self.conf.common.res()).decompose()
             setattr(self.conf.common, 'wl_delta', Entry(val=wl_delta))
         setattr(self.conf.common, 'wl_bins',
                 Entry(val=np.append(np.arange(self.conf.common.wl_min().to(u.nm).value,
