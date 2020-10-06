@@ -2,6 +2,7 @@ from ..target.ATarget import ATarget
 from ..SpectralQty import SpectralQty
 import astropy.units as u
 from astropy.modeling.models import BlackBody
+from astropy.constants import c, k_B
 from ...lib.logger import logger
 from ..Entry import Entry
 from typing import Union
@@ -26,7 +27,7 @@ class BlackBodyTarget(ATarget):
 
     @u.quantity_input(wl_bins='length', temp=[u.Kelvin, u.Celsius], mag=[u.mag, u.mag / u.sr])
     def __init__(self, wl_bins: u.Quantity, temp: u.Quantity = 5778 * u.K, mag: u.Quantity = None,
-                 band: str = "V"):
+                 band: str = "V", law: str = "Planck"):
         """
         Initialize a new black body point source
 
@@ -41,6 +42,9 @@ class BlackBodyTarget(ATarget):
             unit, an extended source will be assumed.
         band : str
             Band used for fitting the planck curve to a star of 0th magnitude. Can be one of [U, B, V, R, I, J, H, K].
+        law : str
+            Which law to use for the calculation of the flux values. Can be either 'Planck' for using Planck's law or
+            'RJ' to use the Rayleigh-Jeans approximation.
 
         Returns
         -------
@@ -48,8 +52,13 @@ class BlackBodyTarget(ATarget):
         if band.upper() not in self._band.keys():
             logger.error("Band has to be one of '[" + ", ".join(list(self._band.keys())) + "]'")
         # Create blackbody model with given temperature
-        bb = BlackBody(temperature=temp, scale=1 * u.W / (u.m ** 2 * u.nm * u.sr))
-
+        bb = None
+        if law.lower() == "planck":
+            bb = BlackBody(temperature=temp, scale=1 * u.W / (u.m ** 2 * u.nm * u.sr))
+        elif law.upper() == "RJ":
+            bb = self.__rayleigh_jeans_factory(temp)
+        else:
+            logger.error("Unknown law '" + law + "' for target type BlackBody.")
         if mag is not None:
             # Calculate the correction factor for a star of 0th magnitude using the spectral flux density
             # for the central wavelength of the given band
@@ -66,6 +75,24 @@ class BlackBodyTarget(ATarget):
             sfd = bb(wl_bins)
         # Initialize super class
         super().__init__(SpectralQty(wl_bins, sfd), wl_bins)
+
+    @staticmethod
+    @u.quantity_input(temp=[u.Kelvin, u.Celsius])
+    def __rayleigh_jeans_factory(temp: u.Quantity):
+        """
+        Create a lambda function for the Rayleigh-Jeans law
+
+        Parameters
+        ----------
+        temp : u.Quantity
+            The temperature in Kelvins
+
+        Returns
+        -------
+        res : lambda
+            A lambda function for the Rayleigh-Jeans law with the variable lambda wavelength
+        """
+        return lambda wl: (2 * c * k_B * temp / wl ** 4 / u.sr).to(u.W / (u.m ** 2 * u.nm * u.sr))
 
     @staticmethod
     def check_config(conf: Entry) -> Union[None, str]:
@@ -92,5 +119,9 @@ class BlackBodyTarget(ATarget):
                 if mes is not None:
                     return mes
             mes = conf.check_selection("band", ["U", "B", "V", "R", "I", "J", "H", "K", "L", "M", "N"])
+            if mes is not None:
+                return mes
+        if hasattr(conf, "law"):
+            mes = conf.check_selection("law", ["Planck", "RJ"])
             if mes is not None:
                 return mes
