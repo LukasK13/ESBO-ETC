@@ -71,7 +71,8 @@ Reading CSV-Files
 
 The format of a file has to be either structured text (e.g. CSV) or astropy ECSV. The format of the file will be automatically detected during read.
 In case of structured text, the units of the columns have to be defined in the column header within square brackets
-(e.g. "wavelength [nm]"). The file must contain two columns with units: wavelength and the spectral quantity:
+(e.g. "wavelength [nm]"). The file must contain two columns with units: wavelength/frequency and the spectral quantity.
+The first column can be either a wavelength or a frequency.
 
 +-----------------+------------------------------+
 | wavelength [nm] | emission [W/(nm\*m^2\*sr)]   |

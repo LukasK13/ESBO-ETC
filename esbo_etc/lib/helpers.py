@@ -103,7 +103,15 @@ def readCSV(file: str, units: list = None, format_: str = None) -> Table:
                 data[data.colnames[i]].unit = units_header[i]
             if units is not None and len(units) == len(data.columns):
                 for i in range(len(data.columns)):
-                    data[data.colnames[i]] = data[data.colnames[i]].to(units[i])
+                    if data[data.colnames[i]].unit.is_equivalent(u.Hz) and units[i].is_equivalent(u.m):
+                        data[data.colnames[i]] = data[data.colnames[i]].to(units[i], equivalencies=u.spectral())
+                    else:
+                        try:
+                            data[data.colnames[i]] = data[data.colnames[i]].to(units[i])
+                        except:
+                            data[data.colnames[i]] = data[data.colnames[i]].to(units[i],
+                                                                               equivalencies=u.spectral_density(
+                                                                                   data[data.colnames[0]]))
         # Use default units
         elif units is not None and len(units) == len(data.columns):
             for i in range(len(data.columns)):
