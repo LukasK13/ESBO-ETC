@@ -302,7 +302,7 @@ class Heterodyne(ASensor):
                                                                     equivalencies=u.spectral_density(
                                                                         background.wl)))
         t_background = background * (
-                    self.__main_beam_efficiency * background.wl ** 2 / (2 * k_B) * self.__eta_fss * u.sr)
+                    self.__main_beam_efficiency * background.wl ** 2 / (2 * k_B) / self.__eta_fss * u.sr)
         t_background = SpectralQty(t_background.wl, t_background.qty.decompose())
         # Calculate the incoming photon current of the target
         logger.info("Calculating the signal temperature.")
@@ -311,13 +311,13 @@ class Heterodyne(ASensor):
             signal = SpectralQty(signal.wl, signal.qty.to(u.W / (u.m ** 2 * u.Hz),
                                                           equivalencies=u.spectral_density(signal.wl)))
             t_signal = signal * (self.__aperture_efficiency * self.__common_conf.d_aperture() ** 2 *
-                                 np.pi / 4 / (2 * k_B) * self.__eta_fss)
+                                 np.pi / 4 / (2 * k_B) / self.__eta_fss)
             t_signal = SpectralQty(t_signal.wl, t_signal.qty.decompose())
         else:
             signal = SpectralQty(signal.wl, signal.qty.to(u.W / (u.m ** 2 * u.Hz * u.sr),
                                                           equivalencies=u.spectral_density(signal.wl)))
-            t_signal = signal * (self.__main_beam_efficiency * signal.wl ** 2 / (
-                    2 * k_B) * self.__eta_fss * u.sr)
+            t_signal = signal * (
+                    self.__main_beam_efficiency * signal.wl ** 2 / (2 * k_B) / self.__eta_fss * u.sr)
             t_signal = SpectralQty(t_signal.wl, t_signal.qty.decompose())
 
         if self.__lambda_local_oscillator is None:
