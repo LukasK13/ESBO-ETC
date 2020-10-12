@@ -111,7 +111,7 @@ def readCSV(file: str, units: list = None, format_: str = None) -> Table:
                         except:
                             data[data.colnames[i]] = data[data.colnames[i]].to(units[i],
                                                                                equivalencies=u.spectral_density(
-                                                                                   data[data.colnames[0]]))
+                                                                                   u.Quantity(data[data.colnames[0]])))
         # Use default units
         elif units is not None and len(units) == len(data.columns):
             for i in range(len(data.columns)):
