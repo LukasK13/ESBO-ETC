@@ -324,8 +324,10 @@ class Heterodyne(ASensor):
             t_signal = t_signal * 2
             t_background = t_background * 2
         else:
-            t_signal = t_signal + t_signal.rebin(2 * self.__lambda_local_oscillator - t_signal.wl)
-            t_background = t_background + t_background.rebin(2 * self.__lambda_local_oscillator - t_background.wl)
+            t_signal = SpectralQty(t_signal.wl, t_signal.qty + t_signal.rebin(
+                2 * self.__lambda_local_oscillator - t_signal.wl).qty)
+            t_background = SpectralQty(t_background.wl, t_background.qty + t_background.rebin(
+                2 * self.__lambda_local_oscillator - t_background.wl).qty)
 
         logger.debug("Spectral signal temperature")
         logger.debug(t_signal)
