@@ -247,6 +247,9 @@ class Atmosphere(AOpticalComponent):
         bb = BlackBody(temperature=temp, scale=em * u.W / (u.m ** 2 * u.nm * u.sr))
         return lambda wl: bb(wl)
 
+    def __repr__(self):
+        return "Atmosphere Object"
+
     @staticmethod
     def check_config(conf: Entry) -> Union[None, str]:
         """
