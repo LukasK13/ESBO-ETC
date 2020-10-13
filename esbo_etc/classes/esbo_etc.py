@@ -1,5 +1,6 @@
 import esbo_etc as eetc
 from esbo_etc.lib.logger import logger
+from esbo_etc.lib.cache import cache
 import logging as log
 import astropy.units as u
 
@@ -65,4 +66,5 @@ class esbo_etc:
             res = detector.getSNR(self.conf.common.exposure_time())
         elif hasattr(self.conf.common, "snr"):
             res = detector.getExpTime(self.conf.common.snr())
+        cache.close()
         return res

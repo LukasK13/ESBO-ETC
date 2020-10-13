@@ -9,3 +9,4 @@ pyfiglet~=0.8.post1
 Sphinx~=3.1.2
 sphinx-rtd-theme~=0.5.0
 requests~=2.24.0
+percache~=0.4.4

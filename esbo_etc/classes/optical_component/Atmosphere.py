@@ -3,9 +3,11 @@ from ..IRadiant import IRadiant
 from ..SpectralQty import SpectralQty
 from ..Entry import Entry
 from ...lib.logger import logger
+from ...lib.cache import cache
 import astropy.units as u
 from astropy.io import ascii
 from astropy.modeling.models import BlackBody
+from astropy.table import QTable
 from typing import Union
 import re
 import requests as req
@@ -58,7 +60,8 @@ class Atmosphere(AOpticalComponent):
 
         args = dict()
         if "atran" in kwargs:
-            args = self._fromATRAN(**{x: kwargs[x] for x in kwargs.keys() if x not in ["emission", "temp"]})
+            data = self.__parse_ATRAN(kwargs["atran"])
+            args = self._fromATRAN(parent=kwargs["parent"], atran=data)
         elif "altitude" in kwargs:
             logger.info("Requesting ATRAN transmission profile.")
             data = self.__call_ATRAN(**{x: kwargs[x] for x in kwargs.keys() if x not in ["parent", "temp"]})
@@ -103,7 +106,7 @@ class Atmosphere(AOpticalComponent):
                                              qty_unit_default=u.dimensionless_unscaled)
         return {"parent": parent, "transmittance": transmittance}
 
-    def _fromATRAN(self, parent: IRadiant, atran: str):
+    def _fromATRAN(self, parent: IRadiant, atran: QTable):
         """
         Initialize a new atmosphere model from an ATRAN output file
 
@@ -111,22 +114,21 @@ class Atmosphere(AOpticalComponent):
         ----------
         parent : IRadiant
             The parent element of the atmosphere from which the electromagnetic radiation is received.
-        atran : str
-            Path to the ATRAN output file containing the spectral transmittance-coefficients of the atmosphere.
+        atran : QTable
+            QTable containing the atmospheric transmission coefficients.
 
         Returns
         -------
         args : dict
             The arguments for the class instantiation.
         """
-        # Read the file
-        data = self.__parse_ATRAN(atran)
         # Create spectral quantity
-        transmittance = SpectralQty(data["col2"].quantity, data["col3"].quantity)
+        transmittance = SpectralQty(atran["col2"].quantity, atran["col3"].quantity)
         return {"parent": parent, "transmittance": transmittance}
 
     @u.quantity_input(altitude="length", latitude="angle", water_vapor="length", zenith_angle="angle", wl_min="length",
                       wl_max="length")
+    @cache
     def __call_ATRAN(self, altitude: u.Quantity, wl_min: u.Quantity, wl_max: u.Quantity,
                      latitude: u.Quantity = 39 * u.degree, water_vapor: u.Quantity = 0 * u.um, n_layers: int = 2,
                      zenith_angle: u.Quantity = 0 * u.degree, resolution: int = 0):
@@ -154,7 +156,7 @@ class Atmosphere(AOpticalComponent):
 
         Returns
         -------
-        data : str
+        data : QTable
             The ATRAN computation results
         """
         # Select closest latitude from ATRAN options
@@ -200,7 +202,7 @@ class Atmosphere(AOpticalComponent):
         # Check if result is empty
         if data == "":
             logger.error("Error: Request returned empty response.")
-        return data
+        return self.__parse_ATRAN(data)
 
     @staticmethod
     def __parse_ATRAN(table: str):
