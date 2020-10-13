@@ -245,8 +245,13 @@ class Imager(ASensor):
         # Check for overexposed pixels
         overexposed = total > self.__well_capacity
         if np.any(overexposed):
+            # Calculate number of overexposed pixels
+            n_overexposed = np.count_nonzero(overexposed)
             # Show a warning for the overexposed pixels
-            logger.warning(prefix + str(np.count_nonzero(overexposed)) + " pixels are overexposed.")
+            if n_overexposed == 1:
+                logger.warning(prefix + str(n_overexposed) + " pixel is overexposed.")
+            else:
+                logger.warning(prefix + str(n_overexposed) + " pixels are overexposed.")
         logger.info("-------------------------------------------------------------------------------------------------")
         logger.info(prefix + "Collected electrons from target:     %1.2e electrons" % signal.sum().value)
         logger.info(prefix + "Collected electrons from background: %1.2e electrons" % background.sum().value)
