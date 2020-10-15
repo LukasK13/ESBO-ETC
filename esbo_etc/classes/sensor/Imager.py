@@ -554,16 +554,16 @@ class Imager(ASensor):
         if not hasattr(sensor, "photometric_aperture"):
             setattr(sensor, "photometric_aperture", Entry(shape=Entry(val="circle"),
                                                           contained_energy=Entry(val="FWHM")))
+        if not hasattr(sensor.photometric_aperture, "shape"):
+            return "Missing container 'shape'."
+        mes = sensor.photometric_aperture.shape.check_selection("val", ["square", "circle"])
+        if mes is not None:
+            return "photometric_aperture -> shape: " + mes
         if hasattr(sensor.photometric_aperture, "aperture_size"):
             mes = sensor.photometric_aperture.aperture_size.check_quantity("val", u.pix)
             if mes is not None:
                 return "photometric_aperture -> aperture_size: " + mes
         else:
-            if not hasattr(sensor.photometric_aperture, "shape"):
-                return "Missing container 'shape'."
-            mes = sensor.photometric_aperture.shape.check_selection("val", ["square", "circle"])
-            if mes is not None:
-                return "photometric_aperture -> shape: " + mes
             if not hasattr(sensor.photometric_aperture, "contained_energy"):
                 return "Missing container 'contained_energy'."
             mes = sensor.photometric_aperture.contained_energy.check_float("val")
