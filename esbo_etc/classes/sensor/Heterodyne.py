@@ -219,12 +219,12 @@ class Heterodyne(ASensor):
         Returns
         -------
         """
-        logger.info("-------------------------------------------------------------------------------------------------")
+        logger.info("--------------------------------------------------------------------------")
         logger.info(prefix + "System temperature:        %1.2e K" % t_sys.value)
         logger.info(prefix + "Noise bandwidth:           %1.2e Hz" % delta_nu.value)
         logger.info(prefix + "RMS antenna temperature:   %1.2e K" % t_rms.value)
         logger.info(prefix + "Antenna temperature:       %1.2e K" % t_signal.value)
-        logger.info("-------------------------------------------------------------------------------------------------")
+        logger.info("--------------------------------------------------------------------------")
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
     def __output(self, t_signal: SpectralQty, t_background: SpectralQty, t_rms: SpectralQty,

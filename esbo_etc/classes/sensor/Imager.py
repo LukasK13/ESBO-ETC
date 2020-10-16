@@ -252,13 +252,13 @@ class Imager(ASensor):
                 logger.warning(prefix + str(n_overexposed) + " pixel is overexposed.")
             else:
                 logger.warning(prefix + str(n_overexposed) + " pixels are overexposed.")
-        logger.info("-------------------------------------------------------------------------------------------------")
+        logger.info("--------------------------------------------------------------------------")
         logger.info(prefix + "Collected electrons from target:     %1.2e electrons" % signal.sum().value)
         logger.info(prefix + "Collected electrons from background: %1.2e electrons" % background.sum().value)
         logger.info(prefix + "Electrons from dark current:         %1.2e electrons" % dark.sum().value)
         logger.info(prefix + "Read noise:                          %1.2e electrons" % (read_noise ** 2).sum().value)
         logger.info(prefix + "Total collected electrons:           %1.2e electrons" % total.sum().value)
-        logger.info("-------------------------------------------------------------------------------------------------")
+        logger.info("--------------------------------------------------------------------------")
 
     @u.quantity_input(signal=u.electron, background=u.electron, read_noise=u.electron ** 0.5, dark=u.electron)
     def __output(self, signal: u.Quantity, background: u.Quantity, read_noise: u.Quantity,
