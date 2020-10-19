@@ -258,3 +258,7 @@ data_w31
 data_sofia
 data_verification
 /cache.db
+esbo-etc_ESBO.xml
+esbo-etc_FORECAST.xml
+esbo-etc_GREAT.xml
+esbo-etc_HIFI.xml
