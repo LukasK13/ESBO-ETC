@@ -6,7 +6,7 @@
         <d_aperture val="0.5" val_unit="m" comment="Diameter of the telescope aperture"/>
         <psf val="Airy" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>
         <jitter_sigma val="10" val_unit="arcsec" comment="Sigma of the telescope jitter"/>
-        <output path="/results" format="fits" comment="Output directory to store output files"/>
+        <output path="results" format="fits" comment="Output directory to store output files"/>
         <exposure_time val="0.1, 1.2" val_unit="s" comment="The exposure time"/>
     </common>
 
