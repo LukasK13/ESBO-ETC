@@ -25,7 +25,7 @@ class TestHeterodyne(TestCase):
 
     def test_getSNR(self):
         snr = self.heterodyne.getSNR(1900 * u.s)
-        self.assertAlmostEqual(snr.value, 10.17992964320754)
+        self.assertAlmostEqual(snr.value, 21.60713878762942)
 
     def test_getExpTime(self):
         exp_time = 1900 * u.s
