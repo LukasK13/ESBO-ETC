@@ -79,8 +79,14 @@ class Entry(object):
                 try:
                     self.__setattr__(name, float(attr) * unit)
                 except ValueError:
-                    return "Expected parameter '" + name + "' with unit '" + unit.to_string() + \
-                           "' but got no unit and cannot convert '" + attr + "' to a numeric value."
+                    try:
+                        self.__setattr__(name, u.Quantity(attr))
+                        mes = self.check_quantity(name, unit, use_default)
+                        if mes is not None:
+                            return mes
+                    except [ValueError, TypeError]:
+                        return "Expected parameter '" + name + "' with unit '" + unit.to_string() + \
+                               "' but got no unit and cannot convert '" + attr + "' to a numeric value."
             else:
                 return "Expected parameter '" + name + "' with unit '" + unit.to_string() + "' but got no unit."
         elif not attr.unit.is_equivalent(unit):

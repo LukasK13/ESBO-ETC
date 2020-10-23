@@ -11,8 +11,13 @@ Each parameter of the configuration is defined by a XML-tag which is indicated b
 
 A parameter can contain multiple attributes which are defined as key-value-pairs and some of them may be optional.
 All attribute values must be quoted as in the example below. The required types shown in the documentation refer to the unquoted value.
-Most numeric attributes require a unit which has to be defined as a second attribute with the suffix *_unit* which is also shown in the example below.
+Most numeric attributes require a unit which can be either included in the value or defined as a second attribute with the suffix *_unit*.
+The documentation uses the latter case for clarity. Both cases are shown as examples below.
 All astropy units defined `here <https://docs.astropy.org/en/stable/units/>`_ can be used.
+
+.. code-block:: xml
+
+    <tag_name val="10 s"/>
 
 .. code-block:: xml
 
