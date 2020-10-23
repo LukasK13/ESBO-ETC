@@ -84,7 +84,7 @@ class Entry(object):
                         mes = self.check_quantity(name, unit, use_default)
                         if mes is not None:
                             return mes
-                    except [ValueError, TypeError]:
+                    except (ValueError, TypeError):
                         return "Expected parameter '" + name + "' with unit '" + unit.to_string() + \
                                "' but got no unit and cannot convert '" + attr + "' to a numeric value."
             else:
