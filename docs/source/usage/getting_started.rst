@@ -9,14 +9,12 @@ Installation
 A Python 3 installation is required to run ESBO-ETC. You can get the latest python version
 `here <https://www.python.org/downloads/>`_.
 
-In order to get ESBO-ETC, clone the code from the IRS git server using
+In order to get ESBO-ETC, download the latest release from the `IRS git server <https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC/releases>`_ or clone the latest development version from the IRS git server using
 
 .. code-block:: bash
     :linenos:
 
     git clone https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC.git
-
-or download the code from the `IRS git server <https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC>`_.
 
 Python Virtual Environment
 --------------------------
