@@ -5,6 +5,7 @@ import astropy.units as u
 from ..lib.logger import logger
 import difflib
 import os
+import numpy as np
 
 
 class Entry(object):
@@ -71,6 +72,7 @@ class Entry(object):
         mes : Union[None, str]
             The error message of the check. This will be None if the check was successful.
         """
+        u.imperial.enable()
         if not hasattr(self, name):
             return "Parameter '" + name + "' not found."
         attr = getattr(self, name)
@@ -80,7 +82,12 @@ class Entry(object):
                     self.__setattr__(name, float(attr) * unit)
                 except ValueError:
                     try:
-                        self.__setattr__(name, u.Quantity(attr))
+                        val = list(map(u.Quantity, attr.split(',')))
+                        if len(val) == 1:
+                            val = val[0]
+                        else:
+                            val = np.array(val[:(len(val)-1)] + [val[-1].value]) << val[-1].unit
+                        self.__setattr__(name, val)
                         mes = self.check_quantity(name, unit, use_default)
                         if mes is not None:
                             return mes
