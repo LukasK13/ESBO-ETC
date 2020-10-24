@@ -72,10 +72,6 @@ class BlackBodyTarget(ATarget):
                 factor = self._band[band.upper()]["sfd"] / (bb(self._band[band.upper()]["wl"]) * u.sr) * u.sr
             # Calculate spectral flux density for the given wavelengths and scale it for a star of the given magnitude
             sfd = bb(wl_bins) * factor * 10 ** (- 2 / 5 * mag / u.mag)  # / 1.195 * 1.16 #  scaling for AETC validation
-            wl_bins_2 = np.arange(15.71, 23.71, 0.01) << u.um
-            sfd_2 = bb(wl_bins_2) * factor * 10 ** (- 2 / 5 * mag / u.mag)
-            sqty_2 = SpectralQty(wl_bins_2, sfd_2).integrate()
-            print((sqty_2 / (8 * u.um)).to(u.W / (u.m ** 2 * u.um)))
         else:
             sfd = bb(wl_bins)
         # Initialize super class
