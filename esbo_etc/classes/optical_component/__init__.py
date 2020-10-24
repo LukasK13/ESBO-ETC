@@ -1,5 +1,6 @@
 from .AOpticalComponent import *
 from .Atmosphere import *
+from .ATRAN import *
 from .StrayLight import *
 from .AHotOpticalComponent import *
 from .Filter import *

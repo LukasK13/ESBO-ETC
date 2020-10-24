@@ -134,6 +134,7 @@ components with a thermal grey body emission form a subclass of the optical comp
 components are available
 
 * An **atmosphere** component modelling the atmospheric transmittance and emission, both read from files.
+* An **ATRAN** component to model the atmosphere using the ATRAN atmopsheric transmission calculator.
 * A **stray light** component for modelling generic background source like zodiacal light or earth stray light.
 * A **cosmic background** component to model thermal black body background radiation like the 2.7 K cosmic background radiation.
 * Hot optical components with thermal emission of a given temperature and emissivity:

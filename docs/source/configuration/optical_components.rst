@@ -12,12 +12,33 @@ Attributes:
 Atmosphere
 ----------
 This component models the behaviour of an atmosphere which has a spectral transmittance and a spectral emission.
-It is possible to read the transmittance of the atmosphere from a CSV file, from an output file of ATRAN or call the webversion of ATRAN to compute the transmission profile.
+The atmospheric transmittance is read from a CSV file.
 The atmospheric emission can bei either read from a CSV file or computed as a grey body radiator of a given temperature and emissivity = 1 - transmission.
 
 .. code-block:: xml
 
     <optical_component type="Atmosphere" transmittance="PathToTransmittanceFile" emission="PathToEmissionFile"/>
+
+.. code-block:: xml
+
+    <optical_component type="Atmosphere" transmittance="PathToTransmittanceFile" temp="200" temp_unit="K"/>
+
+
+Attributes:
+    * | **transmittance:** str
+      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
+    * | **emission:** str, *optional*
+      | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`.
+    * | **temp:** float, *optional*
+      | The atmospheric temperature used for grey body emission.
+    * | **temp_unit:** str, *optional* = "K"
+      | Unit of the atmospheric temperature used for black body emission using the complement of the transmittance.
+
+ATRAN
+----------
+This component uses the atmospheric transmission calculator ATRAN to model the behaviour of the atmosphere
+It is possible to read the transmittance of the atmosphere from an output file of ATRAN or call the webversion of ATRAN to compute the transmission profile.
+The atmospheric emission is computed as a grey body radiator of a given temperature and emissivity = 1 - transmission.
 
 .. code-block:: xml
 
@@ -32,8 +53,6 @@ The atmospheric emission can bei either read from a CSV file or computed as a gr
 
 Attributes:
     * | **transmittance:** str
-      | The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also :ref:`reading_csv`.
-    * | **atran:** str
       | Path to a file containing the output of ATRAN.
     * | **altitude:** float
       | The observatory altitude for the call to ATRAN.
@@ -63,12 +82,11 @@ Attributes:
       | The unit of the zenith angle for the call to ATRAN (0 is towards the zenith).
     * | **resolution:** float, *optional*
       | The resolution for smoothing for the call to ATRAN (0 for no smoothing).
-    * | **emission:** str, *optional*
-      | The path to the file containing the spectral radiance of the emission. For details on the required file structure see also :ref:`reading_csv`.
     * | **temp:** float, *optional*
       | The atmospheric temperature used for grey body emission.
     * | **temp_unit:** str, *optional* = "K"
       | Unit of the atmospheric temperature used for black body emission using the complement of the transmittance.
+
 
 StrayLight
 ----------
