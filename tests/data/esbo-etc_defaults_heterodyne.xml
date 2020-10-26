@@ -6,7 +6,7 @@
         <res val="299792.458" val_unit=""
                    comment="Resolving power for common spectral binning. A linear binning wavelength integral is estimated as (wl_min + wl_max)/(2*R)"/>
         <d_aperture val="2.527" val_unit="m" comment="Diameter of the telescope aperture"/>
-        <psf val="Airy" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>
+        <psf type="Airy" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>
 <!--        <psf val="data/psf.txt" osf="10" osf_unit="" comment="PSF of the optical system. Can be Airy or a file"/>-->
 <!--        <jitter_sigma val="0.1" val_unit="arcsec" comment="Sigma of the telescope jitter"/>-->
         <output path="output" format="csv" comment="Output directory to store output files"/>

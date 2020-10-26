@@ -6,6 +6,7 @@ import numpy as np
 from typing import Union, Tuple
 from ..psf.Airy import Airy
 from ..psf.Zemax import Zemax
+from ..psf.FITS import FITS
 from ..SpectralQty import SpectralQty
 from .PixelMask import PixelMask
 from ...lib.logger import logger
@@ -23,8 +24,8 @@ class Imager(ASensor):
     @u.quantity_input(pixel_geometry=u.pixel, pixel_size="length", sigma_read_out=u.electron ** 0.5 / u.pix,
                       center_offset=u.pix, dark_current=u.electron / u.pix / u.second, well_capacity=u.electron)
     def __init__(self, parent: IRadiant, quantum_efficiency: Union[str, u.Quantity],
-                 pixel_geometry: u.Quantity, pixel_size: u.Quantity, sigma_read_out: u.Quantity, dark_current: u.Quantity,
-                 well_capacity: u.Quantity, f_number: Union[int, float], common_conf: Entry,
+                 pixel_geometry: u.Quantity, pixel_size: u.Quantity, sigma_read_out: u.Quantity,
+                 dark_current: u.Quantity, well_capacity: u.Quantity, f_number: Union[int, float], common_conf: Entry,
                  center_offset: u.Quantity = np.array([0, 0]) << u.pix, shape: str = "circle",
                  contained_energy: Union[str, int, float] = "FWHM", aperture_size: u.Quantity = None):
         """
@@ -82,14 +83,20 @@ class Imager(ASensor):
         self.__central_wl = self.__common_conf.wl_min() + (
                 self.__common_conf.wl_max() - self.__common_conf.wl_min()) / 2
         # Parse PSF
-        if hasattr(common_conf, "psf") and common_conf.psf().lower() == "airy":
+        if common_conf.psf.type.lower() == "airy":
             # Use an airy disk as PSF
             self.__psf = Airy(self.__f_number, self.__central_wl, common_conf.d_aperture(), common_conf.psf.osf,
                               pixel_size)
-        else:
+        elif common_conf.psf.type.lower() == "zemax":
             # Read PSF from Zemax file
             self.__psf = Zemax(common_conf.psf(), self.__f_number, self.__central_wl, common_conf.d_aperture(),
                                common_conf.psf.osf, pixel_size)
+        elif common_conf.psf.type.lower() == "fits":
+            # Read PSF from FITS-file
+            self.__psf = FITS(common_conf.psf(), self.__f_number, self.__central_wl, common_conf.d_aperture(),
+                              common_conf.psf.osf, pixel_size)
+        else:
+            logger.error("Unknown PSF type '" + common_conf.psf() + "'.")
 
     @u.quantity_input(exp_time="time")
     def calcSNR(self, background: SpectralQty, signal: SpectralQty, obstruction: float,
@@ -568,7 +575,7 @@ class Imager(ASensor):
                 return "Missing container 'contained_energy'."
             mes = sensor.photometric_aperture.contained_energy.check_float("val")
             if mes is not None:
-                if conf.common.psf().lower() == "airy":
+                if conf.common.psf.type.lower() == "airy":
                     mes = sensor.photometric_aperture.contained_energy.check_selection("val",
                                                                                        ["peak", "FWHM", "fwhm",
                                                                                         "min"])

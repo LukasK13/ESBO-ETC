@@ -85,20 +85,31 @@ Attributes:
 
 psf
 ---
-*optional* -- The PSF used for the computations. This can be either read from a Zemax file or approximated by a (obstructed) airy disk.
+*optional* -- The PSF used for the computations.
+This can be either read from a Zemax/FITS-file or approximated by a (obstructed) airy disk.
+In case of a FITS-file, the PSF must be included as a 2D map.
+The header keywords ``XPIXSZ`` and ``YPIXSZ`` can be used to define the grid size of the PSF in microns.
+Otherwise, the keyword ``PSFSCALE`` can be used to define the FOV per PSF pixel in arcsec/pixel.
+The keywords ``XPSFCTR`` and ``YPSFCTR`` can be used to define the center point of the PSF, if the PSF is not centered on the grid.
 
 .. code-block:: xml
 
-    <psf val="Airy" osf="10" osf_unit=""/>
+    <psf type="Airy" osf="10" osf_unit=""/>
 
 .. code-block:: xml
 
-    <psf val="data/psf.txt" osf="10" osf_unit=""/>
+    <psf type="FITS" val="data/psf.fits" osf="10" osf_unit=""/>
+
+.. code-block:: xml
+
+    <psf type="Zemax" val="data/psf.txt" osf="10" osf_unit=""/>
 
 Attributes:
-    * | **val:** str = "Airy"
+    * | **type:** str = "Airy"
       |   The PSF to be used for the computations. This can be either the path to a Zemax file or the keyword *Airy* to for an airy disk as PSF.
-    * | **osf:** str = "10"
+    * | **val:** str
+      |   The path to the file to be read.
+    * | **osf:** float = "10"
       |   The oversampling factor to be used to calculate the contained energy and the PSF with jitter.
     * | **osf_unit:** str, *optional* = ""
       |   The unit of the oversampling factor. This has to be emtpy (dimensionless). The default is ``dimensionless``.

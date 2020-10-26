@@ -136,12 +136,12 @@ class Configuration(object):
         mes = self.conf.common.d_aperture.check_quantity("val", u.m)
         mes is not None and logger.error("Configuration check: common -> d_aperture: " + mes)
         if hasattr(self.conf.common, "psf"):
-            if hasattr(self.conf.common.psf, "val"):
-                if self.conf.common.psf().lower() != "airy":
+            if hasattr(self.conf.common.psf, "type"):
+                if self.conf.common.psf.type.lower() != "airy":
                     mes = self.conf.common.psf.check_file("val")
                     mes is not None and logger.error("Configuration check: common -> psf: " + mes)
             else:
-                setattr(self.conf.common.psf, "val", "Airy")
+                logger.error("Configuration check: common -> psf: Missing required parameter 'type'.")
             if hasattr(self.conf.common.psf, "osf"):
                 mes = self.conf.common.psf.check_float("osf")
                 mes is not None and logger.error("Configuration check: common -> psf: " + mes)
