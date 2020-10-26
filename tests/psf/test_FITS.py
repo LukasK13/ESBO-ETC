@@ -33,7 +33,7 @@ class TestFITS(TestCase):
         mask_2 = PixelMask(np.array([1024, 1024]) << u.pix, 6.5 * u.um, np.array([0.5, 0.5]) << u.pix)
         mask_2.createPhotometricAperture("circle", d_ap_2 / 2)
         mask_2 = self.airy.mapToPixelMask(mask_2)
-        self.assertTrue(np.isclose(float(mask.sum()), float(mask_2.sum()), rtol=0.005))
+        self.assertTrue(np.isclose(float(mask.sum()), float(mask_2.sum()), rtol=0.01))
 
         # Jitter
         reduced_observation_angle = self.fits.calcReducedObservationAngle(80, 1 * u.arcsec).value

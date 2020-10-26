@@ -57,7 +57,7 @@ class FITS(AGriddedPSF):
         if "XPSFCTR" in hdul[0].header and "YPSFCTR" in hdul[0].header:
             center_point = [hdul[0].header["XPSFCTR"], hdul[0].header["YPSFCTR"]]
         else:
-            center_point = [x / 2 for x in list(self._psf.shape)]
+            center_point = [x / 2 for x in list(psf.shape)]
 
         # Close the file
         hdul.close()
