@@ -1,0 +1,472 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>esbo_etc.classes.Config &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../../../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>esbo_etc.classes.Config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for esbo_etc.classes.Config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">eT</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">astropy.constants</span> <span class="kn">import</span> <span class="n">c</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">..lib.helpers</span> <span class="kn">import</span> <span class="n">readCSV</span>
+<span class="kn">from</span> <span class="nn">..lib.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">.Entry</span> <span class="kn">import</span> <span class="n">Entry</span>
+<span class="kn">from</span> <span class="nn">..classes</span> <span class="kn">import</span> <span class="n">target</span> <span class="k">as</span> <span class="n">tg</span>
+<span class="kn">from</span> <span class="nn">..classes</span> <span class="kn">import</span> <span class="n">optical_component</span> <span class="k">as</span> <span class="n">oc</span>
+<span class="kn">from</span> <span class="nn">..classes</span> <span class="kn">import</span> <span class="n">sensor</span> <span class="k">as</span> <span class="n">sensor</span>
+<span class="kn">import</span> <span class="nn">difflib</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="Configuration"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.Config.Configuration">[docs]</a><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Class to parse the XML configuration file.</span>
+<span class="sd">    Adapted from ExoSim (https://github.com/ExoSim/ExoSimPublic)</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    conf : Entry</span>
+<span class="sd">        Parsed configuration file as Entry-tree</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Configuration.__init__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.Config.Configuration.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="s2">&quot;esbo-etc_defaults.xml&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse a XML configuration file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : str</span>
+<span class="sd">            configuration file to parse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if configuration file exists</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration file &#39;&quot;</span> <span class="o">+</span> <span class="n">file</span> <span class="o">+</span> <span class="s2">&quot;&#39; doesn&#39;t exist.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Read configuration file</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading configuration from file &#39;&quot;</span> <span class="o">+</span> <span class="n">file</span> <span class="o">+</span> <span class="s2">&quot;&#39;.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="p">(</span><span class="n">eT</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__check_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__calc_metaoptions</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">eT</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse a XML element tree to an Entry-tree</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parent : xml.etree.ElementTree.Element</span>
+<span class="sd">            The parent XML tree to be parsed</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        obj : Entry</span>
+<span class="sd">            The parsed XML tree</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initialize empty Entry object</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">Entry</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="c1"># recursively parse children of child element</span>
+            <span class="n">parsed_child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="c1"># parse attributes of child element</span>
+            <span class="n">parsed_child</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+            <span class="c1"># Add or append the parsed child to the prepared Entry object</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">),</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parsed_child</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">),</span> <span class="n">parsed_child</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">parsed_child</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">__calc_metaoptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate additional attributes e.g. the wavelength grid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__calc_metaoption_wl_delta</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__calc_metaoption_wl_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the wavelength grid used for the calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;wl_delta&quot;</span><span class="p">):</span>
+            <span class="n">wl_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_delta</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">res</span><span class="p">()</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">:</span>
+                <span class="n">wl_delta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_min</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_max</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">res</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">wl_delta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_min</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_max</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span>
+                            <span class="mi">2</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">res</span><span class="p">())</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s1">&#39;wl_delta&#39;</span><span class="p">,</span> <span class="n">Entry</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">wl_delta</span><span class="p">))</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s1">&#39;wl_bins&#39;</span><span class="p">,</span>
+                <span class="n">Entry</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_min</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_max</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">wl_delta</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_max</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__check_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check and fix the parsed configuration file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check common</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;common&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: Missing required container &#39;common&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;wl_min&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common: Missing required container &#39;wl_min&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_min</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; wl_min: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;wl_max&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common: Missing required container &#39;wl_max&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_max</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; wl_max: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;wl_delta&quot;</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">wl_delta</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; wl_delta: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;res&quot;</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; res: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Configuration check: common: Expected one of the containers &#39;wl_delta&#39; or &#39;res&#39; but got none.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;d_aperture&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common: Missing required container &#39;d_aperture&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">d_aperture</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; d_aperture: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;psf&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">psf</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;airy&quot;</span><span class="p">:</span>
+                    <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">check_file</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+                    <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; psf: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; psf: Missing required parameter &#39;type&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">psf</span><span class="p">,</span> <span class="s2">&quot;osf&quot;</span><span class="p">):</span>
+                <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">check_float</span><span class="p">(</span><span class="s2">&quot;osf&quot;</span><span class="p">)</span>
+                <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; psf: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">psf</span><span class="p">,</span> <span class="s2">&quot;osf&quot;</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;psf&quot;</span><span class="p">,</span> <span class="n">Entry</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="s2">&quot;Airy&quot;</span><span class="p">,</span> <span class="n">osf</span><span class="o">=</span><span class="mi">10</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;jitter_sigma&quot;</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">jitter_sigma</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsec</span><span class="p">)</span>
+            <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; jitter_sigma: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;output_path&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">):</span>
+                <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">check_path</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)</span>
+                <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; output: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">):</span>
+                <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">check_selection</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;CSV&quot;</span><span class="p">,</span> <span class="s2">&quot;fits&quot;</span><span class="p">,</span> <span class="s2">&quot;FITS&quot;</span><span class="p">])</span>
+                <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; output: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="s2">&quot;CSV&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;output_path&quot;</span><span class="p">,</span> <span class="n">Entry</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;exposure_time&quot;</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exposure_time</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exposure_time</span><span class="o">.</span><span class="n">check_file</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+                <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; exposure_time: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exposure_time</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">readCSV</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exposure_time</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">],</span>
+                                                             <span class="n">format_</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">quantity</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;snr&quot;</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">snr</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">snr</span><span class="o">.</span><span class="n">check_file</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+                <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common -&gt; snr: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">snr</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">readCSV</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">snr</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">],</span>
+                                                   <span class="n">format_</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">quantity</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;exposure_time&quot;</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">snr</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exposure_time</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Configuration check: common -&gt; snr: Length of exposure time (</span><span class="si">%d</span><span class="s2">) not matching the length of &quot;</span>
+                    <span class="s2">&quot;the SNR (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">exposure_time</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">snr</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;exposure_time&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;snr&quot;</span><span class="p">)):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common: Expected at least one of the containers &#39;exposure_time&#39; or &quot;</span> <span class="o">+</span>
+                         <span class="s2">&quot;&#39;snr&#39; but got none.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check astroscene</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;astroscene&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: Missing required container &#39;astroscene&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: astroscene: Missing required container &#39;target&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: astroscene -&gt; target: Missing required parameter &#39;type&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">tg</span><span class="p">):</span>
+            <span class="c1"># noinspection PyTypeChecker</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: astroscene -&gt; target: Target type &#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span>
+                         <span class="s2">&quot;&#39; does not exist. Did you mean &#39;&quot;</span> <span class="o">+</span>
+                         <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                                                   <span class="nb">dir</span><span class="p">(</span><span class="n">tg</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;?&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">type</span><span class="p">)</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: astroscene -&gt; target: &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;exposure_time&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common</span><span class="p">,</span> <span class="s2">&quot;snr&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;blackbodytarget&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: astroscene -&gt; target: Sensitivity calculation only possible for &quot;</span> <span class="o">+</span>
+                             <span class="s2">&quot;a target of the type &#39;BlackBodyTarget&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_optical_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">astroscene</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: astroscene -&gt; &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+
+        <span class="c1"># Check common_optics</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;common_optics&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common_optics</span><span class="p">,</span> <span class="n">Entry</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_optical_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">common_optics</span><span class="p">)</span>
+            <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: common_optics -&gt; &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+
+        <span class="c1"># Check instrument</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;instrument&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: Missing required container &#39;instrument&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_optical_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: instrument -&gt; &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="s2">&quot;sensor&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: instrument: Missing required container &#39;sensor&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: instrument -&gt; sensor: Missing required parameter &#39;type&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">sensor</span><span class="p">):</span>
+            <span class="c1"># noinspection PyTypeChecker</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: instrument -&gt; sensor: Sensor type &#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span>
+                         <span class="s2">&quot;&#39; does not exist. Did you mean &#39;&quot;</span> <span class="o">+</span>
+                         <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                                                   <span class="nb">dir</span><span class="p">(</span><span class="n">sensor</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;?&quot;</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">type</span><span class="p">)</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">sensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span>
+        <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Configuration check: instrument -&gt; sensor -&gt; &quot;</span> <span class="o">+</span> <span class="n">mes</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__check_optical_components</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="nb">list</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check list of optical components in the parsed configuration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conf : Union[Entry, list]</span>
+<span class="sd">            The configuration entry or the list of configuration entries of the optical components to be checked.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mes : Union[None, str]</span>
+<span class="sd">            The error message of the check. This will be None if the check was successful.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;optical_component&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="n">conf</span><span class="o">.</span><span class="n">optical_component</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">optical_component</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="k">else</span> <span class="p">[</span><span class="n">conf</span><span class="o">.</span><span class="n">optical_component</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">component</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">oc</span><span class="p">):</span>
+                        <span class="c1"># noinspection PyTypeChecker</span>
+                        <span class="k">return</span> <span class="s2">&quot;optical_component: optical component type &#39;&quot;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span> \
+                               <span class="s2">&quot;&#39; does not exist. Did you mean &#39;&quot;</span> <span class="o">+</span> \
+                               <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">dir</span><span class="p">(</span><span class="n">tg</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;?&quot;</span>
+                    <span class="n">mes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">oc</span><span class="p">,</span> <span class="n">component</span><span class="o">.</span><span class="n">type</span><span class="p">)</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="s2">&quot;optical_component -&gt; &quot;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;optical_component: Missing required parameter &#39;type&#39;.&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

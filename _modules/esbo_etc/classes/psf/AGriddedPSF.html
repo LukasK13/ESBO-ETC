@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>esbo_etc.classes.psf.AGriddedPSF &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../../../../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>esbo_etc.classes.psf.AGriddedPSF</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for esbo_etc.classes.psf.AGriddedPSF</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.IPSF</span> <span class="kn">import</span> <span class="n">IPSF</span>
+<span class="kn">from</span> <span class="nn">...lib.helpers</span> <span class="kn">import</span> <span class="n">rasterizeCircle</span>
+<span class="kn">from</span> <span class="nn">..sensor.PixelMask</span> <span class="kn">import</span> <span class="n">PixelMask</span>
+<span class="kn">from</span> <span class="nn">...lib.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">bisect</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">fftconvolve</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp2d</span>
+
+
+<div class="viewcode-block" id="AGriddedPSF"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.psf.html#esbo_etc.classes.psf.AGriddedPSF.AGriddedPSF">[docs]</a><span class="k">class</span> <span class="nc">AGriddedPSF</span><span class="p">(</span><span class="n">IPSF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for modelling the PSF from a two dimensional grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">wl</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">d_aperture</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">grid_delta</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psf</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">f_number</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">wl</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">d_aperture</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">osf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                 <span class="n">pixel_size</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">grid_delta</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">center_point</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new PSF from a 2D grid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        psf : ndarray</span>
+<span class="sd">            2D numpy array containing the parsed PSF values. The zero-point is in the top left corner.</span>
+<span class="sd">        f_number : float</span>
+<span class="sd">            The working focal number of the optical system</span>
+<span class="sd">        wl : Quantity</span>
+<span class="sd">            The central wavelength which is used for calculating the PSF</span>
+<span class="sd">        d_aperture : Quantity</span>
+<span class="sd">            The diameter of the telescope&#39;s aperture.</span>
+<span class="sd">        osf : float</span>
+<span class="sd">            The oversampling factor to be used for oversampling the PSF with regards to the pixel size.</span>
+<span class="sd">        pixel_size : Quantity</span>
+<span class="sd">            The size of a pixel as length-quantity.</span>
+<span class="sd">        grid_delta : Quantity</span>
+<span class="sd">            Size of a grid element as length-Quantity with a value for each grid dimension.</span>
+<span class="sd">        center_point : list</span>
+<span class="sd">            The center point coordinates as list with the zero point in the upper left corner.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Store parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_f_number</span> <span class="o">=</span> <span class="n">f_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wl</span> <span class="o">=</span> <span class="n">wl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d_aperture</span> <span class="o">=</span> <span class="n">d_aperture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_osf</span> <span class="o">=</span> <span class="n">osf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_size</span> <span class="o">=</span> <span class="n">pixel_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psf</span> <span class="o">=</span> <span class="n">psf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span> <span class="o">=</span> <span class="n">grid_delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center_point</span> <span class="o">=</span> <span class="n">center_point</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center_point_os</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psf_os</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psf_osf</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># @u.quantity_input(jitter_sigma=u.arcsec)</span>
+<div class="viewcode-block" id="AGriddedPSF.calcReducedObservationAngle"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.psf.html#esbo_etc.classes.psf.AGriddedPSF.AGriddedPSF.calcReducedObservationAngle">[docs]</a>    <span class="k">def</span> <span class="nf">calcReducedObservationAngle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contained_energy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span>
+                                    <span class="n">jitter_sigma</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the reduced observation angle in lambda / d_ap for the given contained energy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        contained_energy : Union[str, int, float, u.Quantity]</span>
+<span class="sd">            The percentage of energy to be contained within a circle with the diameter reduced observation angle.</span>
+<span class="sd">        jitter_sigma : Quantity</span>
+<span class="sd">            Sigma of the telescope&#39;s jitter in arcsec</span>
+<span class="sd">        obstruction : float</span>
+<span class="sd">            The central obstruction as ratio A_ob / A_ap</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        reduced_observation_angle: Quantity</span>
+<span class="sd">            The reduced observation angle in lambda / d_ap</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Parse the contained energy</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">contained_energy</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">contained_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">contained_energy</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not convert encircled energy to float.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">contained_energy</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+            <span class="n">contained_energy</span> <span class="o">=</span> <span class="n">contained_energy</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+
+        <span class="n">center_point</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">psf_osf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calcPSF</span><span class="p">(</span><span class="n">jitter_sigma</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the maximum possible radius for the circle containing the photometric aperture</span>
+        <span class="n">r_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="c1"># Calculate the total contained energy of the PSF</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">psf</span><span class="p">)</span>
+        <span class="c1"># Iterate the optimal radius for the contained energy</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r_c</span><span class="p">:</span> <span class="n">contained_energy</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="n">psf</span> <span class="o">*</span> <span class="n">rasterizeCircle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">r_c</span><span class="p">,</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="n">total</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">)</span>
+        <span class="c1"># Calculate the reduced observation angle in lambda / d_ap</span>
+        <span class="c1"># noinspection PyTypeChecker</span>
+        <span class="n">reduced_observation_angle</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">psf_osf</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_f_number</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d_aperture</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d_aperture</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wl</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">reduced_observation_angle</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span></div>
+
+    <span class="k">def</span> <span class="nf">_calcPSF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jitter_sigma</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the PSF from the grid. This includes oversampling the PSF and convolving with the</span>
+<span class="sd">        jitter-gaussian.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        jitter_sigma : Quantity</span>
+<span class="sd">            Sigma of the telescope&#39;s jitter in arcsec.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        center_point : ndarray</span>
+<span class="sd">            The indices of the PSF&#39;s center point on the grid.</span>
+<span class="sd">        psf : ndarray</span>
+<span class="sd">            The PSF.</span>
+<span class="sd">        psf_osf : float</span>
+<span class="sd">            The oversampling factor of the returned PSF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate the psf oversampling factor for the PSF based on the current resolution of the PSF</span>
+        <span class="n">psf_osf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pixel_size</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_osf</span><span class="p">))</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">psf_osf</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="c1"># No oversampling is necessary</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf</span>
+            <span class="n">center_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_point</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Oversampling is necessary, oversample the PSF and calculate the new center point.</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">interp2d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_psf</span><span class="p">,</span>
+                         <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">center_point</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">psf_osf</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_point</span><span class="p">]</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">f</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">psf_osf</span><span class="p">)</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">psf_osf</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">psf_osf</span><span class="p">)</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">psf_osf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">jitter_sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Convert angular jitter to jitter on focal plane</span>
+            <span class="n">jitter_sigma_um</span> <span class="o">=</span> <span class="p">(</span><span class="n">jitter_sigma</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">rad</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_number</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d_aperture</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">rad</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span>
+            <span class="c1"># Jitter is enabled. Calculate the corresponding gaussian bell and convolve it with the PSF</span>
+            <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">)</span> <span class="o">/</span> <span class="n">psf_osf</span> <span class="o">&lt;</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">jitter_sigma_um</span><span class="p">:</span>
+                <span class="c1"># 6-sigma interval of the gaussian bell is larger than the grid width</span>
+                <span class="c1"># Calculate the necessary grid length for the 6-sigma interval of the gaussian bell</span>
+                <span class="n">jitter_grid_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">jitter_sigma_um</span> <span class="o">/</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">)</span> <span class="o">/</span> <span class="n">psf_osf</span><span class="p">))</span><span class="o">.</span><span class="n">value</span>
+                <span class="c1"># Make sure, the grid size is odd in order to have a defined kernel center</span>
+                <span class="n">jitter_grid_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">jitter_grid_length</span> <span class="k">if</span> <span class="n">jitter_grid_length</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">jitter_grid_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># Create a meshgrid containing the x and y coordinates of each point within the first quadrant of the</span>
+                <span class="c1"># gaussian kernel</span>
+                <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">((</span><span class="n">jitter_grid_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                                     <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">((</span><span class="n">jitter_grid_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="c1"># Calculate the gaussian kernel in the first quadrant</span>
+                <span class="n">kernel</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">jitter_sigma_um</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                    <span class="o">-</span><span class="p">((</span><span class="n">xv</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">/</span> <span class="n">psf_osf</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span>
+                      <span class="p">(</span><span class="n">yv</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">/</span> <span class="n">psf_osf</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jitter_sigma_um</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="c1"># Mirror the kernel from the first quadrant to all other quadrants</span>
+                <span class="n">kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">kernel</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">kernel</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># Normalize kernel</span>
+                <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+                <span class="c1"># Convolve PSF with gaussian kernel</span>
+                <span class="n">psf</span> <span class="o">=</span> <span class="n">fftconvolve</span><span class="p">(</span><span class="n">psf</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">)</span>
+                <span class="c1"># Calculate new center point</span>
+                <span class="n">center_point</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="nb">int</span><span class="p">((</span><span class="n">jitter_grid_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">center_point</span><span class="p">]</span>
+        <span class="c1"># Save the values as object attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center_point_os</span> <span class="o">=</span> <span class="n">center_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psf_os</span> <span class="o">=</span> <span class="n">psf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psf_osf</span> <span class="o">=</span> <span class="n">psf_osf</span>
+        <span class="k">return</span> <span class="n">center_point</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">psf_osf</span>
+
+<div class="viewcode-block" id="AGriddedPSF.mapToPixelMask"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.psf.html#esbo_etc.classes.psf.AGriddedPSF.AGriddedPSF.mapToPixelMask">[docs]</a>    <span class="k">def</span> <span class="nf">mapToPixelMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">PixelMask</span><span class="p">,</span> <span class="n">jitter_sigma</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PixelMask</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map the integrated PSF values to a sensor grid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        obstruction</span>
+<span class="sd">        mask : PixelMask</span>
+<span class="sd">            The pixel mask to map the values to. The values will only be mapped onto entries with the value 1.</span>
+<span class="sd">        jitter_sigma : Quantity</span>
+<span class="sd">            Sigma of the telescope&#39;s jitter in arcsec</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mask : PixelMask</span>
+<span class="sd">            The pixel mask with the integrated PSF values mapped onto each pixel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate the indices of all non-zero elements of the mask</span>
+        <span class="n">y_ind</span><span class="p">,</span> <span class="n">x_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="c1"># Extract a rectangle containing all non-zero values of the mask</span>
+        <span class="n">mask_red</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">y_ind</span><span class="o">.</span><span class="n">min</span><span class="p">():(</span><span class="n">y_ind</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">x_ind</span><span class="o">.</span><span class="n">min</span><span class="p">():(</span><span class="n">x_ind</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="c1"># Calculate the new PSF-center indices of the reduced mask</span>
+        <span class="n">psf_center_ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">mask</span><span class="o">.</span><span class="n">psf_center_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_ind</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">mask</span><span class="o">.</span><span class="n">psf_center_ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_ind</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span>
+        <span class="c1"># Oversample the reduced mask</span>
+        <span class="n">mask_red_os</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rebin</span><span class="p">(</span><span class="n">mask_red</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_osf</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">PixelMask</span><span class="p">)</span>
+        <span class="c1"># Calculate the new PSF-center indices of the reduced mask</span>
+        <span class="n">psf_center_ind</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_osf</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">psf_center_ind</span><span class="p">]</span>
+
+        <span class="c1"># Get PSF values or calculate them if not available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf_os</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_point_os</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf_osf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">center_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_point_os</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf_os</span>
+            <span class="n">psf_osf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf_osf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">center_point</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">psf_osf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calcPSF</span><span class="p">(</span><span class="n">jitter_sigma</span><span class="p">)</span>
+        <span class="c1"># Calculate the coordinates of each PSF value in microns</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">psf_osf</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">center_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">psf_osf</span>
+        <span class="c1"># Initialize a two-dimensional cubic interpolation function for the PSF</span>
+        <span class="n">psf_interp</span> <span class="o">=</span> <span class="n">interp2d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">psf</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Calculate the values of the PSF for all elements of the reduced mask</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">psf_interp</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mask_red_os</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">psf_center_ind</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">mask_red_os</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                         <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mask_red_os</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">psf_center_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">mask_red_os</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># Bin the oversampled reduced mask to the original resolution and multiply with the reduced mask to select only</span>
+        <span class="c1"># the relevant values</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">mask_red</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rebin</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_osf</span><span class="p">)</span>
+        <span class="c1"># Integrate the reduced mask and divide by the indefinite integral to get relative intensities</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">*</span> <span class="n">mask_red_os</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">psf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">um</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">psf_osf</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># reintegrate the reduced mask into the complete mask</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">y_ind</span><span class="o">.</span><span class="n">min</span><span class="p">():(</span><span class="n">y_ind</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">x_ind</span><span class="o">.</span><span class="n">min</span><span class="p">():(</span><span class="n">x_ind</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="n">mask</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

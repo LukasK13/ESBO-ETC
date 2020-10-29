@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Developer Documentation &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Documentation" href="../api/api.html" />
+    <link rel="prev" title="Output" href="../output/output.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output/output.html">Output</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#project-structure">Project Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#esbo-etc-python-module">ESBO-ETC Python module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software-architecture">Software Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#radiant-interface">Radiant Interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optical-component">Optical Component</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sensor">Sensor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#psf">PSF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#factories">Factories</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#other-classes">Other Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spectral-quantity">Spectral Quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#entry">Entry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#extending-esbo-etc">Extending ESBO-ETC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adding-targets">Adding Targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-optical-components">Adding Optical Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-detector-components">Adding Detector Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ci-cd-pipeline">CI/CD-Pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#jenkins-configuration">Jenkins Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pipeline">Pipeline</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Developer Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="developer-documentation">
+<h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The following section provides detailed information on the the software architecture and on the possibilities to extend ESBO-ETC.
+The source code of ESBO-ETC and this documentation can be found on the <a class="reference external" href="https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC">IRS Gitea-server</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the following, methods of the source code may be mentioned without any details on the required parameters or the return values.
+Please refer to the <a class="reference internal" href="../api/api.html#api"><span class="std std-ref">API Documentation</span></a> for further information.</p>
+</div>
+<p>ESBO-ETC uses <a class="reference external" href="https://docs.astropy.org/en/stable/units/">Astropy Quantities</a> for all computations in order to ensure proper unit conversion.</p>
+<div class="section" id="project-structure">
+<h2>Project Structure<a class="headerlink" href="#project-structure" title="Permalink to this headline">¶</a></h2>
+<p>This project is structured into several folders as shown below. The three main folders are <code class="docutils literal notranslate"><span class="pre">docs</span></code>, which contains the documentation,
+<code class="docutils literal notranslate"><span class="pre">esbo_etc</span></code> containing all source files and <code class="docutils literal notranslate"><span class="pre">tests</span></code>, where all tests are located.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>root
+├── docs                        Documentation files
+│   └── source                  Source files of the documentation
+│       ├── configuration       Configuration chapter of the documentation
+│       ├── developer           Developer chapter of the documentation
+│       └── usage               Usage chapter of the documentation
+├── esbo_etc                    Source code of ESBO-ETC
+│   ├── classes                 Contains all classes of the source code
+│   │   ├── optical_component   Contains all class files of the optical components
+│   │   ├── psf                 Contains all class files to model the different types of PSF
+│   │   ├── sensor              Contains all class files of the sensors
+│   │   └── target              Contains all class files of the targets
+│   ├── lib                     Contains all library functions
+│   └── esbo-etc.py             This is the main file to run the application
+└──  tests                      Contains all tests
+    ├── data                    Necessary data for all tests
+    ├── optical_component       Tests of the optical components
+    ├── psf                     Tests of the different PSF implementations
+    ├── sensor                  Tests of all sensors
+    └── target                  Tests of all targets
+</pre></div>
+</div>
+</div>
+<div class="section" id="esbo-etc-python-module">
+<h2>ESBO-ETC Python module<a class="headerlink" href="#esbo-etc-python-module" title="Permalink to this headline">¶</a></h2>
+<p>ESBO-ETC is designed to be included as module in other Python scripts.
+This is possible by importing the class <code class="docutils literal notranslate"><span class="pre">esbo_etc</span></code> from the module <code class="docutils literal notranslate"><span class="pre">esbo_etc</span></code> as shown below.</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">esbo_etc</span> <span class="kn">import</span> <span class="n">esbo_etc</span>
+</pre></div>
+</td></tr></table></div>
+<p>The class <code class="docutils literal notranslate"><span class="pre">esbo_etc</span></code> requires a path to the configuration file as initialization argument and some other optional paramaters.
+The created object offers the method <code class="docutils literal notranslate"><span class="pre">run()</span></code> to trigger the computation.
+The result of the computation is returned as Astropy quantity.
+A Minimal example looks as follows:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">esbo_etc</span> <span class="kn">import</span> <span class="n">esbo_etc</span>
+
+
+<span class="c1"># Initialize a new ESBO-ETC object</span>
+<span class="n">etc</span> <span class="o">=</span> <span class="n">esbo_etc</span><span class="p">(</span><span class="s2">&quot;path_to_configuration_file.xml&quot;</span><span class="p">)</span>
+
+<span class="c1"># Run the calculations</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">etc</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="software-architecture">
+<h2>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h2>
+<p>For modelling the radiation transportation, the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a> was used as shown in the figure below.</p>
+<div class="figure align-default" id="id3">
+<a class="reference internal image-reference" href="../_images/decorator_pattern.png"><img alt="Decorator Pattern" src="../_images/decorator_pattern.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text">The decorator pattern used for the radiation transportation.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>The radiation transportation pipeline consists always of a single target emitting the signal radiation.
+This target may be encapsulated by multiple optical components which manipulate the radiation by either adding their own background radiation or by decreasing the transmitted radiation.
+The outermost part of the radiation transportation pipeline is formed by some kind of sensor component, detecting the radiation.
+The quality of the detected signal can then be determined by calculating the signal to noise ration (SNR).</p>
+<div class="figure align-default" id="id4">
+<img alt="Class Diagram" src="../_images/class_diagram.png" />
+<p class="caption"><span class="caption-text">Class diagram of the software architecture.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="radiant-interface">
+<h3>Radiant Interface<a class="headerlink" href="#radiant-interface" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id5">
+<img alt="Interface IRadiant" src="../_images/IRadiant.png" />
+<p class="caption"><span class="caption-text">Class diagram of the interface IRadiant.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<p>In order to implement the aforementioned radiation transportation pipeline, a sophisticated software architecture has been designed.
+As shown in the class diagram, the class <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code> forms the backbone of the structure.
+This interface class defines the two methods <code class="docutils literal notranslate"><span class="pre">calcSignal()</span></code> and <code class="docutils literal notranslate"><span class="pre">calcBackground()</span></code> and therefore the basic layout of all decorated classes.
+All targets and optical components implement this interface in oder to allow the cascading calculation of the signal and background fluxes.
+For both targets and optical components exists an abstract superclass which implements the required interface. This allows the actual
+classes to focus on the initialization and calculation of their own properties, ignoring the implementation of the interface.</p>
+<div class="section" id="target">
+<h4>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h4>
+<div class="figure align-default" id="id6">
+<img alt="Target Classes" src="../_images/Target.png" />
+<p class="caption"><span class="caption-text">Class diagram of the target classes.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> implements the interface provided by <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code> and provides the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> which is used to check the relevant parts of the configuration file for this component.
+All available target types must inherit from <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> and therefore must implement the method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code>.
+As the superclass <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> implements the interface provided by <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code>, the compatibility to the radiation transportation pipeline is ensured.
+All subclasses therefore only set up a <code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>-object containing the emitted radiation and call the constructor of <code class="docutils literal notranslate"><span class="pre">ATarget</span></code>.</p>
+</div>
+<div class="section" id="optical-component">
+<h4>Optical Component<a class="headerlink" href="#optical-component" title="Permalink to this headline">¶</a></h4>
+<div class="figure align-default" id="id7">
+<img alt="Optical component classes" src="../_images/OpticalComponent.png" />
+<p class="caption"><span class="caption-text">Class diagram of the optical components.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> implements the interface provided by <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code> and thereby the two methods <code class="docutils literal notranslate"><span class="pre">calcSignal()</span></code> and <code class="docutils literal notranslate"><span class="pre">calcBackground()</span></code>.
+This includes the treatment of central obstruction of the components as well as transmittance / reflectance coefficients.
+Additionally, <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> provides the two methods <code class="docutils literal notranslate"><span class="pre">propagate()</span></code> for handling the propagation of incoming radiation through the optical component and <code class="docutils literal notranslate"><span class="pre">ownNoise()</span></code> for calculating the background radiation contribution of this component.
+The two function may be overwritten by the subclasses, if a custom implementation is necessary.
+Otherwise, the parameters <code class="docutils literal notranslate"><span class="pre">transreflectivity</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code> of the constructor method will be used for the calculations.
+In order to check the relevant parts of the configuration file for this component, the class provides the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> which has to be implement by all subclasses.</p>
+<p>According to the restrictions above, subclasses of <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> can be implemented in two possible ways: either by providing the parameters <code class="docutils literal notranslate"><span class="pre">transreflectivity</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code> to the constructor of the superclass or by implementing the two methods <code class="docutils literal notranslate"><span class="pre">propagate()</span></code> and <code class="docutils literal notranslate"><span class="pre">ownNoise()</span></code>.</p>
+<div class="section" id="hot-optical-component">
+<h5>Hot Optical Component<a class="headerlink" href="#hot-optical-component" title="Permalink to this headline">¶</a></h5>
+<div class="figure align-default" id="id8">
+<img alt="Hot optical component classes" src="developer/images/HotOpticalComponent.png" />
+<p class="caption"><span class="caption-text">Class diagram of the hot optical components.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> extends the abstract superclass <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> by implementing the method <code class="docutils literal notranslate"><span class="pre">ownNoise()</span></code> assuming grey body radiation in order to model optical components with a thermal background contribution.
+This has the consequence, that every subclass of <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> must implement the method <code class="docutils literal notranslate"><span class="pre">propagate()</span></code>, which handles to propagation of the signal and background radiation through the component.
+Like <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code>, the class <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> provides the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> for checking the configuration file.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sensor">
+<h3>Sensor<a class="headerlink" href="#sensor" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id9">
+<img alt="Sensor classes" src="../_images/Sensor.png" />
+<p class="caption"><span class="caption-text">Class diagram of the sensor components.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">ASensor</span></code> is the superclass that must be subclassed by every sensor class.
+It provides the three abstract methods <code class="docutils literal notranslate"><span class="pre">calcSNR()</span></code>, <code class="docutils literal notranslate"><span class="pre">calcExpTime()</span></code> and <code class="docutils literal notranslate"><span class="pre">calSensitivity()</span></code> which must be implemented by the subclasses.
+These three abstract methods act as interface for the processing and evaluation of the incoming radiation in the detector.
+<code class="docutils literal notranslate"><span class="pre">getSNR()</span></code>, <code class="docutils literal notranslate"><span class="pre">getExpTime()</span></code> and <code class="docutils literal notranslate"><span class="pre">getSensitivity()</span></code> are called by the main application to trigger the evaluation of the radiation transportation pipeline and the subsequent calculation of the desired quantity.
+Additionally, <code class="docutils literal notranslate"><span class="pre">ASensor</span></code> defines the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> to allow the check of the sensor-configuration.</p>
+</div>
+<div class="section" id="psf">
+<h3>PSF<a class="headerlink" href="#psf" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id10">
+<img alt="PSF classes" src="../_images/PSF.png" />
+<p class="caption"><span class="caption-text">Class diagram of the PSF classes.</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</div>
+<p>For modelling the diffraction behaviour of the telescope, the interface <code class="docutils literal notranslate"><span class="pre">IPSF</span></code> defines the necessary methods.
+Currently, two different implementations of PSFs are available: the class <code class="docutils literal notranslate"><span class="pre">Airy</span></code> allows to model the PSF as an airy disk, whereas the class <code class="docutils literal notranslate"><span class="pre">Zemax</span></code> allows to use a PSF calculated by the software Zemax.
+Both classes allow the computation of the reduced observation angle for a given encircled energy and the mapping of the PSF onto an pixel grid.</p>
+</div>
+<div class="section" id="factories">
+<h3>Factories<a class="headerlink" href="#factories" title="Permalink to this headline">¶</a></h3>
+<p>In order to instantiate the corresponding objects from the configuration file, the <a class="reference external" href="https://en.wikipedia.org/wiki/Factory_method_pattern">factory method pattern</a> was used.
+The following factory methods are responsible for transforming the parsed configuration into the cascaded radiation transportation pipeline.</p>
+<div class="figure align-default" id="id11">
+<img alt="Factory classes" src="../_images/Factory.png" />
+<p class="caption"><span class="caption-text">Class diagram of the factories.</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract superclass <code class="docutils literal notranslate"><span class="pre">AFactory</span></code> provides the abstract method <code class="docutils literal notranslate"><span class="pre">create()</span></code> to create any target, optical component and detector object.
+Additionally, the method <code class="docutils literal notranslate"><span class="pre">collectOptions()</span></code> allows to collect all options from the parsed configuration as dictionary for the constructor call of the corresponding class.</p>
+<p>The class <code class="docutils literal notranslate"><span class="pre">TargetFactory</span></code> is responsible for the instantiation of all subclasses of <code class="docutils literal notranslate"><span class="pre">ATarget</span></code>.
+In contrast, the class <code class="docutils literal notranslate"><span class="pre">OpticalComponentFactory</span></code> handles the creation of all subclasses of <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code>.
+It provides the method <code class="docutils literal notranslate"><span class="pre">fromConfigBatch</span></code> to set up a batch of optical components.
+Finally, the class <code class="docutils literal notranslate"><span class="pre">SensorFactory</span></code> is responsible for the instantiation of all subclasses of <code class="docutils literal notranslate"><span class="pre">ASensor</span></code>.</p>
+</div>
+</div>
+<div class="section" id="other-classes">
+<h2>Other Classes<a class="headerlink" href="#other-classes" title="Permalink to this headline">¶</a></h2>
+<p>In the following, the most important classes that are used by the software but not part of the radiation transportation pipeline are explained.</p>
+<div class="section" id="spectral-quantity">
+<h3>Spectral Quantity<a class="headerlink" href="#spectral-quantity" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id12">
+<img alt="Class Diagram" src="../_images/SpectralQty.png" />
+<p class="caption"><span class="caption-text">Class diagram of the Spectral Quantity.</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+</div>
+<p>All spectral quantities used for calculations, e.g. spectral flux densities, spectral reflectances, etc., are handled as <code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>-objects.
+They can be set up either by providing the two arrays wavelength bins and the corresponding spectral quantity as parameters to the constructor or by reading them from a file using the class method <code class="docutils literal notranslate"><span class="pre">fromFile()</span></code>.
+In the latter case, the file must be readable by astropy and the units of the columns may be contained in the column header in square brackets.
+<code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>-objects natively support mathematical operations like addition (<code class="docutils literal notranslate"><span class="pre">__add__()</span></code>), substraction (<code class="docutils literal notranslate"><span class="pre">__sub__()</span></code>), multiplication (<code class="docutils literal notranslate"><span class="pre">__mul__()</span></code>) as well as true division (<code class="docutils literal notranslate"><span class="pre">__truediv__()</span></code>) and comparison (<code class="docutils literal notranslate"><span class="pre">__eq__()</span></code>).
+These operations are defined for several other objects like <code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code> as well as Lambda-functions.
+Additionally, the two methods <code class="docutils literal notranslate"><span class="pre">rebin()</span></code> and <code class="docutils literal notranslate"><span class="pre">integrate()</span></code> allow to change the spectral grid or integrate the quantity on the grid.</p>
+</div>
+<div class="section" id="configuration">
+<span id="id1"></span><h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id13">
+<img alt="Class Diagram" src="../_images/Configuration.png" />
+<p class="caption"><span class="caption-text">Class diagram of the Configuration.</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+</div>
+<p>The class <code class="docutils literal notranslate"><span class="pre">Configuration</span></code> contains all methods necessary to parse the XML-configuration file and convert it into a tree of <a class="reference internal" href="#entry"><span class="std std-ref">Entry</span></a>-objects.
+This conversion is triggered in the beginning of the program flow.
+Additionally, the check of the parsed configuration is preformed by this class (<code class="docutils literal notranslate"><span class="pre">check_config()</span></code>, <code class="docutils literal notranslate"><span class="pre">check_optical_components()</span></code>).
+In detail, the static <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code>-method of the corresponding class is called on each Entry-object to perform the checks.
+Finally, this class also computes some meta options like the array containing the wavelength bins.</p>
+</div>
+<div class="section" id="entry">
+<span id="id2"></span><h3>Entry<a class="headerlink" href="#entry" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id14">
+<img alt="Class Diagram" src="../_images/Entry.png" />
+<p class="caption"><span class="caption-text">Class diagram of the Entry.</span><a class="headerlink" href="#id14" title="Permalink to this image">¶</a></p>
+</div>
+<p>The class <code class="docutils literal notranslate"><span class="pre">Entry</span></code> is used to represent the tags of the XML-configuration file and provide basic test mechanisms.
+Each XML-tag is parsed by the <a class="reference internal" href="#configuration"><span class="std std-ref">Configuration</span></a> and converted into an <code class="docutils literal notranslate"><span class="pre">Entry</span></code>-object.
+Thereby each attribute of the XML-tag is converted into an attribute of the corresponding <code class="docutils literal notranslate"><span class="pre">Entry</span></code>-object.
+In case another attribute with the same name and the postfix <em>_unit</em> exists, both attributes are converted to an Astropy-Quantity object.
+In case a parameter is called <code class="docutils literal notranslate"><span class="pre">val</span></code>, this parameter is returned if the <code class="docutils literal notranslate"><span class="pre">Entry</span></code>-object is called.</p>
+<p>In order to allow checks on the attributes of an <code class="docutils literal notranslate"><span class="pre">Entry</span></code>-object, the methods <code class="docutils literal notranslate"><span class="pre">check_quantity()</span></code>, <code class="docutils literal notranslate"><span class="pre">check_selection()</span></code>, <code class="docutils literal notranslate"><span class="pre">check_file()</span></code>, <code class="docutils literal notranslate"><span class="pre">check_path()</span></code> and <code class="docutils literal notranslate"><span class="pre">check_float()</span></code> take the attribute name and possible a default value and return a string as check result.
+If the check is passed, <code class="docutils literal notranslate"><span class="pre">None</span></code> will be returned.</p>
+</div>
+</div>
+<div class="section" id="extending-esbo-etc">
+<h2>Extending ESBO-ETC<a class="headerlink" href="#extending-esbo-etc" title="Permalink to this headline">¶</a></h2>
+<p>ESBO-ETC can be easily extended by adding new targets, new optical components or a new detector component.
+In the following, only the minimal required changes in the source code are described.
+Of course, the documentation must be edited as well if new components are added and corresponding build tests should be defined.
+Before any changes can be committed to the repository, the developer must ensure that all build tests pass.
+The build tests can be started by running</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>venv/bin/python3 -m unittest discover tests
+</pre></div>
+</td></tr></table></div>
+<p>in the console in the project’s root directory.</p>
+<div class="section" id="adding-targets">
+<h3>Adding Targets<a class="headerlink" href="#adding-targets" title="Permalink to this headline">¶</a></h3>
+<p>Adding a new target type to ESBO-ETC is the easiest extension.</p>
+<p>In the first place, the new target component must be defined in a new file <em>classes</em>-folder.
+Thereby, the new component must subclass <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> in order to be decoratable by other optical components.
+The class must provide a constructor which accepts all attributes of the configuration tag as parameters and initializes the superclass passing the emitted radiation as parameter.
+Additionally, the class must implement the method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> in order to check the configuration.
+In case of an configuration error, the method must return the corresponding error message.</p>
+<p>Optionally, the factory method <code class="docutils literal notranslate"><span class="pre">create()</span></code> of the class <code class="docutils literal notranslate"><span class="pre">TargetFactory</span></code> has to be modified, if the constructor of the new component requires more parameters than the configuration tag attributes.</p>
+</div>
+<div class="section" id="adding-optical-components">
+<h3>Adding Optical Components<a class="headerlink" href="#adding-optical-components" title="Permalink to this headline">¶</a></h3>
+<p>Extending ESBO-ETC by a new optical component consists of two tasks.</p>
+<p>First of all, the new optical component class has to be implemented in a separate file in the <em>classes</em>-folder.
+The new class must inherit from the abstract class <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> or, in case of an optical component with thermal emission, from the abstract class <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> and implement all abstract methods.
+In case of a cold optical component, the new class must implement the method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> and call the constructor of the super class.
+In case of a hot optical component, the new class must implement the method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> as well as the method <code class="docutils literal notranslate"><span class="pre">propagate()</span></code> and call the constructor of the super class.</p>
+<p>The method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> is used for checking the XML-configuration file and accepts as parameter the corresponding part of the configuration as <code class="docutils literal notranslate"><span class="pre">Entry</span></code>-object.
+In case of an configuration error, the method must return the corresponding error message.</p>
+<p>The method <code class="docutils literal notranslate"><span class="pre">propagate()</span></code> is used to model the propagation of incoming radiation through the optical component.
+Therefore, this method receives as parameter the incoming radiation as <code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>-object and must return the manipulated radiation as <code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>-object.</p>
+<p>The optional second task consists of modifying the factory method <code class="docutils literal notranslate"><span class="pre">create()</span></code> of the class <code class="docutils literal notranslate"><span class="pre">OpticalComponentFactory</span></code> in order to properly initialize the new optical component from the configuration.
+This is only necessary if the new optical component needs additional parameters besides the attributes of the corresponding configuration tag.</p>
+</div>
+<div class="section" id="adding-detector-components">
+<h3>Adding Detector Components<a class="headerlink" href="#adding-detector-components" title="Permalink to this headline">¶</a></h3>
+<p>In order to add a new detector component, two tasks must be completed.</p>
+<p>The new detector component must be implemented in a designated file in the <em>classes</em>-folder, subclassing <code class="docutils literal notranslate"><span class="pre">ASensor</span></code>.
+Thereby, the new class must implement the three methods <code class="docutils literal notranslate"><span class="pre">calcSNR()</span></code>, <code class="docutils literal notranslate"><span class="pre">calcExpTime()</span></code> and <code class="docutils literal notranslate"><span class="pre">calcSensitivity()</span></code>.
+All three methods obtain the incoming background and signal radiation as well as the obstruction factor as parameters apart from some specific parameters and must return the corresponding calculated value.
+Additionally, all three methods must be able to calculate multiple SNRs, exposure times or sensitivities at once if an array of specific parameters is provided.</p>
+<p>Besides the implementation of the detector, the factory method <code class="docutils literal notranslate"><span class="pre">create()</span></code> of the class <code class="docutils literal notranslate"><span class="pre">SensorFactory</span></code> can be modified.</p>
+</div>
+</div>
+<div class="section" id="ci-cd-pipeline">
+<h2>CI/CD-Pipeline<a class="headerlink" href="#ci-cd-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>Each push to the <a class="reference external" href="https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC">ESBO-ETC Repository</a> triggers a Jenkins CI/CD-pipeline on the ESBO-DS VM.
+This pipeline first executes all unittests to ensure the prober functioning of the code. Afterwards this documentation is being built and deployed to the webroot of ESBO-DS’ webserver.
+All these build steps are defined within a Jenkins-file in the root of the repository. The complete CI/CD set up is shown in the following figure.</p>
+<div class="figure align-default" id="id15">
+<img alt="CI/CD configuration" src="../_images/ci_cd_pipeline.png" />
+<p class="caption"><span class="caption-text">CI/CD configuration.</span><a class="headerlink" href="#id15" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="jenkins-configuration">
+<h3>Jenkins Configuration<a class="headerlink" href="#jenkins-configuration" title="Permalink to this headline">¶</a></h3>
+<p>In <a class="reference external" href="http://esbo-ds.irs.uni-stuttgart.de:8080">Jenkins</a> the pipeline <a class="reference external" href="http://esbo-ds.irs.uni-stuttgart.de:8080/job/ESBO-ETC/">ESBO-ETC</a> is defined and configured to read all sources including the Jenkins-file from the ESBO-ETC repository in Gitea.
+Additionally, a webhook is set up and included in <a class="reference external" href="https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC/settings/hooks">Gitea</a> to trigger the pipeline after each push to the repository.
+After the pipeline has been triggered, Jenkins clones the repository and executes the contained Jenkins-file.</p>
+</div>
+<div class="section" id="pipeline">
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h3>
+<p>The pipeline is divided into three steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Test:</strong> A docker image containing a complete python installation and a virtual environment is built using the Dockerfile in the root of the repo.
+Afterwards all required python modules (see <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>) are being installed in the container and the unittests defined in <code class="docutils literal notranslate"><span class="pre">tests</span></code> executed.
+If all tests pass, the pipeline continues with stage 2.</p></li>
+<li><p><strong>Build Docs:</strong> The documentation is being build using the previous docker image.
+After all required python modules have been installed, the build process using sphinx is started.
+The results of the build process (all website files) are archived (stashed) for the next stage of the pipeline as shown in the image above.</p></li>
+<li><p><strong>Deploy Docs:</strong> The last stage of the pipeline is run locally on the ESBO-DS VM.
+The build results from the previous stage are unarchived and copied to the webroot of the webserver.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api/api.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../output/output.html" class="btn btn-neutral float-left" title="Output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>esbo_etc.classes.sensor.Heterodyne &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../../../../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>esbo_etc.classes.sensor.Heterodyne</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for esbo_etc.classes.sensor.Heterodyne</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.ASensor</span> <span class="kn">import</span> <span class="n">ASensor</span>
+<span class="kn">from</span> <span class="nn">..IRadiant</span> <span class="kn">import</span> <span class="n">IRadiant</span>
+<span class="kn">from</span> <span class="nn">..Entry</span> <span class="kn">import</span> <span class="n">Entry</span>
+<span class="kn">from</span> <span class="nn">...lib.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">..SpectralQty</span> <span class="kn">import</span> <span class="n">SpectralQty</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">astropy.constants</span> <span class="kn">import</span> <span class="n">k_B</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">QTable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="Heterodyne"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne">[docs]</a><span class="k">class</span> <span class="nc">Heterodyne</span><span class="p">(</span><span class="n">ASensor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for modelling the behaviour of a superheterodyne spectrometer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Heterodyne.__init__"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">IRadiant</span><span class="p">,</span> <span class="n">aperture_efficiency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">main_beam_efficiency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                 <span class="n">receiver_temp</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">eta_fss</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lambda_line</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">common_conf</span><span class="p">:</span> <span class="n">Entry</span><span class="p">,</span>
+                 <span class="n">n_on</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lambda_local_oscillator</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new heterodyne detector</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parent : IRadiant</span>
+<span class="sd">            The parent element of the optical component from which the electromagnetic radiation is received.</span>
+<span class="sd">        aperture_efficiency : float</span>
+<span class="sd">            The aperture efficiency of the antenna.</span>
+<span class="sd">        main_beam_efficiency : float</span>
+<span class="sd">            The main beam efficiency of the telescope.</span>
+<span class="sd">        receiver_temp : u.Quantity in Kelvins</span>
+<span class="sd">            The intrinsic noise temperature of all receiver components.</span>
+<span class="sd">        eta_fss : float</span>
+<span class="sd">            The forward scattering efficiency of the antenna.</span>
+<span class="sd">        lambda_line : u.Quantity</span>
+<span class="sd">            The wavelength to be used for calculating the SNR.</span>
+<span class="sd">        kappa : float</span>
+<span class="sd">            The backend degradation factor.</span>
+<span class="sd">        common_conf : Entry</span>
+<span class="sd">            The common-Entry of the configuration.</span>
+<span class="sd">        n_on : float</span>
+<span class="sd">            The number of on source observations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__aperture_efficiency</span> <span class="o">=</span> <span class="n">aperture_efficiency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__main_beam_efficiency</span> <span class="o">=</span> <span class="n">main_beam_efficiency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__receiver_temp</span> <span class="o">=</span> <span class="n">receiver_temp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__eta_fss</span> <span class="o">=</span> <span class="n">eta_fss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_line</span> <span class="o">=</span> <span class="n">lambda_line</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_local_oscillator</span> <span class="o">=</span> <span class="n">lambda_local_oscillator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">=</span> <span class="n">kappa</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span> <span class="o">=</span> <span class="n">common_conf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span> <span class="o">=</span> <span class="n">n_on</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Heterodyne.calcSNR"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne.calcSNR">[docs]</a>    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">calcSNR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">background</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="n">exp_time</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the signal to background ratio (SNR) for the given exposure time using the CCD-equation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        background : SpectralQty</span>
+<span class="sd">            The received background radiation</span>
+<span class="sd">        signal : SpectralQty</span>
+<span class="sd">            The received signal radiation</span>
+<span class="sd">        obstruction : float</span>
+<span class="sd">            The obstruction factor of the aperture as ratio A_ob / A_ap</span>
+<span class="sd">        exp_time : time-Quantity</span>
+<span class="sd">            The exposure time to calculate the SNR for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        snr : Quantity</span>
+<span class="sd">            The calculated SNR as dimensionless quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate the signal and background temperatures</span>
+        <span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calcTemperatures</span><span class="p">(</span><span class="n">background</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">)</span>
+        <span class="n">line_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_line</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t_sys</span> <span class="o">=</span> <span class="n">t_background</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__receiver_temp</span> <span class="o">+</span> <span class="n">t_signal</span>
+        <span class="c1"># Calculate the noise bandwidth</span>
+        <span class="n">delta_nu</span> <span class="o">=</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">,</span> <span class="n">equivalencies</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">spectral</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span><span class="o">.</span><span class="n">wl_delta</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">exp_time_</span> <span class="ow">in</span> <span class="n">exp_time</span> <span class="k">if</span> <span class="n">exp_time</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[</span><span class="n">exp_time</span><span class="p">]:</span>
+            <span class="c1"># Calculate the RMS background temperature</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">t_rms</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t_sys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">exp_time_</span> <span class="o">*</span> <span class="n">delta_nu</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t_rms</span> <span class="o">=</span> <span class="n">t_sys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">exp_time_</span> <span class="o">*</span> <span class="n">delta_nu</span><span class="p">)</span>
+            <span class="c1"># Calculate the SNR</span>
+            <span class="n">snr_</span> <span class="o">=</span> <span class="n">t_signal</span> <span class="o">/</span> <span class="n">t_rms</span>
+            <span class="n">snr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">snr_</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">])</span>
+            <span class="c1"># Print details</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__printDetails</span><span class="p">(</span><span class="n">t_sys</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">delta_nu</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">t_rms</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span>
+                                <span class="s2">&quot;t_exp=</span><span class="si">%.2f</span><span class="s2"> s: &quot;</span> <span class="o">%</span> <span class="n">exp_time_</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__output</span><span class="p">(</span><span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span><span class="p">,</span> <span class="n">t_rms</span><span class="p">,</span> <span class="s2">&quot;texp_</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exp_time_</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">snr</span><span class="o">=</span><span class="n">snr_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">snr</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">snr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Heterodyne.calcExpTime"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne.calcExpTime">[docs]</a>    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">snr</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">calcExpTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">background</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the necessary exposure time in order to achieve the given SNR.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        background : SpectralQty</span>
+<span class="sd">            The received background radiation</span>
+<span class="sd">        signal : SpectralQty</span>
+<span class="sd">            The received signal radiation</span>
+<span class="sd">        obstruction : float</span>
+<span class="sd">            The obstruction factor of the aperture as ratio A_ob / A_ap</span>
+<span class="sd">        snr : Quantity</span>
+<span class="sd">            The SNR for which the necessary exposure time shall be calculated as dimensionless quantity.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        exp_time : Quantity</span>
+<span class="sd">            The necessary exposure time in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate the signal and background temperatures</span>
+        <span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calcTemperatures</span><span class="p">(</span><span class="n">background</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">)</span>
+        <span class="n">line_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_line</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t_sys</span> <span class="o">=</span> <span class="n">t_background</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__receiver_temp</span> <span class="o">+</span> <span class="n">t_signal</span>
+        <span class="c1"># Calculate the noise bandwidth</span>
+        <span class="n">delta_nu</span> <span class="o">=</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">,</span> <span class="n">equivalencies</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">spectral</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span><span class="o">.</span><span class="n">wl_delta</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">exp_time</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">snr_</span> <span class="ow">in</span> <span class="n">snr</span> <span class="k">if</span> <span class="n">snr</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[</span><span class="n">snr</span><span class="p">]:</span>
+            <span class="c1"># Calculate the RMS background temperature</span>
+            <span class="n">t_rms</span> <span class="o">=</span> <span class="n">t_signal</span> <span class="o">/</span> <span class="n">snr_</span>
+            <span class="c1"># Calculate the exposure time</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">exp_time_</span> <span class="o">=</span> <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">t_sys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">/</span> <span class="n">t_rms</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">delta_nu</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">exp_time_</span> <span class="o">=</span> <span class="p">((</span><span class="n">t_sys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">/</span> <span class="n">t_rms</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span>
+                             <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span><span class="p">))</span> <span class="o">/</span> <span class="n">delta_nu</span><span class="p">)</span>
+            <span class="n">exp_time_</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">exp_time_</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">exp_time_</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">decompose</span><span class="p">())</span>
+            <span class="n">exp_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exp_time_</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">])</span>
+            <span class="c1"># Print details</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__printDetails</span><span class="p">(</span><span class="n">t_sys</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">delta_nu</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">t_rms</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span>
+                                <span class="s2">&quot;SNR=</span><span class="si">%.2f</span><span class="s2">: &quot;</span> <span class="o">%</span> <span class="n">snr_</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__output</span><span class="p">(</span><span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span><span class="p">,</span> <span class="n">t_rms</span><span class="p">,</span> <span class="s2">&quot;snr_</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">snr_</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">exp_time</span><span class="o">=</span><span class="n">exp_time_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">exp_time</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_time</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">exp_time</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+    <span class="c1"># @u.quantity_input(exp_time=&quot;time&quot;, snr=u.dimensionless_unscaled,</span>
+    <span class="c1">#                   target_brightness=[u.mag, u.mag / u.sr])</span>
+<div class="viewcode-block" id="Heterodyne.calcSensitivity"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne.calcSensitivity">[docs]</a>    <span class="k">def</span> <span class="nf">calcSensitivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">background</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">exp_time</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+                        <span class="n">snr</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">mag</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">mag</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the sensitivity of the telescope detector combination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        background : SpectralQty</span>
+<span class="sd">            The received background radiation</span>
+<span class="sd">        signal : SpectralQty</span>
+<span class="sd">            The received signal radiation</span>
+<span class="sd">        obstruction : float</span>
+<span class="sd">            The obstruction factor of the aperture as ratio A_ob / A_ap</span>
+<span class="sd">        exp_time : Quantity</span>
+<span class="sd">            The exposure time in seconds.</span>
+<span class="sd">        snr : Quantity</span>
+<span class="sd">            The SNR for which the sensitivity time shall be calculated.</span>
+<span class="sd">        target_brightness : Quantity</span>
+<span class="sd">            The target brightness in mag or mag / sr.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sensitivity: Quantity</span>
+<span class="sd">            The sensitivity as limiting apparent star magnitude in mag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate the signal and background temperatures</span>
+        <span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calcTemperatures</span><span class="p">(</span><span class="n">background</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">)</span>
+        <span class="n">line_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_line</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t_sys</span> <span class="o">=</span> <span class="n">t_background</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__receiver_temp</span> <span class="o">+</span> <span class="n">t_signal</span>
+        <span class="c1"># Calculate the noise bandwidth</span>
+        <span class="n">delta_nu</span> <span class="o">=</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">,</span> <span class="n">equivalencies</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">spectral</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span><span class="o">.</span><span class="n">wl_delta</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sensitivity</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">snr_</span><span class="p">,</span> <span class="n">exp_time_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">snr</span><span class="p">,</span> <span class="n">exp_time</span><span class="p">)</span> <span class="k">if</span> <span class="n">snr</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">zip</span><span class="p">([</span><span class="n">snr</span><span class="p">],</span> <span class="p">[</span><span class="n">exp_time</span><span class="p">]):</span>
+            <span class="c1"># Calculate the RMS background temperature</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">t_rms</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t_sys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">exp_time_</span> <span class="o">*</span> <span class="n">delta_nu</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t_rms</span> <span class="o">=</span> <span class="n">t_sys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kappa</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_on</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">exp_time_</span> <span class="o">*</span> <span class="n">delta_nu</span><span class="p">)</span>
+            <span class="c1"># Calculate the limiting signal temperature</span>
+            <span class="n">t_signal_lim</span> <span class="o">=</span> <span class="n">t_rms</span> <span class="o">*</span> <span class="n">snr_</span>
+            <span class="c1"># Calculate the sensitivity</span>
+            <span class="n">signal_ratio</span> <span class="o">=</span> <span class="n">t_signal_lim</span> <span class="o">/</span> <span class="n">t_signal</span>
+            <span class="n">sensitivity_</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">signal_ratio</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span>
+                                       <span class="n">target_brightness</span> <span class="o">-</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">signal_ratio</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span> <span class="o">*</span> <span class="n">target_brightness</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="n">sensitivity</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sensitivity_</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">])</span>
+            <span class="c1"># Print details</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__printDetails</span><span class="p">(</span><span class="n">t_sys</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">delta_nu</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="n">t_rms</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span>
+                                <span class="n">t_signal_lim</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">line_ind</span><span class="p">],</span> <span class="s2">&quot;SNR=</span><span class="si">%.2f</span><span class="s2"> t_exp=</span><span class="si">%.2f</span><span class="s2"> s: &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">snr_</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">exp_time_</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__output</span><span class="p">(</span><span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span><span class="p">,</span> <span class="n">t_rms</span><span class="p">,</span> <span class="s2">&quot;snr_</span><span class="si">%.2f</span><span class="s2">_texp_</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">snr_</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">exp_time_</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+                          <span class="n">sensitivity</span><span class="o">=</span><span class="n">sensitivity_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">sensitivity</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sensitivity</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">sensitivity</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">t_sys</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">delta_nu</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">,</span> <span class="n">t_rms</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">t_signal</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__printDetails</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_sys</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">delta_nu</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">t_rms</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+                       <span class="n">t_signal</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print details on the signal and noise composition.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t_sys : Quantity</span>
+<span class="sd">            The system temperature.</span>
+<span class="sd">        delta_nu : Quantity</span>
+<span class="sd">            The noise bandwidth.</span>
+<span class="sd">        t_rms : Quantity</span>
+<span class="sd">            The RMS antenna temperature.</span>
+<span class="sd">        t_signal : Quantity</span>
+<span class="sd">            The antenna temperature.</span>
+<span class="sd">        prefix : str</span>
+<span class="sd">            The prefix to be used for printing.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;System temperature:        </span><span class="si">%1.2e</span><span class="s2"> K&quot;</span> <span class="o">%</span> <span class="n">t_sys</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Noise bandwidth:           </span><span class="si">%1.2e</span><span class="s2"> Hz&quot;</span> <span class="o">%</span> <span class="n">delta_nu</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;RMS antenna temperature:   </span><span class="si">%1.2e</span><span class="s2"> K&quot;</span> <span class="o">%</span> <span class="n">t_rms</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Antenna temperature:       </span><span class="si">%1.2e</span><span class="s2"> K&quot;</span> <span class="o">%</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------------&quot;</span><span class="p">)</span>
+
+    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">electron</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">electron</span><span class="p">,</span> <span class="n">read_noise</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">electron</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">dark</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">electron</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_signal</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">t_background</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">t_rms</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span>
+                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">SpectralQty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">exp_time</span><span class="p">:</span> <span class="n">SpectralQty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sensitivity</span><span class="p">:</span> <span class="n">SpectralQty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the signal and the noise in electrons to files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t_signal : SpectralQty</span>
+<span class="sd">            The signal temperature in Kelvins.</span>
+<span class="sd">        t_background : SpectralQty</span>
+<span class="sd">            The background temperature in Kelvins.</span>
+<span class="sd">        t_rms : SpectralQty</span>
+<span class="sd">            The RMS noise temperature in Kelvins.</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the configuration.</span>
+<span class="sd">        snr : SpectralQty</span>
+<span class="sd">            The calculated signal-to-noise ratio per wavelength.</span>
+<span class="sd">        exp_time : SpectralQty</span>
+<span class="sd">            The calculated exposure time  per wavelength.</span>
+<span class="sd">        sensitivity : SpectralQty</span>
+<span class="sd">            The calculated sensitivity per wavelength.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Concatenate the paths</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Output directory &#39;&quot;</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;&#39; already exists.&quot;</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">QTable</span><span class="p">([</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span><span class="p">,</span> <span class="n">t_background</span><span class="o">.</span><span class="n">qty</span><span class="p">,</span> <span class="n">t_rms</span><span class="o">.</span><span class="n">qty</span><span class="p">],</span>
+                     <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Wavelength [&#39;</span> <span class="o">+</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Signal Temperature [&#39;</span> <span class="o">+</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Background Temperature [&#39;</span> <span class="o">+</span> <span class="n">t_background</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;RMS Noise Temperature [&#39;</span> <span class="o">+</span> <span class="n">t_rms</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">),</span>
+                     <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;first table&#39;</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">snr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s1">&#39;SNR [-]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr</span><span class="o">.</span><span class="n">qty</span>
+        <span class="k">if</span> <span class="n">exp_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s1">&#39;Exposure Time [&#39;</span> <span class="o">+</span> <span class="n">exp_time</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp_time</span><span class="o">.</span><span class="n">qty</span>
+        <span class="k">if</span> <span class="n">sensitivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s1">&#39;Sensitivity [&#39;</span> <span class="o">+</span> <span class="n">sensitivity</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensitivity</span><span class="o">.</span><span class="n">qty</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;result.csv&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;ascii.csv&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Heterodyne.calcTemperatures"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne.calcTemperatures">[docs]</a>    <span class="k">def</span> <span class="nf">calcTemperatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">background</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">SpectralQty</span><span class="p">,</span> <span class="n">obstruction</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the noise temperatures of the signal and the background radiation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        background : SpectralQty</span>
+<span class="sd">            The received background radiation</span>
+<span class="sd">        signal : SpectralQty</span>
+<span class="sd">            The received signal radiation</span>
+<span class="sd">        obstruction : float</span>
+<span class="sd">            The obstruction factor of the aperture as ratio A_ob / A_ap</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t_signal : SpectralQty</span>
+<span class="sd">            The spectral signal temperature in Kelvins.</span>
+<span class="sd">        t_background : SpectralQty</span>
+<span class="sd">            The spectral signal temperature in Kelvins.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating the system temperature.&quot;</span><span class="p">)</span>
+        <span class="c1"># Add desired wavelength to wavelength bins</span>
+        <span class="n">wl_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span><span class="o">.</span><span class="n">wl_bins</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_line</span><span class="p">))</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">wl_bins</span><span class="p">)</span>
+        <span class="n">background</span> <span class="o">=</span> <span class="n">background</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">wl_bins</span><span class="p">)</span>
+        <span class="n">background</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">background</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">background</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">W</span> <span class="o">/</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">Hz</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">),</span>
+                                                                    <span class="n">equivalencies</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">spectral_density</span><span class="p">(</span>
+                                                                        <span class="n">background</span><span class="o">.</span><span class="n">wl</span><span class="p">)))</span>
+        <span class="n">t_background</span> <span class="o">=</span> <span class="n">background</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__main_beam_efficiency</span> <span class="o">*</span> <span class="n">background</span><span class="o">.</span><span class="n">wl</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k_B</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eta_fss</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">)</span>
+        <span class="n">t_background</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">t_background</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">t_background</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">decompose</span><span class="p">())</span>
+        <span class="c1"># Calculate the incoming photon current of the target</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating the signal temperature.&quot;</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="s2">&quot;extended&quot;</span> <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">W</span> <span class="o">/</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nm</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">))</span> <span class="k">else</span> <span class="s2">&quot;point&quot;</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;point&quot;</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">W</span> <span class="o">/</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">),</span>
+                                                          <span class="n">equivalencies</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">spectral_density</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">wl</span><span class="p">)))</span>
+            <span class="n">t_signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__aperture_efficiency</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_conf</span><span class="o">.</span><span class="n">d_aperture</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k_B</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eta_fss</span><span class="p">)</span>
+            <span class="n">t_signal</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">decompose</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">W</span> <span class="o">/</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">Hz</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">),</span>
+                                                          <span class="n">equivalencies</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">spectral_density</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">wl</span><span class="p">)))</span>
+            <span class="n">t_signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__main_beam_efficiency</span> <span class="o">*</span> <span class="n">signal</span><span class="o">.</span><span class="n">wl</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k_B</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eta_fss</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">)</span>
+            <span class="n">t_signal</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">decompose</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_local_oscillator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t_signal</span> <span class="o">=</span> <span class="n">t_signal</span> <span class="o">*</span> <span class="mi">2</span>
+            <span class="n">t_background</span> <span class="o">=</span> <span class="n">t_background</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_signal</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span>
+                <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_local_oscillator</span> <span class="o">-</span> <span class="n">t_signal</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+            <span class="n">t_background</span> <span class="o">=</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">t_background</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">t_background</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">t_background</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span>
+                <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lambda_local_oscillator</span> <span class="o">-</span> <span class="n">t_background</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Spectral signal temperature&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">t_signal</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Target size: &quot;</span> <span class="o">+</span> <span class="n">size</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Obstruction: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obstruction</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Spectral background temperature&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">t_background</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t_signal</span><span class="p">,</span> <span class="n">t_background</span></div>
+
+<div class="viewcode-block" id="Heterodyne.check_config"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.Heterodyne.Heterodyne.check_config">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">sensor</span><span class="p">:</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span> <span class="n">Entry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the configuration for this class</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor : Entry</span>
+<span class="sd">            The configuration entry to be checked.</span>
+<span class="sd">        conf: Entry</span>
+<span class="sd">            The complete configuration.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mes : Union[None, str]</span>
+<span class="sd">            The error message of the check. This will be None if the check was successful.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;aperture_efficiency&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing container &#39;aperture_efficiency&#39;.&quot;</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">aperture_efficiency</span><span class="o">.</span><span class="n">check_float</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;aperture_efficiency: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;main_beam_efficiency&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing container &#39;main_beam_efficiency&#39;.&quot;</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">main_beam_efficiency</span><span class="o">.</span><span class="n">check_float</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;main_beam_efficiency: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;receiver_temp&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing container &#39;receiver_temp&#39;.&quot;</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">receiver_temp</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;receiver_temp: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;eta_fss&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing container &#39;eta_fss&#39;.&quot;</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">eta_fss</span><span class="o">.</span><span class="n">check_float</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;eta_fss: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;lambda_line&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing container &#39;lambda_line&#39;.&quot;</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">lambda_line</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;lambda_line: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;lambda_local_oscillator&quot;</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">lambda_local_oscillator</span><span class="o">.</span><span class="n">check_quantity</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;lambda_local_oscillator: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;kappa&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing container &#39;kappa&#39;.&quot;</span>
+        <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">kappa</span><span class="o">.</span><span class="n">check_float</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;kappa: &quot;</span> <span class="o">+</span> <span class="n">mes</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;n_on&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensor</span><span class="o">.</span><span class="n">n_on</span><span class="p">,</span> <span class="n">Entry</span><span class="p">):</span>
+            <span class="n">mes</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">n_on</span><span class="o">.</span><span class="n">check_float</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;n_on: &quot;</span> <span class="o">+</span> <span class="n">mes</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

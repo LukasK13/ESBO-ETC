@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>esbo_etc.classes.sensor.PixelMask &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../../../../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>esbo_etc.classes.sensor.PixelMask</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for esbo_etc.classes.sensor.PixelMask</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">...lib.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">...lib.helpers</span> <span class="kn">import</span> <span class="n">rasterizeCircle</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="PixelMask"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.PixelMask.PixelMask">[docs]</a><span class="k">class</span> <span class="nc">PixelMask</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for modelling the pixel exposure mask for a pixel array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">pixel_geometry</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">center_offset</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pixel_geometry</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">center_offset</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new pixel mask. Each coordinate is now converted to a index representation (y, x).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pixel_geometry : u.Quantity</span>
+<span class="sd">            The geometry of the pixel array in pixels [x, y]</span>
+<span class="sd">        pixel_size : length-Quantity</span>
+<span class="sd">            The edge length of a pixel (assumed to be square).</span>
+<span class="sd">        center_offset : u.Quantity</span>
+<span class="sd">            The offset of the PSF-center relative to the center of the detector array as length-quantity with two</span>
+<span class="sd">            entries: [offset in x-direction, offset in y-direction]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create the ndarray instance of our type, given the usual</span>
+        <span class="c1"># ndarray input arguments.  This will call the standard</span>
+        <span class="c1"># ndarray constructor, but return an object of our type.</span>
+        <span class="c1"># It also triggers a call to PixelMask.__array_finalize__</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PixelMask</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixel_geometry</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">pixel_geometry</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+                                            <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">obj</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># set the new attributes to the values passed</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">pixel_geometry</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">pixel_size</span> <span class="o">=</span> <span class="n">pixel_size</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">center_ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">]</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">psf_center_ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">center_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">center_offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">center_ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">center_offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="c1"># Finally, we must return the newly created object:</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">__array_finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="c1"># ``self`` is a new object resulting from</span>
+        <span class="c1"># ndarray.__new__(PixelMask, ...), therefore it only has</span>
+        <span class="c1"># attributes that the ndarray.__new__ constructor gave it -</span>
+        <span class="c1"># i.e. those of a standard ndarray.</span>
+        <span class="c1">#</span>
+        <span class="c1"># We could have got to the ndarray.__new__ call in 3 ways:</span>
+        <span class="c1"># From an explicit constructor - e.g. PixelMask():</span>
+        <span class="c1">#    obj is None</span>
+        <span class="c1">#    (we&#39;re in the middle of the InfoArray.__new__</span>
+        <span class="c1">#    constructor, and self.pixel_geometry will be set when we return to</span>
+        <span class="c1">#    PixelMask.__new__)</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># From view casting - e.g arr.view(PixelMask):</span>
+        <span class="c1">#    obj is arr</span>
+        <span class="c1">#    (type(obj) can be PixelMask)</span>
+        <span class="c1"># From new-from-template - e.g mask[:3]</span>
+        <span class="c1">#    type(obj) is PixelMask</span>
+        <span class="c1">#</span>
+        <span class="c1"># Note that it is here, rather than in the __new__ method,</span>
+        <span class="c1"># that we set the default value for our attributes, because this</span>
+        <span class="c1"># method sees all creation of default objects - with the</span>
+        <span class="c1"># PixelMask.__new__ constructor, but also with</span>
+        <span class="c1"># arr.view(PixelMask).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;pixel_geometry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;pixel_size&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_ind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;center_ind&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psf_center_ind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;psf_center_ind&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># We do not need to return anything</span>
+
+<div class="viewcode-block" id="PixelMask.createPhotometricAperture"><a class="viewcode-back" href="../../../../api/esbo_etc.classes.sensor.html#esbo_etc.classes.sensor.PixelMask.PixelMask.createPhotometricAperture">[docs]</a>    <span class="nd">@u</span><span class="o">.</span><span class="n">quantity_input</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">,</span> <span class="n">center_offset</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">createPhotometricAperture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">center_offset</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a photometric aperture on the pixel mask.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shape : str</span>
+<span class="sd">            Shape of the photometric aperture. This can be either &#39;circle&#39; or &#39;square&#39;.</span>
+<span class="sd">        radius : u.Quantity</span>
+<span class="sd">            The radius of the photometric aperture in pixels. In case of a square, the radius equals the half of the</span>
+<span class="sd">            side length.</span>
+<span class="sd">        center_offset : u.Quantity</span>
+<span class="sd">            The offset of the photometric aperture&#39;s centre with respect to the array&#39;s centre in pixels [x ,y]. The</span>
+<span class="sd">            origin of the coordinate system is in the upper left corner.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate the center coordinates</span>
+        <span class="k">if</span> <span class="n">center_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span> <span class="o">+</span> <span class="n">center_offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">yc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span> <span class="o">+</span> <span class="n">center_offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_center_ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span>
+            <span class="n">yc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_center_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">xc</span> <span class="o">+</span> <span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">xc</span> <span class="o">-</span> <span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span>\
+                <span class="p">(</span><span class="n">yc</span> <span class="o">+</span> <span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">yc</span> <span class="o">-</span> <span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Some parts of the photometric aperture are outside of the array.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;circle&quot;</span><span class="p">:</span>
+            <span class="c1"># Rasterize a circle on the grid</span>
+            <span class="n">rasterizeCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">xc</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">yc</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">shape</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;square&quot;</span><span class="p">:</span>
+            <span class="c1"># Rasterize a square on the grid</span>
+            <span class="c1"># Calculate the left, right, upper and lower bounds of the square</span>
+            <span class="n">x_right</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">xc</span> <span class="o">+</span> <span class="n">radius</span> <span class="o">-</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">x_right</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">x_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">x_left</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">xc</span> <span class="o">-</span> <span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">xc</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">+</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">y_low</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">yc</span> <span class="o">+</span> <span class="n">radius</span> <span class="o">-</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">y_low</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">y_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_geometry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">y_up</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">yc</span> <span class="o">-</span> <span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">yc</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">+</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="c1"># Mark the pixels contained in the square with 1</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">y_up</span><span class="p">:(</span><span class="n">y_low</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">x_left</span><span class="p">:(</span><span class="n">x_right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unknown photometric aperture shape: &#39;&quot;</span> <span class="o">+</span> <span class="n">shape</span> <span class="o">+</span> <span class="s2">&quot;&#39;.&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

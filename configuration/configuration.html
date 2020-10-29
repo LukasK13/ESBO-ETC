@@ -1,0 +1,1902 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Building the Configuration &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Output" href="../output/output.html" />
+    <link rel="prev" title="Getting Started" href="../usage/getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Building the Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-structure">Basic Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common">Common</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#wl-min">wl_min</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wl-max">wl_max</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wl-delta">wl_delta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#res">res</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-aperture">d_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#psf">psf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#jitter-sigma">jitter_sigma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output">output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exposure-time">exposure_time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snr">snr</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#target">Target</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#blackbodytarget">BlackBodyTarget</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filetarget">FileTarget</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optical-components">Optical components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#atmosphere">Atmosphere</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#atran">ATRAN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#straylight">StrayLight</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cosmicbackground">CosmicBackground</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mirror">Mirror</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lens">Lens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#beamsplitter">BeamSplitter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filter">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sensor">Sensor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imager">Imager</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#f-number">f_number</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pixel-geometry">pixel_geometry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#center-offset">center_offset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pixel">pixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#photometric-aperture">photometric_aperture</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#heterodyne">Heterodyne</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aperture-efficiency">aperture_efficiency</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#main-beam-efficiency">main_beam_efficiency</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#receiver-temp">receiver_temp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eta-fss">eta_fss</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lambda-line">lambda_line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lambda-local-oscillator">lambda_local_oscillator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kappa">kappa</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#n-on">n_on</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reading-csv-files">Reading CSV-Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-configuration">Example Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Building the Configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="building-the-configuration">
+<h1>Building the Configuration<a class="headerlink" href="#building-the-configuration" title="Permalink to this headline">¶</a></h1>
+<p>ESBO-ETC has to be configured by a XML-file. For basic information on XML and how to edit XML-files, have a look at
+<a class="reference external" href="https://www.w3schools.com/xml/default.asp">this tutorial</a>.
+Each parameter of the configuration is defined by a XML-tag which is indicated by</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;tag_name/&gt;</span>
+</pre></div>
+</div>
+<p>A parameter can contain multiple attributes which are defined as key-value-pairs and some of them may be optional.
+All attribute values must be quoted as in the example below. The required types shown in the documentation refer to the unquoted value.
+Most numeric attributes require a unit which can be either included in the value or defined as a second attribute with the suffix <em>_unit</em>.
+The documentation uses the latter case for clarity. Both cases are shown as examples below.
+All astropy units defined <a class="reference external" href="https://docs.astropy.org/en/stable/units/">here</a> can be used.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;tag_name</span> <span class="na">val=</span><span class="s">&quot;10 s&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;tag_name</span> <span class="na">val=</span><span class="s">&quot;10&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;s&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The tree structure of the configuration file is explained below.</p>
+<p>During the initialization of the program, the configuration is checked and possible errors reported with recommendations on how to fix the errors.
+The attributes in the documentation below are the minimal attributes. This means, that additional attributes like <em>comment</em> can be added
+without breaking the configuration. This can be helpful to document tags as shown in the <a class="reference internal" href="#example-config"><span class="std std-ref">Example Configuration</span></a>.</p>
+<div class="section" id="basic-structure">
+<h2>Basic Structure<a class="headerlink" href="#basic-structure" title="Permalink to this headline">¶</a></h2>
+<p>The basic structure of the configuration file is shown in the following tree. The configuration structure starts with a
+root element which is divided into common paramaters, astroscene, common_optics and instrument. This basic structure has
+to be used and must not be changed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>root
+├── common
+│   └── Common configuration parameters
+├── astroscene
+│   └── Components outside of the telescope like target, atmosphere, ...
+├── common_optics
+│   └── Common components for all sensors like mirrors, lenses, ...
+└── instrument
+    └── The sensor and its configuration parameters
+</pre></div>
+</div>
+</div>
+<div class="section" id="common">
+<h2>Common<a class="headerlink" href="#common" title="Permalink to this headline">¶</a></h2>
+<p>The tag <code class="docutils literal notranslate"><span class="pre">common</span></code> groups common configuration parameters and is therefore mandatory.</p>
+<div class="section" id="wl-min">
+<h3>wl_min<a class="headerlink" href="#wl-min" title="Permalink to this headline">¶</a></h3>
+<p>The minimal wavelength to consider in the computations.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;wl_min</span> <span class="na">val=</span><span class="s">&quot;3&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the minimal wavelength.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the minimal wavelength. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>, <code class="docutils literal notranslate"><span class="pre">Hz</span></code>, <code class="docutils literal notranslate"><span class="pre">kHZ</span></code>, <code class="docutils literal notranslate"><span class="pre">MHz</span></code>, <code class="docutils literal notranslate"><span class="pre">GHz</span></code>, <code class="docutils literal notranslate"><span class="pre">THz</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="wl-max">
+<h3>wl_max<a class="headerlink" href="#wl-max" title="Permalink to this headline">¶</a></h3>
+<p>The maximal wavelength to consider in the computations.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;wl_max</span> <span class="na">val=</span><span class="s">&quot;5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the maximal wavelength.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the maximal wavelength. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>, <code class="docutils literal notranslate"><span class="pre">Hz</span></code>, <code class="docutils literal notranslate"><span class="pre">kHZ</span></code>, <code class="docutils literal notranslate"><span class="pre">MHz</span></code>, <code class="docutils literal notranslate"><span class="pre">GHz</span></code>, <code class="docutils literal notranslate"><span class="pre">THz</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="wl-delta">
+<span id="id1"></span><h3>wl_delta<a class="headerlink" href="#wl-delta" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – The wavelength grid size to be used for the computations.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;wl_delta</span> <span class="na">val=</span><span class="s">&quot;5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the wavelength grid size.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the wavelength grid size. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>, <code class="docutils literal notranslate"><span class="pre">Hz</span></code>, <code class="docutils literal notranslate"><span class="pre">kHZ</span></code>, <code class="docutils literal notranslate"><span class="pre">MHz</span></code>, <code class="docutils literal notranslate"><span class="pre">GHz</span></code>, <code class="docutils literal notranslate"><span class="pre">THz</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="res">
+<span id="id2"></span><h3>res<a class="headerlink" href="#res" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – The spectral resolution to be used for the computations.
+The central wavelength as defined by the average of the parameters <cite>wl_min</cite> and <cite>wl_max</cite> will be used to compute the wavelength grid size.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;res</span> <span class="na">val=</span><span class="s">&quot;1000&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the spectral resolution.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the spectral resolution. This has to be emtpy (dimensionless) or one of [<code class="docutils literal notranslate"><span class="pre">m/s</span></code>, <code class="docutils literal notranslate"><span class="pre">km/s</span></code>].  The default is <code class="docutils literal notranslate"><span class="pre">dimensionless</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Either <a class="reference internal" href="#wl-delta"><span class="std std-ref">wl_delta</span></a> or <a class="reference internal" href="#res"><span class="std std-ref">res</span></a> must be given in the configuration.
+This parameters controls the accuracy of the integration of spectral quantities which is necessary for example for the imaging detector.
+Therefore, the user has to balance between computational effort and precision.</p>
+</div>
+</div>
+<div class="section" id="d-aperture">
+<h3>d_aperture<a class="headerlink" href="#d-aperture" title="Permalink to this headline">¶</a></h3>
+<p>The diameter of the telescope aperture.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;d_aperture</span> <span class="na">val=</span><span class="s">&quot;2.3&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;m&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the telescope aperture diameter.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the telescope aperture diameter. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="psf">
+<span id="id3"></span><h3>psf<a class="headerlink" href="#psf" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – The PSF used for the computations.
+This can be either read from a Zemax/FITS-file or approximated by a (obstructed) airy disk.
+In case of a FITS-file, the PSF must be included as a 2D map.
+The header keywords <code class="docutils literal notranslate"><span class="pre">XPIXSZ</span></code> and <code class="docutils literal notranslate"><span class="pre">YPIXSZ</span></code> can be used to define the grid size of the PSF in microns.
+Otherwise, the keyword <code class="docutils literal notranslate"><span class="pre">PSFSCALE</span></code> can be used to define the FOV per PSF pixel in arcsec/pixel.
+The keywords <code class="docutils literal notranslate"><span class="pre">XPSFCTR</span></code> and <code class="docutils literal notranslate"><span class="pre">YPSFCTR</span></code> can be used to define the center point of the PSF, if the PSF is not centered on the grid.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;psf</span> <span class="na">type=</span><span class="s">&quot;Airy&quot;</span> <span class="na">osf=</span><span class="s">&quot;10&quot;</span> <span class="na">osf_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;psf</span> <span class="na">type=</span><span class="s">&quot;FITS&quot;</span> <span class="na">val=</span><span class="s">&quot;data/psf.fits&quot;</span> <span class="na">osf=</span><span class="s">&quot;10&quot;</span> <span class="na">osf_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;psf</span> <span class="na">type=</span><span class="s">&quot;Zemax&quot;</span> <span class="na">val=</span><span class="s">&quot;data/psf.txt&quot;</span> <span class="na">osf=</span><span class="s">&quot;10&quot;</span> <span class="na">osf_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>type:</strong> str = “Airy”</div>
+<div class="line-block">
+<div class="line">The PSF to be used for the computations. This can be either the path to a Zemax file or the keyword <em>Airy</em> to for an airy disk as PSF.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> str</div>
+<div class="line-block">
+<div class="line">The path to the file to be read.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>osf:</strong> float = “10”</div>
+<div class="line-block">
+<div class="line">The oversampling factor to be used to calculate the contained energy and the PSF with jitter.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>osf_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the oversampling factor. This has to be emtpy (dimensionless). The default is <code class="docutils literal notranslate"><span class="pre">dimensionless</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="jitter-sigma">
+<span id="id4"></span><h3>jitter_sigma<a class="headerlink" href="#jitter-sigma" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – The pointing jitter sigma.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;jitter_sigma</span> <span class="na">val=</span><span class="s">&quot;2&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;arcsec&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the pointing jitter sigma.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “arcsec”</div>
+<div class="line-block">
+<div class="line">The unit of the pointing jitter sigma. This has to be one of [<code class="docutils literal notranslate"><span class="pre">arcsec</span></code>, <code class="docutils literal notranslate"><span class="pre">arcmin</span></code>, <code class="docutils literal notranslate"><span class="pre">degree</span></code>, <code class="docutils literal notranslate"><span class="pre">radians</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">arcsec</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="output">
+<span id="output-dir"></span><h3>output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – Output settings for the results of the computation (see also <a class="reference internal" href="../output/output.html#output"><span class="std std-ref">Output</span></a>).</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;output</span> <span class="na">path=</span><span class="s">&quot;output&quot;</span> <span class="na">format=</span><span class="s">&quot;fits&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>path:</strong> str = “.”</div>
+<div class="line-block">
+<div class="line">The path to the output directory.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>format:</strong> str = “CSV”</div>
+<div class="line-block">
+<div class="line">The format to be used for outputting the signal and noise contributions. This has to be one of [<code class="docutils literal notranslate"><span class="pre">FITS</span></code>, <code class="docutils literal notranslate"><span class="pre">CSV</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="exposure-time">
+<span id="id5"></span><h3>exposure_time<a class="headerlink" href="#exposure-time" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – The exposure time(s) for the computations.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;exposure_time</span> <span class="na">val=</span><span class="s">&quot;0.1&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;s&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;exposure_time</span> <span class="na">val=</span><span class="s">&quot;0.1, 0.2, 0.3&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;s&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;exposure_time</span> <span class="na">val=</span><span class="s">&quot;data/exposure_time.csv&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> (float, str)</div>
+<div class="line-block">
+<div class="line">The exposure time(s) to be used for the computations. This can be either a single value, a comma separated list of values or the path to a CSV-file containing a single column of exposure time values. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “s”</div>
+<div class="line-block">
+<div class="line">The unit of the exposure time. This has to be one of [<code class="docutils literal notranslate"><span class="pre">ns</span></code>, <code class="docutils literal notranslate"><span class="pre">us</span></code>, <code class="docutils literal notranslate"><span class="pre">ms</span></code>, <code class="docutils literal notranslate"><span class="pre">s</span></code>, <code class="docutils literal notranslate"><span class="pre">min</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>]. If the path to a file is provided, this parameter must be omitted. The default is <code class="docutils literal notranslate"><span class="pre">s</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="snr">
+<span id="id6"></span><h3>snr<a class="headerlink" href="#snr" title="Permalink to this headline">¶</a></h3>
+<p><em>optional</em> – The signal to noise ration (SNR) for the computations.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;snr</span> <span class="na">val=</span><span class="s">&quot;10&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;snr</span> <span class="na">val=</span><span class="s">&quot;10, 20, 30&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;snr</span> <span class="na">val=</span><span class="s">&quot;data/snr.csv&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> (float, str)</div>
+<div class="line-block">
+<div class="line">The SNR(s) to be used for the computations. This can be either a single value, a comma separated list of values or the path to a CSV-file containing a single column of SNR values. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the exposure time. This has to be emtpy (dimensionless). If the path to a file is provided, this parameter must be omitted. The default is <code class="docutils literal notranslate"><span class="pre">dimensionless</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The two parameters <a class="reference internal" href="#exposure-time"><span class="std std-ref">exposure_time</span></a> and <a class="reference internal" href="#snr"><span class="std std-ref">snr</span></a> control the desired output of the computations.
+If only the exposure time is given, the corresponding signal to noise ration will be calculated and vice versa.
+If both the exposure time and the SNR is given as well as a black body target, the sensitivity will be calculated as limiting apparent magnitude.</p>
+</div>
+</div>
+</div>
+<div class="section" id="target">
+<span id="id7"></span><h2>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h2>
+<p>Currently ESBO-ETC supports the following two different types of targets. A configuration can contain only one target
+which has to be contained in the container <code class="docutils literal notranslate"><span class="pre">&lt;astroscene&gt;</span></code>. Each target consists of the basic tag
+<code class="docutils literal notranslate"><span class="pre">&lt;target&gt;</span></code> and possible other target-type specific attributes.
+Each target can be either modelled as a point source or as an infinitely extended target. In case of a point-source,
+a PSF will be used to determine the irradiance of each pixel. In case of a extended source, a uniform PSF is assumed,
+ignoring the parameters <a class="reference internal" href="#psf"><span class="std std-ref">psf</span></a>, <a class="reference internal" href="#jitter-sigma"><span class="std std-ref">jitter_sigma</span></a>, and some instrument specific parameters.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;target</span> <span class="na">type=</span><span class="s">&quot;BlackBodyTarget&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>type:</strong> str</div>
+<div class="line-block">
+<div class="line">The type of the target. Currently, only <a class="reference internal" href="#blackbodytarget"><span class="std std-ref">BlackBodyTarget</span></a> and <a class="reference internal" href="#filetarget"><span class="std std-ref">FileTarget</span></a> are supported.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="blackbodytarget">
+<span id="id8"></span><h3>BlackBodyTarget<a class="headerlink" href="#blackbodytarget" title="Permalink to this headline">¶</a></h3>
+<p>Model a target as a black body of a given temperature and apparent magnitude.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;target</span> <span class="na">type=</span><span class="s">&quot;BlackBodyTarget&quot;</span> <span class="na">temp=</span><span class="s">&quot;5778&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">mag=</span><span class="s">&quot;10&quot;</span> <span class="na">mag_unit=</span><span class="s">&quot;mag&quot;</span> <span class="na">band=</span><span class="s">&quot;B&quot;</span> <span class="na">size=</span><span class="s">&quot;point&quot;</span> <span class="na">law=</span><span class="s">&quot;Planck&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float</div>
+<div class="line-block">
+<div class="line">The temperature of the black body.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em> = “K”</div>
+<div class="line-block">
+<div class="line">The unit of the black body’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>mag:</strong> float, <em>optional</em> = None</div>
+<div class="line-block">
+<div class="line">The apparent magnitude of the black body in magnitudes. In case of None or magnitude per solid angle, an extended target is assumed.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>mag_unit:</strong> str, <em>optional</em> = “mag”</div>
+<div class="line-block">
+<div class="line">The unit of the black body’s magnitude. This has to be [<code class="docutils literal notranslate"><span class="pre">mag</span></code>, <code class="docutils literal notranslate"><span class="pre">mag</span> <span class="pre">/</span> <span class="pre">arcsec**2</span></code>, <code class="docutils literal notranslate"><span class="pre">mag</span> <span class="pre">/</span> <span class="pre">sr</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">mag</span></code>.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>band:</strong> str, <em>optional</em></div>
+<div class="line-block">
+<div class="line">The band used for fitting the black body’s flux density to Vega’s flux density. This has to be one of [<code class="docutils literal notranslate"><span class="pre">U</span></code>, <code class="docutils literal notranslate"><span class="pre">B</span></code>, <code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">R</span></code>, <code class="docutils literal notranslate"><span class="pre">I</span></code>, <code class="docutils literal notranslate"><span class="pre">J</span></code>, <code class="docutils literal notranslate"><span class="pre">H</span></code>, <code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span></code>].</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>law:</strong> str, <em>optional</em></div>
+<div class="line-block">
+<div class="line">The law used for the black body emission. This can be either <code class="docutils literal notranslate"><span class="pre">Planck</span></code> for using Planck’s law or <code class="docutils literal notranslate"><span class="pre">RJ</span></code> for using the Rayleigh-Jeans approximation of Planck’s law.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="filetarget">
+<span id="id9"></span><h3>FileTarget<a class="headerlink" href="#filetarget" title="Permalink to this headline">¶</a></h3>
+<p>Create a target from a file containing the spectral flux densities or, in case of an extended source, the spectral radiance of the target.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;target</span> <span class="na">type=</span><span class="s">&quot;FileTarget&quot;</span> <span class="na">val=</span><span class="s">&quot;PathToFile&quot;</span> <span class="na">size=</span><span class="s">&quot;point&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> str</div>
+<div class="line-block">
+<div class="line">The path to the file containing the spectral flux densities / radiances. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="optical-components">
+<h2>Optical components<a class="headerlink" href="#optical-components" title="Permalink to this headline">¶</a></h2>
+<p>Each optical component consists of the basic tag <code class="docutils literal notranslate"><span class="pre">&lt;optical_component&gt;</span></code> and the attribute <code class="docutils literal notranslate"><span class="pre">type</span></code> and possible other
+component-specific attributes.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Mirror&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>type:</strong> str</div>
+<div class="line">The type of the optical component. This can be one of the following types.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="atmosphere">
+<h3>Atmosphere<a class="headerlink" href="#atmosphere" title="Permalink to this headline">¶</a></h3>
+<p>This component models the behaviour of an atmosphere which has a spectral transmittance and a spectral emission.
+The atmospheric transmittance is read from a CSV file.
+The atmospheric emission can bei either read from a CSV file or computed as a grey body radiator of a given temperature and emissivity = 1 - transmission.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Atmosphere&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;PathToTransmittanceFile&quot;</span> <span class="na">emission=</span><span class="s">&quot;PathToEmissionFile&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Atmosphere&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;PathToTransmittanceFile&quot;</span> <span class="na">temp=</span><span class="s">&quot;200&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>transmittance:</strong> str</div>
+<div class="line">The path to the file containing the spectral transmittance coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>emission:</strong> str, <em>optional</em></div>
+<div class="line">The path to the file containing the spectral radiance of the emission. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float, <em>optional</em></div>
+<div class="line">The atmospheric temperature used for grey body emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em> = “K”</div>
+<div class="line">Unit of the atmospheric temperature used for black body emission using the complement of the transmittance.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="atran">
+<h3>ATRAN<a class="headerlink" href="#atran" title="Permalink to this headline">¶</a></h3>
+<p>This component uses the atmospheric transmission calculator ATRAN to model the behaviour of the atmosphere
+It is possible to read the transmittance of the atmosphere from an output file of ATRAN or call the webversion of ATRAN to compute the transmission profile.
+The atmospheric emission is computed as a grey body radiator of a given temperature and emissivity = 1 - transmission.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Atmosphere&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;PathToATRANFile&quot;</span> <span class="na">temp=</span><span class="s">&quot;200&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Atmosphere&quot;</span> <span class="na">altitude=</span><span class="s">&quot;41000&quot;</span> <span class="na">altitude_unit=</span><span class="s">&quot;ft&quot;</span> <span class="na">wl_min=</span><span class="s">&quot;16&quot;</span> <span class="na">wl_min_unit=</span><span class="s">&quot;um&quot;</span>
+                   <span class="na">wl_max=</span><span class="s">&quot;24&quot;</span> <span class="na">wl_max_unit=</span><span class="s">&quot;um&quot;</span> <span class="na">latitude=</span><span class="s">&quot;39&quot;</span> <span class="na">latitude_unit=</span><span class="s">&quot;degree&quot;</span> <span class="na">water_vapor=</span><span class="s">&quot;0&quot;</span>
+                   <span class="na">water_vapor_unit=</span><span class="s">&quot;um&quot;</span> <span class="na">n_layers=</span><span class="s">&quot;2&quot;</span> <span class="na">zenith_angle=</span><span class="s">&quot;0&quot;</span> <span class="na">zenith_angle_unit=</span><span class="s">&quot;degree&quot;</span> <span class="na">resolution=</span><span class="s">&quot;0&quot;</span>
+                   <span class="na">temp=</span><span class="s">&quot;240&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>transmittance:</strong> str</div>
+<div class="line">Path to a file containing the output of ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>altitude:</strong> float</div>
+<div class="line">The observatory altitude for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>altitude_unit:</strong> str, <em>optional</em> = “ft”</div>
+<div class="line">The unit of the observatory altitude for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>wl_min:</strong> float</div>
+<div class="line">The minimum wavelength for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>wl_min_unit:</strong> str, <em>optional</em> = “um”</div>
+<div class="line">The unit of the minimum wavelength for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>wl_max:</strong> float</div>
+<div class="line">The maximum wavelength for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>wl_max_unit:</strong> str, <em>optional</em> = “um”</div>
+<div class="line">The unit of the maximum wavelength for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>latitude:</strong> float, <em>optional</em></div>
+<div class="line">The observatory latitude for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>latitude_unit:</strong> str, <em>optional</em> = “degree”</div>
+<div class="line">The unit of the observatory latitude for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>water_vapor:</strong> float, <em>optional</em></div>
+<div class="line">The water vapor overburden for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>water_vapor_unit:</strong> str, <em>optional</em> = “um”</div>
+<div class="line">The unit of the water vapor overburden for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>n_layers:</strong> float, <em>optional</em></div>
+<div class="line">The number of atmospheric layers for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>zenith_angle:</strong> float, <em>optional</em></div>
+<div class="line">The zenith angle for the call to ATRAN.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>zenith_angle_unit:</strong> str, <em>optional</em> = “degree”</div>
+<div class="line">The unit of the zenith angle for the call to ATRAN (0 is towards the zenith).</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>resolution:</strong> float, <em>optional</em></div>
+<div class="line">The resolution for smoothing for the call to ATRAN (0 for no smoothing).</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float, <em>optional</em></div>
+<div class="line">The atmospheric temperature used for grey body emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em> = “K”</div>
+<div class="line">Unit of the atmospheric temperature used for black body emission using the complement of the transmittance.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="straylight">
+<h3>StrayLight<a class="headerlink" href="#straylight" title="Permalink to this headline">¶</a></h3>
+<p>This component allows to model generic noise sources like stray light or zodiacal light from a file containing the spectral radiance of the emission.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;StrayLight&quot;</span> <span class="na">emission=</span><span class="s">&quot;PathToEmissionFile&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>emission:</strong> str, <em>optional</em></div>
+<div class="line">The path to the file containing the spectral radiance of the emission. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="cosmicbackground">
+<h3>CosmicBackground<a class="headerlink" href="#cosmicbackground" title="Permalink to this headline">¶</a></h3>
+<p>This component allows to model generic black body noise sources like the cosmic background.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;CosmicBackground&quot;</span> <span class="na">temp=</span><span class="s">&quot;2.7&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;1.0&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float</div>
+<div class="line">The temperature of the black body.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em> = “K”</div>
+<div class="line">The unit of the black body’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>emissivity:</strong> float, <em>optional</em></div>
+<div class="line">The emissivity of the cosmic background.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="mirror">
+<h3>Mirror<a class="headerlink" href="#mirror" title="Permalink to this headline">¶</a></h3>
+<p>Model a mirror including the mirror’s thermal emission as well as possible obstruction of the mirror and the thermal emission of the obstructing component.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Mirror&quot;</span> <span class="na">reflectance=</span><span class="s">&quot;PathToReflectance&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;PathToEmissivity&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.2&quot;</span> <span class="na">obstructor_temp=</span><span class="s">&quot;70&quot;</span> <span class="na">obstructor_temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstructor_emissivity=</span><span class="s">&quot;0.9&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>reflectance:</strong> [str, float]</div>
+<div class="line">Either a floating point value for the reflectance or a path to the file containing the spectral reflectance coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>emissivity:</strong> str, <em>optional</em></div>
+<div class="line">The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>. If not given, 1 - reflectance is used.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the mirror for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the mirror’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstruction:</strong> float, <em>optional</em></div>
+<div class="line">The obstruction factor of the mirror as ratio of the areas A<sub>obstructor</sub> / A<sub>mirror</sub>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the obstructing component for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the obstructing component’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_emissivity:</strong> float, <em>optional</em></div>
+<div class="line">The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="lens">
+<h3>Lens<a class="headerlink" href="#lens" title="Permalink to this headline">¶</a></h3>
+<p>Model a lens including the lens’ thermal emission as well as possible obstruction of the lens and the thermal emission of the obstructing component.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Lens&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;PathToTransmittance&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;PathToEmissivity&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.2&quot;</span> <span class="na">obstructor_temp=</span><span class="s">&quot;70&quot;</span> <span class="na">obstructor_temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstructor_emissivity=</span><span class="s">&quot;0.9&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>transmittance:</strong> [str, float]</div>
+<div class="line">Either a floating point value for the transmittance or a path to the file containing the spectral transmittance coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>emissivity:</strong> str, <em>optional</em></div>
+<div class="line">The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>. If not given, 1 - transmittance is used.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the lens for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the lens’ temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstruction:</strong> float, <em>optional</em></div>
+<div class="line">The obstruction factor of the lens as ratio of the areas A<sub>obstructor</sub> / A<sub>lens</sub>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the obstructing component for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the obstructing component’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_emissivity:</strong> float, <em>optional</em></div>
+<div class="line">The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="beamsplitter">
+<h3>BeamSplitter<a class="headerlink" href="#beamsplitter" title="Permalink to this headline">¶</a></h3>
+<p>Model a beam splitter including the beam splitter’s thermal emission as well as possible obstruction of the beam splitter and the thermal emission of the obstructing component.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;BeamSplitter&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;PathToTransmittance&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;PathToEmissivity&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.2&quot;</span> <span class="na">obstructor_temp=</span><span class="s">&quot;70&quot;</span> <span class="na">obstructor_temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstructor_emissivity=</span><span class="s">&quot;0.9&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>transmittance:</strong> [str, float]</div>
+<div class="line">Either a floating point value for the transmittance or a path to the file containing the spectral transmittance coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>emissivity:</strong> str, <em>optional</em></div>
+<div class="line">The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>. If not given, 1 - transmittance is used.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the beam splitter for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the beam splitter’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstruction:</strong> float, <em>optional</em></div>
+<div class="line">The obstruction factor of the beam splitter as ratio of the areas A<sub>obstructor</sub> / A<sub>beam splitter</sub>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the obstructing component for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the obstructing component’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_emissivity:</strong> float, <em>optional</em></div>
+<div class="line">The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="filter">
+<h3>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<p>Model a beam splitter including the beam splitter’s thermal emission as well as possible obstruction of the beam splitter and the thermal emission of the obstructing component.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Filter&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;PathToTransmittance&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;PathToEmissivity&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.2&quot;</span> <span class="na">obstructor_temp=</span><span class="s">&quot;70&quot;</span> <span class="na">obstructor_temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstructor_emissivity=</span><span class="s">&quot;0.9&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Filter&quot;</span> <span class="na">band=</span><span class="s">&quot;M&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;PathToEmissivity&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.2&quot;</span> <span class="na">obstructor_temp=</span><span class="s">&quot;70&quot;</span> <span class="na">obstructor_temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstructor_emissivity=</span><span class="s">&quot;0.9&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Filter&quot;</span> <span class="na">start=</span><span class="s">&quot;400&quot;</span> <span class="na">start_unit=</span><span class="s">&quot;nm&quot;</span> <span class="na">end=</span><span class="s">&quot;480&quot;</span> <span class="na">end_unit=</span><span class="s">&quot;nm&quot;</span> <span class="na">emissivity=</span><span class="s">&quot;PathToEmissivity&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.2&quot;</span> <span class="na">obstructor_temp=</span><span class="s">&quot;70&quot;</span> <span class="na">obstructor_temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstructor_emissivity=</span><span class="s">&quot;0.9&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>transmittance:</strong> [str, float]</div>
+<div class="line">Either a floating point value for the transmittance or a path to the file containing the spectral transmittance coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>band:</strong> str</div>
+<div class="line">The spectral Band of the filter. This has to be one of [<code class="docutils literal notranslate"><span class="pre">U</span></code>, <code class="docutils literal notranslate"><span class="pre">B</span></code>, <code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">R</span></code>, <code class="docutils literal notranslate"><span class="pre">I</span></code>, <code class="docutils literal notranslate"><span class="pre">J</span></code>, <code class="docutils literal notranslate"><span class="pre">H</span></code>, <code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span></code>]</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>start:</strong> float</div>
+<div class="line">The start wavelength of the pass band of the filter.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>start_unit:</strong> str</div>
+<div class="line">The unit of the start wavelength. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>end:</strong> float</div>
+<div class="line">The end wavelength of the pass band of the filter.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>end_unit:</strong> str</div>
+<div class="line">The unit of the end wavelength. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>emissivity:</strong> str, <em>optional</em></div>
+<div class="line">The path to the file containing the spectral emissivity coefficients. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>. If not given, 1 - transmittance is used.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp:</strong> float</div>
+<div class="line">The temperature of the beam splitter for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the beam splitter’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstruction:</strong> float, <em>optional</em></div>
+<div class="line">The obstruction factor of the beam splitter as ratio of the areas A<sub>obstructor</sub> / A<sub>filter</sub>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp:</strong> float, <em>optional</em></div>
+<div class="line">The temperature of the obstructing component for the thermal emission.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_temp_unit:</strong> str, <em>optional</em></div>
+<div class="line">The unit of the obstructing component’s temperature. This has to be one of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">K</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>obstructor_emissivity:</strong> float, <em>optional</em></div>
+<div class="line">The emissivity of the obstructing component for the thermal emission. Valid ranges are 0.0 - 1.0. The default is 1.0.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="sensor">
+<h2>Sensor<a class="headerlink" href="#sensor" title="Permalink to this headline">¶</a></h2>
+<p>Currently, ESBO-ETC only supports detectors of the type <a class="reference internal" href="#imager"><span class="std std-ref">Imager</span></a>.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;sensor</span> <span class="na">type=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>type:</strong> str</div>
+<div class="line-block">
+<div class="line">The type of the detector. Has to be one of [<code class="docutils literal notranslate"><span class="pre">Imager</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="imager">
+<span id="id10"></span><h3>Imager<a class="headerlink" href="#imager" title="Permalink to this headline">¶</a></h3>
+<p>The Imager sensor type allows to model a generic imaging sensor which uses a pixel based array to create only spatially resolved images. The imager-component contains several parameters which are explained in the following.</p>
+<div class="highlight-xml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">&lt;sensor</span> <span class="na">type=</span><span class="s">&quot;Imager&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;f_number</span> <span class="na">val=</span><span class="s">&quot;13&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;pixel_geometry</span> <span class="na">val=</span><span class="s">&quot;1024, 1024&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;center_offset</span> <span class="na">val=</span><span class="s">&quot;0.0, 0.0&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;pixel&gt;</span>
+        <span class="nt">&lt;quantum_efficiency</span> <span class="na">val=</span><span class="s">&quot;data/ccd/QE.txt&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;pixel_size</span> <span class="na">val=</span><span class="s">&quot;6.5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;dark_current</span> <span class="na">val=</span><span class="s">&quot;0.6&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron / (pix * s)&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;sigma_read_out</span> <span class="na">val=</span><span class="s">&quot;1.4&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron(1/2) / pix&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;well_capacity</span> <span class="na">val=</span><span class="s">&quot;30000&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/pixel&gt;</span>
+    <span class="nt">&lt;photometric_aperture&gt;</span>
+        <span class="nt">&lt;shape</span> <span class="na">val=</span><span class="s">&quot;circle&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;contained_energy</span> <span class="na">val=</span><span class="s">&quot;80&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;aperture_size</span> <span class="na">val=</span><span class="s">&quot;100&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/photometric_aperture&gt;</span>
+<span class="nt">&lt;/sensor&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="f-number">
+<h4>f_number<a class="headerlink" href="#f-number" title="Permalink to this headline">¶</a></h4>
+<p>The working focal number of the instrument.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;f_number</span> <span class="na">val=</span><span class="s">&quot;13&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the working focal number of the instrument.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the working focal number of the instrument. This has to be emtpy (dimensionless).</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="pixel-geometry">
+<span id="id11"></span><h4>pixel_geometry<a class="headerlink" href="#pixel-geometry" title="Permalink to this headline">¶</a></h4>
+<p>The geometry of the sensor’s pixel array.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;pixel_geometry</span> <span class="na">val=</span><span class="s">&quot;1024, 1024&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The geometry of the sensor’s pixel array as a comma separated list of the number of pixels per dimension (X, Y).</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “pix”</div>
+<div class="line-block">
+<div class="line">The unit of the geometry of the sensor’s pixel array. This has to be <code class="docutils literal notranslate"><span class="pre">pix</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="center-offset">
+<span id="id12"></span><h4>center_offset<a class="headerlink" href="#center-offset" title="Permalink to this headline">¶</a></h4>
+<p>The PSF’s center offset from the arithmetical center of the detector array which is defined as half of the number of pixels per dimension as defined in <a class="reference internal" href="#pixel-geometry"><span class="std std-ref">pixel_geometry</span></a></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;center_offset</span> <span class="na">val=</span><span class="s">&quot;0.0, 0.0&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">PSF’s center offset as a comma separated list of the offset in pixels per dimension (X, Y).</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “pix”</div>
+<div class="line-block">
+<div class="line">The unit of the PSF’s center offset. This has to be <code class="docutils literal notranslate"><span class="pre">pix</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="pixel">
+<h4>pixel<a class="headerlink" href="#pixel" title="Permalink to this headline">¶</a></h4>
+<p>The pixel-container contains parameters which apply to all pixels of the sensor array.</p>
+<div class="highlight-xml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">&lt;pixel&gt;</span>
+    <span class="nt">&lt;quantum_efficiency</span> <span class="na">val=</span><span class="s">&quot;data/ccd/QE.txt&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;pixel_size</span> <span class="na">val=</span><span class="s">&quot;6.5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;dark_current</span> <span class="na">val=</span><span class="s">&quot;0.6&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron / (pix * s)&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;sigma_read_out</span> <span class="na">val=</span><span class="s">&quot;1.4&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron(1/2) / pix&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;well_capacity</span> <span class="na">val=</span><span class="s">&quot;30000&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/pixel&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="quantum-efficiency">
+<h5>quantum_efficiency<a class="headerlink" href="#quantum-efficiency" title="Permalink to this headline">¶</a></h5>
+<p>The quantum efficiency of a detector pixel.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;quantum_efficiency</span> <span class="na">val=</span><span class="s">&quot;data/ccd/QE.txt&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> (float, str)</div>
+<div class="line-block">
+<div class="line">Either the value of the quantum efficiency or the path to the file containing the quantum efficiency values. For details on the required file structure see also <a class="reference internal" href="#reading-csv"><span class="std std-ref">Reading CSV-Files</span></a>.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “electron / photon”</div>
+<div class="line-block">
+<div class="line">The unit of the edge length of a detector pixel. This has to be <code class="docutils literal notranslate"><span class="pre">electron</span> <span class="pre">/</span> <span class="pre">photon</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="pixel-size">
+<h5>pixel_size<a class="headerlink" href="#pixel-size" title="Permalink to this headline">¶</a></h5>
+<p>The spatial size of each detector pixel. Each pixel is assumed to be of quadratic.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;pixel_size</span> <span class="na">val=</span><span class="s">&quot;6.5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the edge length of a detector pixel.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the edge length of a detector pixel. This has to be one of [<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">pm</span></code>]. The default is <code class="docutils literal notranslate"><span class="pre">m</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="dark-current">
+<h5>dark_current<a class="headerlink" href="#dark-current" title="Permalink to this headline">¶</a></h5>
+<p>The dark current of a detector pixel.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dark_current</span> <span class="na">val=</span><span class="s">&quot;0.6&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron / (pix * s)&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the dark current of a detector pixel.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “electron / (pix * s)”</div>
+<div class="line-block">
+<div class="line">The unit of the dark current of a detector pixel. This has to be <code class="docutils literal notranslate"><span class="pre">electron</span> <span class="pre">/</span> <span class="pre">(pix</span> <span class="pre">*</span> <span class="pre">s)</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="sigma-read-out">
+<h5>sigma_read_out<a class="headerlink" href="#sigma-read-out" title="Permalink to this headline">¶</a></h5>
+<p>The read out noise of a detector pixel.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;sigma_read_out</span> <span class="na">val=</span><span class="s">&quot;1.4&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron(1/2) / pix&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the read out noise of a detector pixel.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “electron(1/2) / pix”</div>
+<div class="line-block">
+<div class="line">The unit of the read out noise of a detector pixel. This has to be <code class="docutils literal notranslate"><span class="pre">electron(1/2)</span> <span class="pre">/</span> <span class="pre">pix</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="well-capacity">
+<h5>well_capacity<a class="headerlink" href="#well-capacity" title="Permalink to this headline">¶</a></h5>
+<p>The well capacity of a detector pixel.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;well_capacity</span> <span class="na">val=</span><span class="s">&quot;30000&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the well capacity of a detector pixel.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “electron”</div>
+<div class="line-block">
+<div class="line">The unit of the well capacity of a detector pixel. This has to be <code class="docutils literal notranslate"><span class="pre">electron</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="photometric-aperture">
+<h4>photometric_aperture<a class="headerlink" href="#photometric-aperture" title="Permalink to this headline">¶</a></h4>
+<p><em>optional</em></p>
+<p>The photometric_aperture-container contains parameters for the photometric aperture of the observation. This container is only required, if the <a class="reference internal" href="#target"><span class="std std-ref">Target</span></a> has the shape <code class="docutils literal notranslate"><span class="pre">point</span></code>.</p>
+<div class="highlight-xml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">&lt;photometric_aperture/&gt;</span>
+    <span class="nt">&lt;shape</span> <span class="na">val=</span><span class="s">&quot;circle&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;contained_energy</span> <span class="na">val=</span><span class="s">&quot;80&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;aperture_size</span> <span class="na">val=</span><span class="s">&quot;100&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/photometric_aperture&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="shape">
+<h5>shape<a class="headerlink" href="#shape" title="Permalink to this headline">¶</a></h5>
+<p>The shape of the photometric aperture which will be placed around the center of the PSF which is defined by <a class="reference internal" href="#center-offset"><span class="std std-ref">center_offset</span></a>. After the radius of the photometric aperture was calculated using a disk for the given <a class="reference internal" href="#contained-energy"><span class="std std-ref">contained_energy</span></a>, this radius will be used as radius or edge length of the photometric aperture shape.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;shape</span> <span class="na">val=</span><span class="s">&quot;circle&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> str</div>
+<div class="line-block">
+<div class="line">The shape of the photometric aperture. This has to be one of [<code class="docutils literal notranslate"><span class="pre">circle</span></code>, <code class="docutils literal notranslate"><span class="pre">square</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="contained-energy">
+<span id="id13"></span><h5>contained_energy<a class="headerlink" href="#contained-energy" title="Permalink to this headline">¶</a></h5>
+<p><em>optional</em></p>
+<p>The energy to be contained within the photometric aperture. This value will used for the computation of the radius of the photometric aperture.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;contained_energy</span> <span class="na">val=</span><span class="s">&quot;80&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> (float, str)</div>
+<div class="line-block">
+<div class="line">The energy to be contained within the photometric aperture. This can be either the percentage of contained energy or one of [<code class="docutils literal notranslate"><span class="pre">Peak</span></code>, <code class="docutils literal notranslate"><span class="pre">FWHM</span></code>, <code class="docutils literal notranslate"><span class="pre">Min</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="aperture-size">
+<h5>aperture_size<a class="headerlink" href="#aperture-size" title="Permalink to this headline">¶</a></h5>
+<p><em>optional</em></p>
+<p>The radius respectively the edge length of the photometric aperture in pixels. If this parameter is given, the <a class="reference internal" href="#contained-energy"><span class="std std-ref">contained_energy</span></a> parameter will be ignored.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;aperture_size</span> <span class="na">val=</span><span class="s">&quot;100&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The radius respectively the edge length of the photometric aperture.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “pix”</div>
+<div class="line-block">
+<div class="line">The unit of the radius respectively the edge length of the photometric aperture. This has to be <code class="docutils literal notranslate"><span class="pre">pix</span></code>.</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="heterodyne">
+<h3>Heterodyne<a class="headerlink" href="#heterodyne" title="Permalink to this headline">¶</a></h3>
+<p>The heterodyne sensor type allows to model a generic DSB heterodyne radio receiver which uses an local oscillator and an mixer to create spectral images. The heterodyne-component contains several parameters which are explained in the following. All parameters are defined according to the <a class="reference external" href="https://www.sofia.usra.edu/science/proposing-and-observing/observers-handbook-cycle-9/6-great/61-specifications#PerformanceGREAT">Guide to GREAT</a>.</p>
+<div class="highlight-xml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">&lt;sensor</span> <span class="na">type=</span><span class="s">&quot;Heterodyne&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;aperture_efficiency</span> <span class="na">val=</span><span class="s">&quot;0.55&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;main_beam_efficiency</span> <span class="na">val=</span><span class="s">&quot;0.67&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;receiver_temp</span> <span class="na">val=</span><span class="s">&quot;1050&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;K&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;eta_fss</span> <span class="na">val=</span><span class="s">&quot;0.97&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;lambda_line</span> <span class="na">val=</span><span class="s">&quot;157.774&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;lambda_local_oscillator</span> <span class="na">val=</span><span class="s">&quot;158&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;kappa</span> <span class="na">val=</span><span class="s">&quot;1&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;n_on</span> <span class="na">val=</span><span class="s">&quot;10&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/sensor&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="aperture-efficiency">
+<h4>aperture_efficiency<a class="headerlink" href="#aperture-efficiency" title="Permalink to this headline">¶</a></h4>
+<p>The aperture efficiency of the instrument.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;aperture_efficiency</span> <span class="na">val=</span><span class="s">&quot;0.55&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the aperture efficiency of the instrument.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the aperture efficiency of the instrument. This has to be emtpy (dimensionless).</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="main-beam-efficiency">
+<h4>main_beam_efficiency<a class="headerlink" href="#main-beam-efficiency" title="Permalink to this headline">¶</a></h4>
+<p>The main beam efficiency of the instrument.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;main_beam_efficiency</span> <span class="na">val=</span><span class="s">&quot;0.67&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The value of the main beam efficiency of the instrument.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the main beam efficiency of the instrument. This has to be emtpy (dimensionless).</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="receiver-temp">
+<h4>receiver_temp<a class="headerlink" href="#receiver-temp" title="Permalink to this headline">¶</a></h4>
+<p>The receiver’s noise temperature.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;receiver_temp</span> <span class="na">val=</span><span class="s">&quot;1050&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;K&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The receiver’s noise temperature.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “K”</div>
+<div class="line-block">
+<div class="line">The unit of the receiver temperature. This has to be on of [<code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">Celsius</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="eta-fss">
+<h4>eta_fss<a class="headerlink" href="#eta-fss" title="Permalink to this headline">¶</a></h4>
+<p>The forward scattering efficiency of the detector.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;eta_fss</span> <span class="na">val=</span><span class="s">&quot;0.97&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The forward scattering efficiency of the detector.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the forward scattering efficiency of the instrument. This has to be emtpy (dimensionless).</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="lambda-line">
+<h4>lambda_line<a class="headerlink" href="#lambda-line" title="Permalink to this headline">¶</a></h4>
+<p>The wavelength or frequency of the observed line.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;lambda_line</span> <span class="na">val=</span><span class="s">&quot;157.774&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The wavelength of the observed line.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the observed line wavelength. This has to be on of [<code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">Hz</span></code>, <code class="docutils literal notranslate"><span class="pre">kHZ</span></code>, <code class="docutils literal notranslate"><span class="pre">MHz</span></code>, <code class="docutils literal notranslate"><span class="pre">GHz</span></code>, <code class="docutils literal notranslate"><span class="pre">THz</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="lambda-local-oscillator">
+<h4>lambda_local_oscillator<a class="headerlink" href="#lambda-local-oscillator" title="Permalink to this headline">¶</a></h4>
+<p>The wavelength or frequency of the local oscillator. This parameter is optional. If no value is given, the noise temperature of the signal band is doubled.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;lambda_local_oscillator</span> <span class="na">val=</span><span class="s">&quot;158&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The wavelength of the local oscillator.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “m”</div>
+<div class="line-block">
+<div class="line">The unit of the local oscillator wavelength. This has to be on of [<code class="docutils literal notranslate"><span class="pre">nm</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">cm</span></code>, <code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">Hz</span></code>, <code class="docutils literal notranslate"><span class="pre">kHZ</span></code>, <code class="docutils literal notranslate"><span class="pre">MHz</span></code>, <code class="docutils literal notranslate"><span class="pre">GHz</span></code>, <code class="docutils literal notranslate"><span class="pre">THz</span></code>].</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="kappa">
+<h4>kappa<a class="headerlink" href="#kappa" title="Permalink to this headline">¶</a></h4>
+<p>The instrument’s backend degradation factor.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;kappa</span> <span class="na">val=</span><span class="s">&quot;1&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The instrument’s backend degradation factor.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the backend degradation factor. This has to be emtpy (dimensionless).</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="n-on">
+<h4>n_on<a class="headerlink" href="#n-on" title="Permalink to this headline">¶</a></h4>
+<p>The number of on-source observations per off-source observation.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;n_on</span> <span class="na">val=</span><span class="s">&quot;10&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<dl>
+<dt>Attributes:</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><strong>val:</strong> float</div>
+<div class="line-block">
+<div class="line">The number of on-source observations per off-source observation.</div>
+</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>val_unit:</strong> str, <em>optional</em> = “”</div>
+<div class="line-block">
+<div class="line">The unit of the number of on-source observations per off-source observation. This has to be emtpy (dimensionless).</div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="reading-csv-files">
+<span id="reading-csv"></span><h2>Reading CSV-Files<a class="headerlink" href="#reading-csv-files" title="Permalink to this headline">¶</a></h2>
+<p>The format of a file has to be either structured text (e.g. CSV) or astropy ECSV. The format of the file will be automatically detected during read.
+In case of structured text, the units of the columns have to be defined in the column header within square brackets
+(e.g. “wavelength [nm]”). The file must contain two columns with units: wavelength/frequency and the spectral quantity.
+The first column can be either a wavelength or a frequency.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>wavelength [nm]</p></th>
+<th class="head"><p>emission [W/(nm*m^2*sr)]</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>200</p></td>
+<td><p>1.345e-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>201</p></td>
+<td><p>1.364e-15</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example-configuration">
+<span id="example-config"></span><h2>Example Configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-xml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">&lt;root&gt;</span>
+    <span class="nt">&lt;common&gt;</span>
+        <span class="nt">&lt;wl_min</span> <span class="na">val=</span><span class="s">&quot;3&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span> <span class="na">comment=</span><span class="s">&quot;Shortest wavelength used for binning input spectra&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;wl_max</span> <span class="na">val=</span><span class="s">&quot;5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span> <span class="na">comment=</span><span class="s">&quot;Shortest wavelength used for binning input spectra&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;wl_delta</span> <span class="na">val=</span><span class="s">&quot;1&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;nm&quot;</span> <span class="na">comment=</span><span class="s">&quot;Wavelength increment used for binning input spectra&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;d_aperture</span> <span class="na">val=</span><span class="s">&quot;0.5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;m&quot;</span> <span class="na">comment=</span><span class="s">&quot;Diameter of the telescope aperture&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;psf</span> <span class="na">val=</span><span class="s">&quot;Airy&quot;</span> <span class="na">osf=</span><span class="s">&quot;10&quot;</span> <span class="na">osf_unit=</span><span class="s">&quot;&quot;</span> <span class="na">comment=</span><span class="s">&quot;PSF of the optical system. Can be Airy or a file&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;jitter_sigma</span> <span class="na">val=</span><span class="s">&quot;10&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;arcsec&quot;</span> <span class="na">comment=</span><span class="s">&quot;Sigma of the telescope jitter&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;output</span> <span class="na">path=</span><span class="s">&quot;output&quot;</span> <span class="na">format=</span><span class="s">&quot;fits&quot;</span> <span class="na">comment=</span><span class="s">&quot;Output directory to store output files&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;exposure_time</span> <span class="na">val=</span><span class="s">&quot;0.1, 1.2&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;s&quot;</span> <span class="na">comment=</span><span class="s">&quot;The exposure time&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/common&gt;</span>
+
+    <span class="nt">&lt;astroscene&gt;</span>
+        <span class="nt">&lt;target</span> <span class="na">type=</span><span class="s">&quot;BlackBodyTarget&quot;</span> <span class="na">temp=</span><span class="s">&quot;5778&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">mag=</span><span class="s">&quot;10&quot;</span> <span class="na">mag_unit=</span><span class="s">&quot;mag&quot;</span> <span class="na">band=</span><span class="s">&quot;B&quot;</span>
+                <span class="na">comment=</span><span class="s">&quot;Modeling the sun as mag 10 star. Size can be point or extended&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Atmosphere&quot;</span> <span class="na">transmittance=</span><span class="s">&quot;data/atmosphere/ESBO-DS_transmittance.txt&quot;</span>
+                           <span class="na">emission=</span><span class="s">&quot;data/atmosphere/ESBO-DS_emission.txt&quot;</span> <span class="na">comment=</span><span class="s">&quot;Including the atmosphere&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/astroscene&gt;</span>
+
+    <span class="nt">&lt;common_optics&gt;</span>
+        <span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Mirror&quot;</span> <span class="na">reflectance=</span><span class="s">&quot;data/mirror/Reflectance_UV-enhanced-aluminium-mirror.txt&quot;</span>
+                           <span class="na">emissivity=</span><span class="s">&quot;0&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">obstruction=</span><span class="s">&quot;0.0&quot;</span> <span class="na">comment=</span><span class="s">&quot;M1&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Mirror&quot;</span> <span class="na">reflectance=</span><span class="s">&quot;data/mirror/Reflectance_UV-enhanced-aluminium-mirror.txt&quot;</span>
+                           <span class="na">emissivity=</span><span class="s">&quot;0&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">comment=</span><span class="s">&quot;M2&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Mirror&quot;</span> <span class="na">reflectance=</span><span class="s">&quot;data/mirror/Reflectance_UV-enhanced-aluminium-mirror.txt&quot;</span>
+                           <span class="na">emissivity=</span><span class="s">&quot;0&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">comment=</span><span class="s">&quot;M3&quot;</span><span class="nt">/&gt;</span>
+       <span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Filter&quot;</span> <span class="na">band=</span><span class="s">&quot;M&quot;</span>
+                           <span class="na">emissivity=</span><span class="s">&quot;data/filter/emissivity.csv&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">comment=</span><span class="s">&quot;Filter wheel&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/common_optics&gt;</span>
+
+    <span class="nt">&lt;instrument&gt;</span>
+        <span class="nt">&lt;optical_component</span> <span class="na">type=</span><span class="s">&quot;Mirror&quot;</span> <span class="na">reflectance=</span><span class="s">&quot;data/lens/Reflectance_UV-enhanced-aluminium-mirror.txt&quot;</span>
+                           <span class="na">emissivity=</span><span class="s">&quot;0&quot;</span> <span class="na">temp=</span><span class="s">&quot;70&quot;</span> <span class="na">temp_unit=</span><span class="s">&quot;K&quot;</span> <span class="na">comment=</span><span class="s">&quot;M4&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;sensor</span> <span class="na">type=</span><span class="s">&quot;Imager&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;f_number</span> <span class="na">val=</span><span class="s">&quot;13&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;&quot;</span> <span class="na">comment=</span><span class="s">&quot;The working f/#&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;pixel_geometry</span> <span class="na">val=</span><span class="s">&quot;1024, 1024&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span> <span class="na">comment=</span><span class="s">&quot;Pixel geometry&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;center_offset</span> <span class="na">val=</span><span class="s">&quot;0.0, 0.0&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;pix&quot;</span> <span class="na">comment=</span><span class="s">&quot;Shift of the array center&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;pixel&gt;</span>
+                <span class="nt">&lt;quantum_efficiency</span> <span class="na">val=</span><span class="s">&quot;data/ccd/QE.txt&quot;</span> <span class="na">comment=</span><span class="s">&quot;Quantum efficiency of the detector&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;pixel_size</span> <span class="na">val=</span><span class="s">&quot;6.5&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;um&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;dark_current</span> <span class="na">val=</span><span class="s">&quot;0.6&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron / (pix * s)&quot;</span> <span class="na">comment=</span><span class="s">&quot;Detector dark current&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;sigma_read_out</span> <span class="na">val=</span><span class="s">&quot;1.4&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron(1/2) / pix&quot;</span> <span class="na">comment=</span><span class="s">&quot;Detector readout noise in e-rms&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;well_capacity</span> <span class="na">val=</span><span class="s">&quot;30000&quot;</span> <span class="na">val_unit=</span><span class="s">&quot;electron&quot;</span> <span class="na">comment=</span><span class="s">&quot;Well capacity of a pixel&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/pixel&gt;</span>
+            <span class="nt">&lt;photometric_aperture</span> <span class="na">comment=</span><span class="s">&quot;The photometric aperture used to calculate signal and noise.&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;shape</span> <span class="na">val=</span><span class="s">&quot;circle&quot;</span> <span class="na">comment=</span><span class="s">&quot;Shape of the photometric aperture. Can be square / circle&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;contained_energy</span> <span class="na">val=</span><span class="s">&quot;80&quot;</span> <span class="na">comment=</span><span class="s">&quot;Contained energy for calculating the SNR&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/photometric_aperture&gt;</span>
+        <span class="nt">&lt;/sensor&gt;</span>
+    <span class="nt">&lt;/instrument&gt;</span>
+<span class="nt">&lt;/root&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../output/output.html" class="btn btn-neutral float-right" title="Output" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../usage/getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

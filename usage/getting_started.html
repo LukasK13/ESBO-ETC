@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building the Configuration" href="../configuration/configuration.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#python-virtual-environment">Python Virtual Environment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#linux-macos">Linux / MacOS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#global-python-installation">Global Python installation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Linux / MacOS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Windows</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#running-esbo-etc">Running ESBO-ETC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#shell-script">Shell-Script</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Linux / MacOS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#python-interpreter">Python Interpreter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#component-overview">Component Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#target">Target</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optical-component">Optical Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sensor">Sensor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Getting Started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This chapter provides information on how to start using ESBO-ETC.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>A Python 3 installation is required to run ESBO-ETC. You can get the latest python version
+<a class="reference external" href="https://www.python.org/downloads/">here</a>.</p>
+<p>In order to get ESBO-ETC, download the latest release from the <a class="reference external" href="https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC/releases">IRS git server</a> or clone the latest development version from the IRS git server using</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>git clone https://egit.irs.uni-stuttgart.de/esbo_ds/ESBO-ETC.git
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="python-virtual-environment">
+<h3>Python Virtual Environment<a class="headerlink" href="#python-virtual-environment" title="Permalink to this headline">¶</a></h3>
+<p>It is advisable to create a python virtual environment for ESBO-ETC where all necessary packages will be installed.
+To create a virtual environment and install all packages, got to the project’s root directory an run</p>
+<div class="section" id="linux-macos">
+<h4>Linux / MacOS<a class="headerlink" href="#linux-macos" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span>python3 -m venv venv
+<span class="nb">source</span> venv/bin/activate
+python venv/bin/pip install -r requirements.txt
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="windows">
+<h4>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
+<p>It might be possible that you need to install <a class="reference external" href="https://visualstudio.microsoft.com/visual-cpp-build-tools/">Microsoft Build Tools for C++</a> in order to compile astropy.</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span>conda create -n venv
+conda activate venv
+conda install -c anaconda pip
+pip install -r requirements.txt
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="global-python-installation">
+<h3>Global Python installation<a class="headerlink" href="#global-python-installation" title="Permalink to this headline">¶</a></h3>
+<p>Instead of a virtual environment, the global python installation can be used to run ESBO-ETC. Therefore, the necessary
+packages need to be installed by running the following command from the project’s root directory.</p>
+<div class="section" id="id1">
+<h4>Linux / MacOS<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>pip install -r requirements.txt
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="id2">
+<h4>Windows<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>conda install -c anaconda pip
+pip install -r requirements.txt
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="running-esbo-etc">
+<h2>Running ESBO-ETC<a class="headerlink" href="#running-esbo-etc" title="Permalink to this headline">¶</a></h2>
+<p>ESBO-ETC can be run using in multiple ways as explained in the following subsections. However all methods provide the
+same options which can be shown using the parameter <code class="docutils literal notranslate"><span class="pre">-h</span></code> or <code class="docutils literal notranslate"><span class="pre">--help</span></code>.</p>
+<p>The following options are available:</p>
+<dl class="field-list simple">
+<dt class="field-odd">-h, --help</dt>
+<dd class="field-odd"><p>Show the help.</p>
+</dd>
+<dt class="field-even">-c, --config</dt>
+<dd class="field-even"><p>Specify the path to the configuration file. Default is esbo-etc_defaults.xml.</p>
+</dd>
+<dt class="field-odd">-l, --logging</dt>
+<dd class="field-odd"><p>Specify the log level for the application. Possible levels are DEBUG, INFO, WARNING, ERROR.</p>
+</dd>
+<dt class="field-even">-v, --version</dt>
+<dd class="field-even"><p>Print version information.</p>
+</dd>
+<dt class="field-odd">-m, --manual</dt>
+<dd class="field-odd"><p>Print the manual.</p>
+</dd>
+</dl>
+<div class="section" id="shell-script">
+<h3>Shell-Script<a class="headerlink" href="#shell-script" title="Permalink to this headline">¶</a></h3>
+<p>The recommended way to run ESBO-ETC is to use the provided shell-script which will add the project’s root directory to
+the PATH-variable. However the shell-script only works for virtual environment installations with the virtual environment named <code class="docutils literal notranslate"><span class="pre">venv</span></code>.</p>
+<div class="section" id="id3">
+<h4>Linux / MacOS<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>./run_esbo-etc <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-c config.xml<span class="o">]</span> <span class="o">[</span>-l LOGGING<span class="o">]</span> <span class="o">[</span>-v<span class="o">]</span> <span class="o">[</span>-m<span class="o">]</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="id4">
+<h4>Windows<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>run_esbo-etc.bat <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-c config.xml<span class="o">]</span> <span class="o">[</span>-l LOGGING<span class="o">]</span> <span class="o">[</span>-v<span class="o">]</span> <span class="o">[</span>-m<span class="o">]</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="python-interpreter">
+<h3>Python Interpreter<a class="headerlink" href="#python-interpreter" title="Permalink to this headline">¶</a></h3>
+<p>An alternative way to start ESBO-ETC is by using the python interpreter from the command line. This method works for
+both a virtual environment as well as for the global python installation. Launching ESBO-ETC can be done using</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>python esbo_etc/esbo-etc.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-c config.xml<span class="o">]</span> <span class="o">[</span>-l LOGGING<span class="o">]</span> <span class="o">[</span>-v<span class="o">]</span> <span class="o">[</span>-m<span class="o">]</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="component-overview">
+<h2>Component Overview<a class="headerlink" href="#component-overview" title="Permalink to this headline">¶</a></h2>
+<p>ESBO-ETC offers many different components to model the path from the astronomical target to the detector. All components
+can be divided into the three following classes.</p>
+<div class="section" id="target">
+<h3>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h3>
+<p>The component class <em>Target</em> models astronomical targets, defining the spectral flux density of their signal and their
+shape (point source vs. extended source). Currently, two different target types are available:</p>
+<ul class="simple">
+<li><p>A target modelled as <strong>black body</strong> with a given temperature and apparent magnitude.</p></li>
+<li><p>A target with the signal’s spectral flux density read from a <strong>file</strong>.</p></li>
+</ul>
+</div>
+<div class="section" id="optical-component">
+<h3>Optical Component<a class="headerlink" href="#optical-component" title="Permalink to this headline">¶</a></h3>
+<p>Multiple optical components are available for modelling the signal and background flux propagation. The hot optical
+components with a thermal grey body emission form a subclass of the optical components. Currently, the following optical
+components are available</p>
+<ul>
+<li><p>An <strong>atmosphere</strong> component modelling the atmospheric transmittance and emission, both read from files.</p></li>
+<li><p>An <strong>ATRAN</strong> component to model the atmosphere using the ATRAN atmopsheric transmission calculator.</p></li>
+<li><p>A <strong>stray light</strong> component for modelling generic background source like zodiacal light or earth stray light.</p></li>
+<li><p>A <strong>cosmic background</strong> component to model thermal black body background radiation like the 2.7 K cosmic background radiation.</p></li>
+<li><p>Hot optical components with thermal emission of a given temperature and emissivity:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A <strong>mirror</strong> component modelling the optical properties of a mirror like the mirror’s reflectance.</p></li>
+<li><p>A <strong>lens</strong> component the optical properties of a lens like the lens’ transmittance.</p></li>
+<li><p>A <strong>beam splitter</strong> component the optical properties of a beam splitter like the beam splitter’s transmittance.</p></li>
+<li><p>A <strong>filter</strong> component the optical properties of a filter like the filter’s transmittance.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="sensor">
+<h3>Sensor<a class="headerlink" href="#sensor" title="Permalink to this headline">¶</a></h3>
+<p>Currently, two sensor components are available:</p>
+<ul class="simple">
+<li><p>The <strong>imager</strong> detector for generic imaging sensors like CCDs providing many parameters to adapt the component
+to the needs like the dark current, the read noise, pixel size, array size but also parameters for the photometric
+aperture like the percentage of contained energy or the shape of the photometric aperture.</p></li>
+<li><p>The <strong>heterodyne</strong> sensor for spectroscopy using the heterodyne principle providing also multiple parameters.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../configuration/configuration.html" class="btn btn-neutral float-right" title="Building the Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>esbo_etc.classes.SpectralQty &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../../../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>esbo_etc.classes.SpectralQty</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for esbo_etc.classes.SpectralQty</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">..lib.helpers</span> <span class="kn">import</span> <span class="n">isLambda</span><span class="p">,</span> <span class="n">readCSV</span>
+<span class="kn">from</span> <span class="nn">..lib.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">trapz</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="c1"># noinspection PyUnresolvedReferences</span>
+<div class="viewcode-block" id="SpectralQty"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty">[docs]</a><span class="k">class</span> <span class="nc">SpectralQty</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to hold and work with spectral quantities</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SpectralQty.__init__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wl</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">qty</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new spectral quantity</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wl : Quantity</span>
+<span class="sd">            The binned wavelengths</span>
+<span class="sd">        qty : Quantity</span>
+<span class="sd">            The quantity values corresponding to the binned wavelengths. If the values are supplied without a unit,</span>
+<span class="sd">            they are assumed to be dimensionless.</span>
+<span class="sd">        fill_value : Union[bool, int, float]</span>
+<span class="sd">            How to treat missing values. True enables extrapolation, False disables extrapolation and the spectrum will</span>
+<span class="sd">            be truncated. If a numeric value is given, the missing values will be filled with this value.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sqty : SpectralQty</span>
+<span class="sd">            The created spectral quantity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if both lengths are equal</span>
+        <span class="k">if</span> <span class="n">wl</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">qty</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="c1"># check if units are given. If not, add a dimensionless unit</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">qty</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">=</span> <span class="n">qty</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">=</span> <span class="n">qty</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Lengths not matching&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_value</span> <span class="o">=</span> <span class="n">fill_value</span></div>
+
+<div class="viewcode-block" id="SpectralQty.fromFile"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.fromFile">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wl_unit_default</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">qty_unit_default</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">fill_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new spectral quantity and read the values from a file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : str</span>
+<span class="sd">            Path to the file to read the values from. The file needs to provide two columns: wavelength</span>
+<span class="sd">            and the corresponding spectral quantity. The format of the file will be guessed by</span>
+<span class="sd">            `astropy.io.ascii.read()`. If the file doesn&#39;t provide units via astropy&#39;s enhanced CSV format, the units</span>
+<span class="sd">            will be read from the column headers or otherwise assumed to be *wl_unit_default* and *qty_unit_default*.</span>
+<span class="sd">        wl_unit_default : Quantity</span>
+<span class="sd">            Default unit to be used for the wavelength column if no units are provided by the file.</span>
+<span class="sd">        qty_unit_default : Quantity</span>
+<span class="sd">            Default unit to be used for the quantity column if no units are provided by the file.</span>
+<span class="sd">        fill_value : Union[bool, int, float]</span>
+<span class="sd">            How to treat missing values. True enables extrapolation, False disables extrapolation and the spectrum will</span>
+<span class="sd">            be truncated. If a numeric value is given, the missing values will be filled with this value.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sqty : SpectralQty</span>
+<span class="sd">            The created spectral quantity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Read the file</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">readCSV</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="p">[</span><span class="n">wl_unit_default</span><span class="p">,</span> <span class="n">qty_unit_default</span><span class="p">]</span> <span class="k">if</span> <span class="n">wl_unit_default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                       <span class="n">qty_unit_default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">colnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">quantity</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">colnames</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">quantity</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpectralQty.__str__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a SpectralQty object to a string representation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        precision : int</span>
+<span class="sd">            Precision of the printed values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ret : str</span>
+<span class="sd">            String representation of the object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wl_str</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">qty_str</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)):</span>
+            <span class="n">wl_str_temp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">.</span><span class="si">%d</span><span class="s2">g&quot;</span> <span class="o">%</span> <span class="n">precision</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">qty_str_temp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">.</span><span class="si">%d</span><span class="s2">g&quot;</span> <span class="o">%</span> <span class="n">precision</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">wl_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wl_str_temp</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wl_str_temp</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">qty_str_temp</span><span class="p">)),</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+            <span class="n">qty_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qty_str_temp</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wl_str_temp</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">qty_str_temp</span><span class="p">)),</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;Wavelength: [&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wl_str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;] &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span> <span class="o">+</span>\
+               <span class="s2">&quot;Quantitiy:  [&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qty_str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;] &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SpectralQty.__eq__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if this object is equal to another object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : SpectralQty</span>
+<span class="sd">            Object to compare with</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        res : bool</span>
+<span class="sd">            Result of the comparison</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="ow">and</span> \
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span> <span class="ow">and</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpectralQty.__add__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">]])</span> <span class="o">-&gt;</span>\
+            <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the sum with another object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Union[int, float, u.Quantity, &quot;SpectralQty&quot;, Callable]</span>
+<span class="sd">            Addend to be added to this object. If the binning of the object on the right hand side differs</span>
+<span class="sd">            from the binning of the left object, the object on the right hand side will be rebinned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sum : SpectralQty</span>
+<span class="sd">            The sum of both objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Summand is of type int or float, use same unit</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># Summand is of type Quantity</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">other</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Units are not matching for addition.&quot;</span><span class="p">)</span>
+        <span class="c1"># Summand is of type lambda</span>
+        <span class="k">elif</span> <span class="n">isLambda</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># Summand is of type SpectralQty</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="c1"># Wavelengths are matching, just add the quantities</span>
+                    <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Wavelengths are not matching, rebinning needed</span>
+                    <span class="n">other_rebinned</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">qty</span> <span class="o">+</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Units are not matching for addition.&quot;</span><span class="p">)</span></div>
+
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
+
+<div class="viewcode-block" id="SpectralQty.__sub__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__sub__">[docs]</a>    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">]])</span> <span class="o">-&gt;</span>\
+            <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the difference to another object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Union[int, float, u.Quantity, &quot;SpectralQty&quot;, Callable]</span>
+<span class="sd">            Subtrahend to be subtracted from this object. If the binning of the object on the right hand side differs</span>
+<span class="sd">            from the binning of the left object, the object on the right hand side will be rebinned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        diff : SpectralQty</span>
+<span class="sd">            The difference of both objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Subtrahend is of type int or float, use same unit</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">-</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># Subtrahend is of type Quantity</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">-</span> <span class="n">other</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Units are not matching for subtraction.&#39;</span><span class="p">)</span>
+        <span class="c1"># Subtrahend is of type lambda</span>
+        <span class="k">elif</span> <span class="n">isLambda</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">-</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># Subtrahend is of type SpectralQty</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+                <span class="c1"># Wavelengths are matching, just subtract the quantities</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                <span class="c1"># Wavelengths are not matching, rebinning needed</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Rebin subtrahend</span>
+                    <span class="n">other_rebinned</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">-</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">qty</span> <span class="o">-</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Units are not matching for substraction.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpectralQty.__mul__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__mul__">[docs]</a>    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">]])</span> <span class="o">-&gt;</span>\
+            <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the product with another object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Union[int, float, u.Quantity, &quot;SpectralQty&quot;, Callable]</span>
+<span class="sd">            Factor to be multiplied with this object. If the binning of the object on the right hand side differs</span>
+<span class="sd">            from the binning of the left object, the object on the right hand side will be rebinned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        prod : SpectralQty</span>
+<span class="sd">            The product of both objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Factor is of type int, float or Quantity, just multiply</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">*</span> <span class="n">other</span><span class="p">)</span>
+        <span class="c1"># Factor is of type lambda</span>
+        <span class="k">elif</span> <span class="n">isLambda</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">*</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># Factor is of type SpectralQty</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+                <span class="c1"># Wavelengths are matching, just multiply the quantities</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                <span class="c1"># Wavelengths are not matching, rebinning needed</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Rebin factor</span>
+                    <span class="n">other_rebinned</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">*</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">qty</span> <span class="o">*</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Units are not matching for multiplication.&quot;</span><span class="p">)</span></div>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+<div class="viewcode-block" id="SpectralQty.__truediv__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__truediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">]])</span> <span class="o">-&gt;</span>\
+            <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the quotient with another object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Union[int, float, u.Quantity, &quot;SpectralQty&quot;, Callable]</span>
+<span class="sd">            Divisor for this object. If the binning of the object on the right hand side differs</span>
+<span class="sd">            from the binning of the left object, the object on the right hand side will be rebinned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        quot : SpectralQty</span>
+<span class="sd">            The quotient of both objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Factor is of type int, float or Quantity, just multiply</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span>
+        <span class="c1"># Factor is of type lambda</span>
+        <span class="k">elif</span> <span class="n">isLambda</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">/</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># Factor is of type SpectralQty</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+                <span class="c1"># Wavelengths are matching, just multiply the quantities</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                <span class="c1"># Wavelengths are not matching, rebinning needed</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Rebin factor</span>
+                    <span class="n">other_rebinned</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">==</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">/</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Wavelengths are still not matching as extrapolation is disabled, rebin this spectral quantity</span>
+                        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">other_rebinned</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">qty</span> <span class="o">/</span> <span class="n">other_rebinned</span><span class="o">.</span><span class="n">qty</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Units are not matching for division.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpectralQty.__pow__"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.__pow__">[docs]</a>    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raise to spectral quantity to the given power.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Union[int, float]</span>
+<span class="sd">            The exponent for this object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        prod : SpectralQty</span>
+<span class="sd">            The spectral quantity raised to the given power.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Factor is of type int, float or Quantity, just multiply</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span> <span class="o">**</span> <span class="n">other</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpectralQty.rebin"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.rebin">[docs]</a>    <span class="k">def</span> <span class="nf">rebin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wl</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SpectralQty&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resample the spectral quantity sqty(wl) over the new grid wl, rebinning if necessary, otherwise interpolates.</span>
+<span class="sd">        Copied from ExoSim (https://github.com/ExoSim/ExoSimPublic).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wl : Quantity</span>
+<span class="sd">            new binned wavelengths</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sqty : SpectralQty</span>
+<span class="sd">            The rebinned spectral quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Mismatching units for rebinning: &quot;</span> <span class="o">+</span> <span class="n">wl</span><span class="o">.</span><span class="n">unit</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">wl</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">wl</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">or</span> <span class="n">wl</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">wl</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fill_value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_value</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Extrapolation disabled, bandwidth will be reduced.&quot;</span><span class="p">)</span>
+                    <span class="c1"># Remove new wavelengths where extrapolation would have been necessary</span>
+                    <span class="n">wl</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wl</span> <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)]</span> <span class="o">*</span> <span class="n">wl</span><span class="o">.</span><span class="n">unit</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s2">&quot;extrapolate&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_fill_value</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SpectralQty</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">wl</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpectralQty.integrate"><a class="viewcode-back" href="../../../api/esbo_etc.classes.html#esbo_etc.classes.SpectralQty.SpectralQty.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrate the spectral quantity over the given spectrum using</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int : Quantity</span>
+<span class="sd">            The integrated quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">trapz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qty</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Radiant Interface &mdash; ESBO-ETC 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ESBO-ETC
+          
+
+          
+            
+            <img src="../_static/ESBOds_LOGO.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.html">Building the Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output/output.html">Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ESBO-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Radiant Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <p>For modelling the radiation transportation, the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a> was used as shown in the figure below.</p>
+<div class="figure align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/decorator_pattern.png"><img alt="Decorator Pattern" src="../_images/decorator_pattern.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text">The decorator pattern used for the radiation transportation.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>The radiation transportation pipeline consists always of a single target emitting the signal radiation.
+This target may be encapsulated by multiple optical components which manipulate the radiation by either adding their own background radiation or by decreasing the transmitted radiation.
+The outermost part of the radiation transportation pipeline is formed by some kind of sensor component, detecting the radiation.
+The quality of the detected signal can then be determined by calculating the signal to noise ration (SNR).</p>
+<div class="figure align-default" id="id2">
+<img alt="Class Diagram" src="../_images/class_diagram.png" />
+<p class="caption"><span class="caption-text">Class diagram of the software architecture.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="radiant-interface">
+<h1>Radiant Interface<a class="headerlink" href="#radiant-interface" title="Permalink to this headline">¶</a></h1>
+<div class="figure align-default" id="id3">
+<img alt="Interface IRadiant" src="../_images/IRadiant.png" />
+<p class="caption"><span class="caption-text">Class diagram of the interface IRadiant.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>In order to implement the aforementioned radiation transportation pipeline, a sophisticated software architecture has been designed.
+As shown in the class diagram, the class <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code> forms the backbone of the structure.
+This interface class defines the two methods <code class="docutils literal notranslate"><span class="pre">calcSignal()</span></code> and <code class="docutils literal notranslate"><span class="pre">calcBackground()</span></code> and therefore the basic layout of all decorated classes.
+All targets and optical components implement this interface in oder to allow the cascading calculation of the signal and background fluxes.
+For both targets and optical components exists an abstract superclass which implements the required interface. This allows the actual
+classes to focus on the initialization and calculation of their own properties, ignoring the implementation of the interface.</p>
+<div class="section" id="target">
+<h2>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-default" id="id4">
+<img alt="Target Classes" src="../_images/Target.png" />
+<p class="caption"><span class="caption-text">Class diagram of the target classes.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> implements the interface provided by <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code> and provides the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> which is used to check the relevant parts of the configuration file for this component.
+All available target types must inherit from <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> and therefore must implement the method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code>.
+As the superclass <code class="docutils literal notranslate"><span class="pre">ATarget</span></code> implements the interface provided by <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code>, the compatibility to the radiation transportation pipeline is ensured.
+All subclasses therefore only set up a <code class="docutils literal notranslate"><span class="pre">SpectralQty</span></code>-object containing the emitted radiation and call the constructor of <code class="docutils literal notranslate"><span class="pre">ATarget</span></code>.</p>
+</div>
+<div class="section" id="optical-component">
+<h2>Optical Component<a class="headerlink" href="#optical-component" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-default" id="id5">
+<img alt="Optical component classes" src="../_images/OpticalComponent.png" />
+<p class="caption"><span class="caption-text">Class diagram of the optical components.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> implements the interface provided by <code class="docutils literal notranslate"><span class="pre">IRadiant</span></code> and thereby the two methods <code class="docutils literal notranslate"><span class="pre">calcSignal()</span></code> and <code class="docutils literal notranslate"><span class="pre">calcBackground()</span></code>.
+This includes the treatment of central obstruction of the components as well as transmittance / reflectance coefficients.
+Additionally, <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> provides the two methods <code class="docutils literal notranslate"><span class="pre">propagate()</span></code> for handling the propagation of incoming radiation through the optical component and <code class="docutils literal notranslate"><span class="pre">ownNoise()</span></code> for calculating the background radiation contribution of this component.
+The two function may be overwritten by the subclasses, if a custom implementation is necessary.
+Otherwise, the parameters <code class="docutils literal notranslate"><span class="pre">transreflectivity</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code> of the constructor method will be used for the calculations.
+In order to check the relevant parts of the configuration file for this component, the class provides the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> which has to be implement by all subclasses.</p>
+<p>According to the restrictions above, subclasses of <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> can be implemented in two possible ways: either by providing the parameters <code class="docutils literal notranslate"><span class="pre">transreflectivity</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code> to the constructor of the superclass or by implementing the two methods <code class="docutils literal notranslate"><span class="pre">propagate()</span></code> and <code class="docutils literal notranslate"><span class="pre">ownNoise()</span></code>.</p>
+<div class="section" id="hot-optical-component">
+<h3>Hot Optical Component<a class="headerlink" href="#hot-optical-component" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id6">
+<img alt="Hot optical component classes" src="developer/images/HotOpticalComponent.png" />
+<p class="caption"><span class="caption-text">Class diagram of the hot optical components.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> extends the abstract superclass <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code> by implementing the method <code class="docutils literal notranslate"><span class="pre">ownNoise()</span></code> assuming grey body radiation in order to model optical components with a thermal background contribution.
+This has the consequence, that every subclass of <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> must implement the method <code class="docutils literal notranslate"><span class="pre">propagate()</span></code>, which handles to propagation of the signal and background radiation through the component.
+Like <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code>, the class <code class="docutils literal notranslate"><span class="pre">AHotOpticalComponent</span></code> provides the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> for checking the configuration file.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sensor">
+<h1>Sensor<a class="headerlink" href="#sensor" title="Permalink to this headline">¶</a></h1>
+<div class="figure align-default" id="id7">
+<img alt="Sensor classes" src="../_images/Sensor.png" />
+<p class="caption"><span class="caption-text">Class diagram of the sensor components.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract class <code class="docutils literal notranslate"><span class="pre">ASensor</span></code> is the superclass that must be subclassed by every sensor class.
+It provides the three abstract methods <code class="docutils literal notranslate"><span class="pre">calcSNR()</span></code>, <code class="docutils literal notranslate"><span class="pre">calcExpTime()</span></code> and <code class="docutils literal notranslate"><span class="pre">calSensitivity()</span></code> which must be implemented by the subclasses.
+These three abstract methods act as interface for the processing and evaluation of the incoming radiation in the detector.
+<code class="docutils literal notranslate"><span class="pre">getSNR()</span></code>, <code class="docutils literal notranslate"><span class="pre">getExpTime()</span></code> and <code class="docutils literal notranslate"><span class="pre">getSensitivity()</span></code> are called by the main application to trigger the evaluation of the radiation transportation pipeline and the subsequent calculation of the desired quantity.
+Additionally, <code class="docutils literal notranslate"><span class="pre">ASensor</span></code> defines the abstract method <code class="docutils literal notranslate"><span class="pre">checkConfig()</span></code> to allow the check of the sensor-configuration.</p>
+</div>
+<div class="section" id="psf">
+<h1>PSF<a class="headerlink" href="#psf" title="Permalink to this headline">¶</a></h1>
+<div class="figure align-default" id="id8">
+<img alt="PSF classes" src="../_images/PSF.png" />
+<p class="caption"><span class="caption-text">Class diagram of the PSF classes.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
+<p>For modelling the diffraction behaviour of the telescope, the interface <code class="docutils literal notranslate"><span class="pre">IPSF</span></code> defines the necessary methods.
+Currently, two different implementations of PSFs are available: the class <code class="docutils literal notranslate"><span class="pre">Airy</span></code> allows to model the PSF as an airy disk, whereas the class <code class="docutils literal notranslate"><span class="pre">Zemax</span></code> allows to use a PSF calculated by the software Zemax.
+Both classes allow the computation of the reduced observation angle for a given encircled energy and the mapping of the PSF onto an pixel grid.</p>
+</div>
+<div class="section" id="factories">
+<h1>Factories<a class="headerlink" href="#factories" title="Permalink to this headline">¶</a></h1>
+<p>In order to instantiate the corresponding objects from the configuration file, the <a class="reference external" href="https://en.wikipedia.org/wiki/Factory_method_pattern">factory method pattern</a> was used.
+The following factory methods are responsible for transforming the parsed configuration into the cascaded radiation transportation pipeline.</p>
+<div class="figure align-default" id="id9">
+<img alt="Factory classes" src="../_images/Factory.png" />
+<p class="caption"><span class="caption-text">Class diagram of the factories.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+<p>The abstract superclass <code class="docutils literal notranslate"><span class="pre">AFactory</span></code> provides the abstract method <code class="docutils literal notranslate"><span class="pre">create()</span></code> to create any target, optical component and detector object.
+Additionally, the method <code class="docutils literal notranslate"><span class="pre">collectOptions()</span></code> allows to collect all options from the parsed configuration as dictionary for the constructor call of the corresponding class.</p>
+<p>The class <code class="docutils literal notranslate"><span class="pre">TargetFactory</span></code> is responsible for the instantiation of all subclasses of <code class="docutils literal notranslate"><span class="pre">ATarget</span></code>.
+In contrast, the class <code class="docutils literal notranslate"><span class="pre">OpticalComponentFactory</span></code> handles the creation of all subclasses of <code class="docutils literal notranslate"><span class="pre">AOpticalComponent</span></code>.
+It provides the method <code class="docutils literal notranslate"><span class="pre">fromConfigBatch</span></code> to set up a batch of optical components.
+Finally, the class <code class="docutils literal notranslate"><span class="pre">SensorFactory</span></code> is responsible for the instantiation of all subclasses of <code class="docutils literal notranslate"><span class="pre">ASensor</span></code>.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Lukas Klass, Philipp Maier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
