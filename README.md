@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/LukasK13/ESBO-ETC.svg?branch=master)](https://travis-ci.com/LukasK13/ESBO-ETC)
+[![Test Application](https://github.com/LukasK13/ESBO-ETC/workflows/Test%20Application/badge.svg)](https://github.com/LukasK13/ESBO-ETC/actions)
+[![Deploy Docs](https://github.com/LukasK13/ESBO-ETC/workflows/Deploy%20Docs/badge.svg)](https://github.com/LukasK13/ESBO-ETC/actions)
 
 # ESBO-ETC
 A modular exposure time calculator for the ESBO telescope.
