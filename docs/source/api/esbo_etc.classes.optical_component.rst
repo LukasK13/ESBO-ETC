@@ -20,6 +20,14 @@ esbo\_etc.classes.optical\_component.AOpticalComponent module
    :undoc-members:
    :show-inheritance:
 
+esbo\_etc.classes.optical\_component.ATRAN module
+-------------------------------------------------
+
+.. automodule:: esbo_etc.classes.optical_component.ATRAN
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 esbo\_etc.classes.optical\_component.Atmosphere module
 ------------------------------------------------------
 

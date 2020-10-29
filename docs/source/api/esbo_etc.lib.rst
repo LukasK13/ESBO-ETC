@@ -4,6 +4,14 @@ esbo\_etc.lib package
 Submodules
 ----------
 
+esbo\_etc.lib.cache module
+--------------------------
+
+.. automodule:: esbo_etc.lib.cache
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 esbo\_etc.lib.helpers module
 ----------------------------
 

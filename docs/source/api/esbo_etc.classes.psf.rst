@@ -4,10 +4,26 @@ esbo\_etc.classes.psf package
 Submodules
 ----------
 
+esbo\_etc.classes.psf.AGriddedPSF module
+----------------------------------------
+
+.. automodule:: esbo_etc.classes.psf.AGriddedPSF
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 esbo\_etc.classes.psf.Airy module
 ---------------------------------
 
 .. automodule:: esbo_etc.classes.psf.Airy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+esbo\_etc.classes.psf.FITS module
+---------------------------------
+
+.. automodule:: esbo_etc.classes.psf.FITS
    :members:
    :undoc-members:
    :show-inheritance:
