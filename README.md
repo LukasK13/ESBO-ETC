@@ -1,4 +1,4 @@
-[![Build Status](http://esbo-ds.irs.uni-stuttgart.de:8080/buildStatus/icon?job=ESBO-ETC)](http://esbo-ds.irs.uni-stuttgart.de:8080/job/ESBO-ETC/)
+[![Build Status](https://travis-ci.com/LukasK13/ESBO-ETC.svg?branch=master)](https://travis-ci.com/LukasK13/ESBO-ETC)
 
 # ESBO-ETC
 A modular exposure time calculator for the ESBO telescope.
