@@ -1,7 +1,15 @@
 ESBO-ETC can be easily extended by adding new targets, new optical components or a new detector component.
 In the following, only the minimal required changes in the source code are described.
-Of course, the documentation must be edited as well if new components are added.
+Of course, the documentation must be edited as well if new components are added and corresponding build tests should be defined.
+Before any changes can be committed to the repository, the developer must ensure that all build tests pass.
+The build tests can be started by running
 
+.. code-block:: bash
+    :linenos:
+
+    venv/bin/python3 -m unittest discover tests
+
+in the console in the project's root directory.
 
 Adding Targets
 --------------
