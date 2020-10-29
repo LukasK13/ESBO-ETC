@@ -314,7 +314,7 @@ Attributes:
       |   The unit of the observed line wavelength. This has to be on of [``nm``, ``um``, ``mm``, ``cm``, ``m``, ``Hz``, ``kHZ``, ``MHz``, ``GHz``, ``THz``].
 
 lambda_local_oscillator
-^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 The wavelength or frequency of the local oscillator. This parameter is optional. If no value is given, the noise temperature of the signal band is doubled.
 
 .. code-block:: xml
